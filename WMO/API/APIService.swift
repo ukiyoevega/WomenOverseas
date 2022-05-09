@@ -7,9 +7,18 @@
 
 import Foundation
 
+
 public struct APIService {
     let baseURL = URL(string: "https://www.womenoverseas.com")!
-    var apiKey = ""
+    var apiKey: String {
+        get {
+            UserDefaults.standard.string(forKey: "com.womenoverseas.apiKey") ?? ""
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "com.womenoverseas.apiKey")
+
+        }
+    }
     public static var shared = APIService()
     let decoder = JSONDecoder()
     

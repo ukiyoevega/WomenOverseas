@@ -15,19 +15,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         let contentView = LoginView()
-        
         if let windowScene = scene as? UIWindowScene {
-            
             let window = UIWindow(windowScene: windowScene)
-            window.rootViewController = UIHostingController(rootView: contentView)
+            let key = APIService.shared.apiKey
+            if key.isEmpty {
+                window.rootViewController = UIHostingController(rootView: contentView)
+            } else {
+                let tab = TabbarView(link: nil).accentColor(Color("button_pink", bundle: nil))
+                window.rootViewController = UIHostingController(rootView: tab)
+            }
             self.window = window
             window.makeKeyAndVisible()
         }
-                
-//        AppUserDefaults.shared.numberOfLaunch += 1
-//        if AppUserDefaults.shared.numberOfLaunch == 3 {
-//            SKStoreReviewController.requestReview()
-//        }
     }
 
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        if let url = userActivity.webpageURL, url.path.contains("topic") {
+            let tabview = TabbarView(link: url.absoluteString).accentColor(Color("button_pink", bundle: nil))
+            self.window?.rootViewController = UIHostingController(rootView: tabview)
+        }
+    }
 }

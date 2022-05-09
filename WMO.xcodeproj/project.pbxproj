@@ -10,7 +10,6 @@
 		B2AA08762814330D0065A30E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA08752814330D0065A30E /* SceneDelegate.swift */; };
 		B2AA0878281433F80065A30E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA0877281433F80065A30E /* AppDelegate.swift */; };
 		B2EE551428119AE6008A8DD5 /* TabbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EE551328119AE6008A8DD5 /* TabbarView.swift */; };
-		B2EE551628119AE6008A8DD5 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EE551528119AE6008A8DD5 /* MainView.swift */; };
 		B2EE551828119AE9008A8DD5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2EE551728119AE9008A8DD5 /* Assets.xcassets */; };
 		B2EE551B28119AE9008A8DD5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2EE551A28119AE9008A8DD5 /* Preview Assets.xcassets */; };
 		B2EE552728123363008A8DD5 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EE552628123363008A8DD5 /* APIService.swift */; };
@@ -27,11 +26,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B29E33BE2828DA2D00F6F548 /* WMO.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WMO.entitlements; sourceTree = "<group>"; };
 		B2AA08752814330D0065A30E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		B2AA0877281433F80065A30E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B2EE551028119AE6008A8DD5 /* WMO.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WMO.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2EE551328119AE6008A8DD5 /* TabbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabbarView.swift; sourceTree = "<group>"; };
-		B2EE551528119AE6008A8DD5 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		B2EE551728119AE9008A8DD5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B2EE551A28119AE9008A8DD5 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B2EE552628123363008A8DD5 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
@@ -78,8 +77,8 @@
 		B2EE551228119AE6008A8DD5 /* WMO */ = {
 			isa = PBXGroup;
 			children = (
+				B29E33BE2828DA2D00F6F548 /* WMO.entitlements */,
 				B2EE598D2812E2EF008A8DD5 /* Info.plist */,
-				B2EE551528119AE6008A8DD5 /* MainView.swift */,
 				B2AA0877281433F80065A30E /* AppDelegate.swift */,
 				B2AA08752814330D0065A30E /* SceneDelegate.swift */,
 				B2EE553028124113008A8DD5 /* LoginView.swift */,
@@ -219,7 +218,6 @@
 				B2EE5689281255C6008A8DD5 /* EndPoint.swift in Sources */,
 				B2AA0878281433F80065A30E /* AppDelegate.swift in Sources */,
 				B2EE59872812B507008A8DD5 /* ASN1Parser.swift in Sources */,
-				B2EE551628119AE6008A8DD5 /* MainView.swift in Sources */,
 				B2EE59892812BC1C008A8DD5 /* APIRequest.Key.swift in Sources */,
 				B2EE552728123363008A8DD5 /* APIService.swift in Sources */,
 				B2EE551428119AE6008A8DD5 /* TabbarView.swift in Sources */,
@@ -352,14 +350,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = WMO/WMO.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WMO/Preview Content\"";
-				DEVELOPMENT_TEAM = X6YLL7FPZ2;
+				DEVELOPMENT_TEAM = Y3927VSTTA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WMO/Info.plist;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "她乡";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -383,14 +382,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = WMO/WMO.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WMO/Preview Content\"";
-				DEVELOPMENT_TEAM = X6YLL7FPZ2;
+				DEVELOPMENT_TEAM = Y3927VSTTA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WMO/Info.plist;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "她乡";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

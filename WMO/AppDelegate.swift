@@ -14,7 +14,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-//        UIApplication.shared.registerForRemoteNotifications()
         let window = UIWindow(frame: UIScreen.main.bounds)
         let controller = UIHostingController(rootView:
             LoginView()
@@ -22,45 +21,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window.rootViewController = controller
         self.window = window
         window.makeKeyAndVisible()
-        print("Your code here")
         return true
     }
-
-    // MARK: UISceneSession Lifecycle
-//    func application(_ application: UIApplication,
-//                     configurationForConnecting connectingSceneSession: UISceneSession,
-//                     options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-//        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
-//    }
-//    
-//    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) {
-//        
-//    }
+    
+    func application(_ application: UIApplication, willContinueUserActivityWithType userActivityType: String) -> Bool {
+        print("UIApplication willContinueUserActivityWithType userActivityType \(userActivityType)")
+        return true
+    }
+    
+    func application(_ application: UIApplication, didUpdate userActivity: NSUserActivity) {
+        print("UIApplication didUpdate userActivity \(userActivity)")
+    }
+    
+    func application(_ application: UIApplication, didFailToContinueUserActivityWithType userActivityType: String, error: Error) {
+        print("UIApplication didFailToContinueUserActivityWithType \(error)")
+    }
+    
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        print("UIApplication continue userActivity \(userActivity)")
+        if let url = userActivity.webpageURL?.path {
+            print("continue userActivity \(url)")
+            let tabview = TabbarView(link: url).accentColor(Color("button_pink", bundle: nil))
+            self.window?.rootViewController = UIHostingController(rootView: tabview)
+            return true
+        }
+        return false
+    }
 }
-
-//
-//@available(iOS 14.0, macOS 10.16, *)
-//@main
-//struct MainView: App {
-//
-//    init() {
-//        setupApperance()
-//    }
-//
-//    var body: some Scene {
-//        WindowGroup {
-//            LoginView()
-//        }
-//    }
-//
-//    private func setupApperance() {
-//        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.red,
-//                                                                 .font: UIFont.systemFont(ofSize: 40)]
-//        UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor.green,
-//                                                            .font: UIFont.systemFont(ofSize: 18)]
-//        UIBarButtonItem.appearance().setTitleTextAttributes([.foregroundColor: UIColor.blue,
-//                                                             .font: UIFont.systemFont(ofSize: 16)], for: .normal)
-//        UIWindow.appearance().tintColor = UIColor.systemPink
-//    }
-//}
-//

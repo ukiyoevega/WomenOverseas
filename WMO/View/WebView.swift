@@ -51,9 +51,11 @@ class WebviewController: UIViewController {
         webview.navigationDelegate = self
         view.addSubview(webview)
         
-        webview.frame = self.view.frame
+        webview.frame = view.frame
+        webview.scrollView.showsHorizontalScrollIndicator = false
+        webview.scrollView.delegate = self
         webview.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addConstraints([
+        view.addConstraints([
             webview.topAnchor.constraint(equalTo: self.view.topAnchor),
             webview.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
             webview.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
@@ -61,16 +63,40 @@ class WebviewController: UIViewController {
         ])
         
         webview.addSubview(self.progressbar)
-        self.setProgressBarPosition()
+        setProgressBarPosition()
+//        setupGesture()
+        webview.allowsBackForwardNavigationGestures = true
+        webview.scrollView.addObserver(self, forKeyPath: "contentOffset", options: .new, context: nil)
         
-                webview.scrollView.addObserver(self, forKeyPath: "contentOffset", options: .new, context: nil)
+        progressbar.progress = 0.1
+        //        webview.observe(\.estimatedProgress) { [weak self] webview, changed in
+        //            print("WKWebView estiamted Progress \(webview.estimatedProgress)")
+        //            self?.progressbar.progress = Float(webview.estimatedProgress)
+        //        }
+        webview.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
+    }
+    
+    func setupGesture() {
+        let swipeLeftRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(recognizer:)))
+        let swipeRightRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(recognizer:)))
+        swipeLeftRecognizer.direction = .left
+        swipeRightRecognizer.direction = .right
+        webview.addGestureRecognizer(swipeLeftRecognizer)
+        webview.addGestureRecognizer(swipeRightRecognizer)
+    }
+    
+    @objc private func handleSwipe(recognizer: UISwipeGestureRecognizer) {
+        if (recognizer.direction == .left) {
+            if webview.canGoForward {
+                webview.goForward()
+            }
+        }
         
-        self.progressbar.progress = 0.1
-//        webview.observe(\.estimatedProgress) { [weak self] webview, changed in
-//            print("WKWebView estiamted Progress \(webview.estimatedProgress)")
-//            self?.progressbar.progress = Float(webview.estimatedProgress)
-//        }
-                webview.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
+        if (recognizer.direction == .right) {
+            if webview.canGoBack {
+                webview.goBack()
+            }
+        }
     }
     
     func setProgressBarPosition() {
@@ -97,12 +123,20 @@ class WebviewController: UIViewController {
                 self.progressbar.alpha = 1.0
                 progressbar.setProgress(Float(webview.estimatedProgress), animated: true)
             }
-
+            
         case "contentOffset":
             self.setProgressBarPosition()
-
+            
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        }
+    }
+}
+
+extension WebviewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if (scrollView.contentOffset.x > 0) {
+            scrollView.contentOffset = CGPoint(x: 0, y: scrollView.contentOffset.y)
         }
     }
 }
@@ -136,7 +170,7 @@ extension WebviewController: WKNavigationDelegate {
         else {
             return
         }
-        let tabview = TabbarView().accentColor(Color("button_pink", bundle: nil))
+        let tabview = TabbarView(link: nil).accentColor(Color("button_pink", bundle: nil))
         sceneDelegate.window?.rootViewController = UIHostingController(rootView: tabview)
     }
     
@@ -150,6 +184,12 @@ extension WebviewController: WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        let removeElementScript = "document.querySelector('.d-tab-bar').style.display='none';"
+        webView.evaluateJavaScript(removeElementScript) { (response, error) in
+            if let error = error {
+                print(error.localizedDescription) // TODO: toast error
+            }
+        }
     }
     
     private func decrypted(rawData: String, with key: SecKey, algorithm: SecKeyAlgorithm) throws -> [String: Any] {
