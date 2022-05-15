@@ -9,12 +9,23 @@ import SwiftUI
 import WebKit
 import CryptoKit
 
+private let refConLength: CGFloat = 50
+private let refDropHeight: CGFloat = 70
+
 struct Webview: UIViewControllerRepresentable {
+        
+    let type: TabbarView.Tab
     let url: URL
-    let sedKey: SecKey?
+    let secKey: SecKey?
+    
+    init(type: TabbarView.Tab, url: URL, secKey: SecKey? = nil) {
+        self.type = type
+        self.url = url
+        self.secKey = secKey
+    }
     
     func makeUIViewController(context: Context) -> WebviewController {
-        let webviewController = WebviewController(seckKey: self.sedKey)
+        let webviewController = WebviewController(seckKey: self.secKey, type: type, preloadLatest: false)
         var urlRequest = URLRequest(url: self.url)
         if !APIService.shared.apiKey.isEmpty {
             urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")
@@ -23,96 +34,73 @@ struct Webview: UIViewControllerRepresentable {
         return webviewController
     }
     
-    func updateUIViewController(_ webviewController: WebviewController, context: Context) {}
+    func updateUIViewController(_ webviewController: WebviewController, context: Context) {
+    }
+
 }
 
 class WebviewController: UIViewController {
+    
+    enum RemoveElement: String {
+        case header = "d-header-wrap"
+        case tabbar = "d-tab-bar"
+    }
+    
     private let secKey: SecKey?
+    private let type: TabbarView.Tab
+    private let refreshControl = UIRefreshControl()
+    private var webViewTopConstraint: NSLayoutConstraint?
+    
     lazy public var webview: WKWebView = WKWebView()
     lazy private var progressbar: UIProgressView = UIProgressView()
     
-    init(seckKey: SecKey?) {
+    init(seckKey: SecKey?, type: TabbarView.Tab, preloadLatest: Bool = false) {
         self.secKey = seckKey
+        self.type = type
         super.init(nibName: nil, bundle: nil)
+        if preloadLatest, let url = URL(string: "https://womenoverseas.com/latest") {
+            self.webview.load(URLRequest(url: url))
+        }
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    deinit {
-        //        webview.removeObserver(self, forKeyPath: "estimatedProgress")
-        //        webview.scrollView.removeObserver(self, forKeyPath: "contentOffset")
-    }
+    private var estimatedProgressObserve: NSKeyValueObservation?
+    private var conentOffsetObserve: NSKeyValueObservation?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        webview.navigationDelegate = self
+        view.backgroundColor = .white
+        setupSubviews()
+        setupObservers()
+    }
+    
+    private func setupSubviews() {
         view.addSubview(webview)
-        
+        webview.backgroundColor = .white
         webview.frame = view.frame
-        webview.scrollView.showsHorizontalScrollIndicator = false
-        webview.scrollView.delegate = self
-        webview.translatesAutoresizingMaskIntoConstraints = false
-        view.addConstraints([
-            webview.topAnchor.constraint(equalTo: self.view.topAnchor),
-            webview.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
-            webview.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            webview.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-        ])
-        
-        webview.addSubview(self.progressbar)
-        setProgressBarPosition()
-//        setupGesture()
+        webview.navigationDelegate = self
         webview.allowsBackForwardNavigationGestures = true
-        webview.scrollView.addObserver(self, forKeyPath: "contentOffset", options: .new, context: nil)
-        
+        webview.scrollView.showsHorizontalScrollIndicator = false
+        webview.scrollView.contentSize = view.bounds.size
+        webview.scrollView.delegate = self
+        webview.addSubview(self.progressbar)
         progressbar.progress = 0.1
-        //        webview.observe(\.estimatedProgress) { [weak self] webview, changed in
-        //            print("WKWebView estiamted Progress \(webview.estimatedProgress)")
-        //            self?.progressbar.progress = Float(webview.estimatedProgress)
-        //        }
-        webview.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
+        setProgressBarPosition()
+        /*
+        webview.scrollView.addSubview(refreshControl)
+        refreshControl.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
+        refreshControl.tintColor = UIColor.systemPink
+        refreshControl.frame.size = CGSize(width: 50, height: 50)
+         */
     }
     
-    func setupGesture() {
-        let swipeLeftRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(recognizer:)))
-        let swipeRightRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(recognizer:)))
-        swipeLeftRecognizer.direction = .left
-        swipeRightRecognizer.direction = .right
-        webview.addGestureRecognizer(swipeLeftRecognizer)
-        webview.addGestureRecognizer(swipeRightRecognizer)
-    }
-    
-    @objc private func handleSwipe(recognizer: UISwipeGestureRecognizer) {
-        if (recognizer.direction == .left) {
-            if webview.canGoForward {
-                webview.goForward()
-            }
-        }
-        
-        if (recognizer.direction == .right) {
-            if webview.canGoBack {
-                webview.goBack()
-            }
-        }
-    }
-    
-    func setProgressBarPosition() {
-        self.progressbar.translatesAutoresizingMaskIntoConstraints = false
-        webview.removeConstraints(webview.constraints)
-        webview.addConstraints([
-            self.progressbar.topAnchor.constraint(equalTo: webview.topAnchor, constant: webview.scrollView.contentOffset.y * -1),
-            self.progressbar.leadingAnchor.constraint(equalTo: webview.leadingAnchor),
-            self.progressbar.trailingAnchor.constraint(equalTo: webview.trailingAnchor),
-        ])
-    }
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        switch keyPath {
-        case "estimatedProgress":
-            if webview.estimatedProgress >= 1.0 {
+    private func setupObservers() {
+        estimatedProgressObserve = webview.observe(\.estimatedProgress, options: .new) { [weak self] webview, changed in
+            guard let self = self, let value = changed.newValue else { return }
+            if value >= 1.0 {
                 UIView.animate(withDuration: 0.3, animations: { () in
                     self.progressbar.alpha = 0.0
                 }, completion: { finished in
@@ -121,15 +109,32 @@ class WebviewController: UIViewController {
             } else {
                 self.progressbar.isHidden = false
                 self.progressbar.alpha = 1.0
-                progressbar.setProgress(Float(webview.estimatedProgress), animated: true)
+                self.progressbar.setProgress(Float(value), animated: true)
             }
-            
-        case "contentOffset":
-            self.setProgressBarPosition()
-            
-        default:
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
+        conentOffsetObserve = webview.scrollView.observe(\.contentOffset, options: .new) { [weak self] scrollView, changed in
+            self?.setProgressBarPosition()
+        }
+        NotificationCenter.default.addObserver(forName: .triggerScrollToTopAndRefresh, object: nil, queue: .main) { [weak self] noti in
+            guard let triggeredTab = noti.userInfo?["tab"] as? TabbarView.Tab, triggeredTab == self?.type else { return }
+            self?.refreshControl.endRefreshing()
+            self?.webview.scrollView.setContentOffset(CGPoint(x: 0, y: -refDropHeight), animated: true)
+        }
+    }
+    
+    @objc private func pullToRefresh() {
+        webview.reload()
+        refreshControl.endRefreshing()
+    }
+    
+    private func setProgressBarPosition() {
+        self.progressbar.translatesAutoresizingMaskIntoConstraints = false
+        webview.removeConstraints(webview.constraints)
+        webview.addConstraints([
+            self.progressbar.topAnchor.constraint(equalTo: webview.topAnchor, constant: webview.scrollView.contentOffset.y * -1),
+            self.progressbar.leadingAnchor.constraint(equalTo: webview.leadingAnchor),
+            self.progressbar.trailingAnchor.constraint(equalTo: webview.trailingAnchor),
+        ])
     }
 }
 
@@ -144,6 +149,8 @@ extension WebviewController: UIScrollViewDelegate {
 extension WebviewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        print("route to \(navigationAction.request.url)")
+        var payloadDecrypted = false
         if let url = webView.url, let secKey = self.secKey,
            let components = URLComponents(string: url.absoluteString),
            let payload = components.queryItems?.first(where: { $0.name == "payload" })?.value {
@@ -151,17 +158,40 @@ extension WebviewController: WKNavigationDelegate {
                 let trimmedPayload = String(payload.filter { !" \n".contains($0) })
                 let decryptedJsonString = try decrypted(rawData: trimmedPayload, with: secKey, algorithm: .rsaEncryptionPKCS1)
                 APIService.shared.apiKey = decryptedJsonString["key"] as? String ?? ""
+                payloadDecrypted = true
             } catch {
                 print(error) // TODO: error handling
             }
         }
-        if let navigationScheme = navigationAction.request.url?.scheme, ["http", "https"].contains(navigationScheme) {
-            return decisionHandler(.allow)
+        decisionHandler(.allow)
+        if payloadDecrypted { // dismiss if payload decrypted
+            self.dismiss(animated: true) {
+                self.routeToTab()
+            }
+        } else if let nextURL = navigationAction.request.url, nextURL.absoluteString != self.webview.url?.absoluteString {
+            if nextURL.host == "womenoverseas.com" {
+                webView.load(navigationAction.request)
+            } else if canOpenHomePageBottomItems(nextURL) {
+                UIApplication.shared.open(nextURL)
+            }
         }
-        decisionHandler(.cancel) // dismiss if payload decrypted
-        self.dismiss(animated: true) {
-            self.routeToTab()
-        }
+    }
+    
+    func canOpenHomePageBottomItems(_ url: URL) -> Bool {
+        let bottomLinks = [
+         "mailto:womenoverseas.taxiang@gmail.com",
+         "https://blog.womenoverseas.com/",
+         "https://mp.weixin.qq.com/s?__biz=MzAwMTMyNjA1Nw==&mid=2451850815&idx=1&sn=fe03c92f701f50306a513e9194ad2746&chksm=8d0b88b9ba7c01af2cda70bf1834ba68cd46892d640a7920bc3912fd1b64d57b5cbb56c65678&token=562956425&lang=zh_CN#rd",
+         "https://www.xiaohongshu.com/user/profile/604595aa0000000001004db3?xhsshare=CopyLink&appuid=5ba493a1bcc119000128062f&apptime=1615355488",
+         "https://pod.link/1549407631",
+         "https://weibo.com/u/7574581372?refer_flag=1005055010_&is_all=1",
+         "https://mp.weixin.qq.com/s/XqM5cdW_q0XeX7X-zXErYA",
+         "https://t.me/womenoverseas",
+         "https://pod.link/1549407631",
+         "https://www.youtube.com/channel/UCFDELGqbjkz9v2vGM0d6HfA",
+         "https://www.instagram.com/womenoverseas/"
+         ]
+        return bottomLinks.contains(url.absoluteString)
     }
     
     func routeToTab() {
@@ -170,7 +200,7 @@ extension WebviewController: WKNavigationDelegate {
         else {
             return
         }
-        let tabview = TabbarView(link: nil).accentColor(Color("button_pink", bundle: nil))
+        let tabview = TabbarView(tab: .home, link: nil).accentColor(Color("button_pink", bundle: nil))
         sceneDelegate.window?.rootViewController = UIHostingController(rootView: tabview)
     }
     
@@ -181,15 +211,22 @@ extension WebviewController: WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        print("test error \(error.localizedDescription)")
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard let url = webview.url?.absoluteString else { return }
+        let featured = "精华贴".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "featured"
+        removeElement(.tabbar)
+        let headerAvoiding = ["latest", featured, "topic", "upcoming-events"]
+        if headerAvoiding.map(url.contains).contains(true) && self.type != .home {
+            removeElement(.header)
+        }
     }
     
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        let removeElementScript = "document.querySelector('.d-tab-bar').style.display='none';"
-        webView.evaluateJavaScript(removeElementScript) { (response, error) in
-            if let error = error {
-                print(error.localizedDescription) // TODO: toast error
-            }
-        }
+    private func removeElement(_ type: RemoveElement) {
+        let removeElementScript = "document.querySelector('.\(type.rawValue)').style.display='none';"
+        webview.evaluateJavaScript(removeElementScript, completionHandler: nil) // TODO: error handling
     }
     
     private func decrypted(rawData: String, with key: SecKey, algorithm: SecKeyAlgorithm) throws -> [String: Any] {

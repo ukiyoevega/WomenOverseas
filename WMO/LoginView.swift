@@ -41,7 +41,7 @@ struct LoginView: View {
                 .sheet(isPresented: $showWebView) {
                     let request = ApiKeyRequest()
                     if let url = try? request.absoluteURL(), let secKey = request.keyPair {
-                        Webview(url: url, sedKey: secKey)
+                        Webview(type: .none, url: url, secKey: secKey)
                     }
                 }
                 HStack(spacing: 2) {
