@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 
+private let iconWidth: CGFloat = 50
 private let itemVerticalSpacing: CGFloat = 10
 private let titleFontSize: CGFloat = 15
 private let titleLineSpacing: CGFloat = 3
@@ -25,28 +26,45 @@ struct TopicListView: View {
     
     var body: some View {
         WithViewStore(self.store) { viewStore in
-            List {
-                Section {
-                    ForEach(viewStore.topicResponse, id: \.uuid) { res in
-                        ForEach(res.topicList.topics) { topic in
-                            TopicRow(topic: topic,
-                                     category: viewStore.categories.first(where: { $0.id == topic.categoryId }),
-                                     user: res.users.first(where: { $0.id == topic.posters.first?.uid })
-                            )
-                        }
-                    }
-                } header: {
+            NavigationView {
+                Group {
                     CategoriesView(categories: viewStore.categories)
                         .listRowInsets(EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0))
-                        .onAppear {
-                            viewStore.send(.loadCategories)
+                    List {
+                        ForEach(viewStore.topicResponse, id: \.uuid) { res in
+                            ForEach(res.topicList.topics) { topic in
+                                TopicRow(topic: topic,
+                                         category: viewStore.categories.first(where: { $0.id == topic.categoryId }),
+                                         user: res.users.first(where: { $0.id == topic.posters.first?.uid })
+                                )
+                            }
                         }
+                    }
+                    .listStyle(PlainListStyle())
+                } // workaround for icon-style navigation bar title
+                .navigationBarTitle(Text(""))
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarItems(
+                    leading:
+                        Image("wo_icon")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: iconWidth, height: 40, alignment: .center)
+                            .padding(UIScreen.main.bounds.size.width / 2 - iconWidth / 2),
+                    trailing:
+                        HStack {
+                            Button(action: {
+                                // TODO: add filter
+                            }) {
+                                Image(systemName: "square.grid.2x2")
+                                    .font(.system(size: 15, weight: .medium))
+                            }.foregroundColor(Color(hex: "D8805E")) // icon color
+                        }.padding(.trailing, 30)
+                )
+                .onAppear {
+                    viewStore.send(.loadCategories)
                 }
-            }
-            .listStyle(PlainListStyle())
-            .onAppear {
-                viewStore.send(.loadTopics)
-            }
+            } // NavigationView
         }
     }
 }
@@ -73,6 +91,12 @@ struct TopicRow: View {
             .padding(.init(top: 2, leading: 5, bottom: 2, trailing: 5))
             .background(Color("tag_bg", bundle: nil))
             .cornerRadius(tagCornerRadius)
+    }
+    
+    private func lastPostedAt(_ iso8601: String) -> String {
+        let formatter = Date.dateFormatter
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        return formatter.date(from: iso8601)?.dateStringWithAgo ?? ""
     }
     
     var body: some View {
@@ -110,7 +134,7 @@ struct TopicRow: View {
                 }
             }
             HStack(spacing: detailInfoSpacing) { // lastUpdated_viewCount_postCount
-                Text(topic.lastPostedAt).font(.system(size: lastViewFontSize))
+                Text(lastPostedAt(topic.lastPostedAt)).font(.system(size: lastViewFontSize))
                 Spacer()
                 Image(systemName: "eye.fill").font(.system(size: lastViewFontSize))
                 Text("\(topic.views)").font(.system(size: lastViewFontSize))

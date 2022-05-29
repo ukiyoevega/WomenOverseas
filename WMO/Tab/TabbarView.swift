@@ -21,6 +21,7 @@ struct TabbarView: View {
     init(tab: Tab, link: String? = nil) {
         self.selectedTab = tab
         self.link = link
+//        self.setupApperance()
     }
     
     enum Tab: Equatable {
@@ -38,7 +39,7 @@ struct TabbarView: View {
             Text(text).foregroundColor(Color("header_pink", bundle: nil))
         }
     }
-    let statusBarModifier = NavigationBarModifier(backgroundColor: UIColor(named: "header_pink") ?? .white, textColor: .white)
+//    let statusBarModifier = NavigationBarModifier(backgroundColor: UIColor(named: "header_pink") ?? .white, textColor: .white)
 
     private func url(_ string: String?) -> URL {
         if let urlString = string, let url = URL(string: urlString) {
@@ -84,7 +85,7 @@ struct TabbarView: View {
                     }.tag(Tab.event)
             }
             .foregroundColor(Color("button_pink", bundle: nil))
-            .modifier(statusBarModifier)
+//            .modifier(statusBarModifier)
             .onAppear(perform: {
                 if let link = link, let _ = URL(string: link) {
                     self.shouldPresentLink = true
