@@ -16,7 +16,47 @@ enum APIError: Error {
 
 struct Failure: Error, Equatable {}
 
-public struct APIService {
+
+struct APIService {
+    // TODO: test code
+    lazy var getTopics: (String) -> Effect<TopicListResponse, Failure> = {
+        return { paramPlaceholder in
+            let latest = EndPoint.Topics.latest(by: .default, ascending: false)
+            let path = latest.path
+            var components = URLComponents(string: "https://womenoverseas.com" + path)!
+            var urlRequest = URLRequest(url: components.url!)
+            urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")
+            
+            return URLSession.shared.dataTaskPublisher(for: urlRequest)
+              .map { data, _ in data }
+              .decode(type: TopicListResponse.self, decoder: JSONDecoder())
+              .map({ response in response })
+              .mapError { error in
+                  print("error \(error)")
+                  return Failure() // TODO: error handling
+              }
+              .eraseToEffect()
+        }
+    }()
+    
+    lazy var getCategories: (String) -> Effect<[CategoryList.Category], Failure> = {
+        return { paramPlaceholder in
+            var components = URLComponents(string: "https://womenoverseas.com" + EndPoint.Category.list.path)!
+            var urlRequest = URLRequest(url: components.url!)
+            urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")
+            
+            return URLSession.shared.dataTaskPublisher(for: urlRequest)
+              .map { data, _ in data }
+              .decode(type: CategoriesResponse.self, decoder: JSONDecoder())
+              .map({ response in response.categoryList.categories })
+              .mapError { error in
+                  print("error \(error)")
+                  return Failure() // TODO: error handling
+              }
+              .eraseToEffect()
+        }
+    }()
+    
     let baseURL = URL(string: "https://www.womenoverseas.com")!
     var apiKey: String {
         get {
