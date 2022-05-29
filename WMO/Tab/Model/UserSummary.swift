@@ -9,18 +9,7 @@ import Foundation
 
 // moving to the standard that Apple have created without having to bring in another library
 enum User {
-    struct UserSummary: Decodable {
-        let badge: [Badge]
-        let users: [User]
-        let summary: Summary
-        
-        enum CodingKeys: String, CodingKey {
-            case badge
-            case users
-            case summary = "user_summary"
-        }
-    }
-
+    
     struct Badge: Decodable {
         let name: String
     }

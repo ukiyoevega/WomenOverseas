@@ -29,6 +29,7 @@ struct TabbarView: View {
         case latest
         case featured
         case event
+        case profile
         case none
     }
     
@@ -73,16 +74,20 @@ struct TabbarView: View {
                     .tabItem {
                         self.tabbarItem(text: "Latest", image: "square.stack.fill")
                     }.tag(Tab.latest)
-                Webview(type: .featured,
-                        url: url("https://womenoverseas.com/tag/%E7%B2%BE%E5%8D%8E%E8%B4%B4"))
-                    .tabItem {
-                        self.tabbarItem(text: "Featured", image: "star.circle")
-                    }.tag(Tab.featured)
+//                Webview(type: .featured,
+//                        url: url("https://womenoverseas.com/tag/%E7%B2%BE%E5%8D%8E%E8%B4%B4"))
+//                    .tabItem {
+//                        self.tabbarItem(text: "Featured", image: "star.circle")
+//                    }.tag(Tab.featured)
                 Webview(type: .event,
                         url: url("https://womenoverseas.com/upcoming-events"))
                     .tabItem {
                         self.tabbarItem(text: "Events", image: "calendar")
                     }.tag(Tab.event)
+                ProfileView()
+                    .tabItem {
+                        self.tabbarItem(text: "Me", image: "person.fill")
+                    }.tag(Tab.profile)
             }
             .foregroundColor(Color("button_pink", bundle: nil))
 //            .modifier(statusBarModifier)

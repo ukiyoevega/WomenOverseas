@@ -27,3 +27,17 @@ struct CategoriesResponse: Decodable {
     }
     
 }
+
+struct UserResponse: Decodable {
+    let badges: [User.Badge]
+    let users: [User.User]
+    let topics: [Topic]
+    let summary: User.Summary
+    
+    enum CodingKeys: String, CodingKey {
+        case badges
+        case users
+        case topics
+        case summary = "user_summary"
+    }
+}

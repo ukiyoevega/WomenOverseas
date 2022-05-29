@@ -43,6 +43,7 @@
 		B2EE598B2812C5B6008A8DD5 /* URLEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EE598A2812C5B6008A8DD5 /* URLEncoding.swift */; };
 		B2EE59A32813E594008A8DD5 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EE59A22813E594008A8DD5 /* WebView.swift */; };
 		B2EFD55D283C57A200D7A6A0 /* CategoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EFD55C283C57A200D7A6A0 /* CategoryList.swift */; };
+		B2EFD6D5283CD41900D7A6A0 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EFD6D4283CD41900D7A6A0 /* ProfileView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -84,6 +85,7 @@
 		B2EE598D2812E2EF008A8DD5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B2EE59A22813E594008A8DD5 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		B2EFD55C283C57A200D7A6A0 /* CategoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryList.swift; sourceTree = "<group>"; };
+		B2EFD6D4283CD41900D7A6A0 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,6 +219,7 @@
 				B2EE553028124113008A8DD5 /* LoginView.swift */,
 				B2EE551328119AE6008A8DD5 /* TabbarView.swift */,
 				B2322FF5284234CF0048A717 /* TopicList */,
+				B2EFD6D4283CD41900D7A6A0 /* ProfileView.swift */,
 				B2A481E3283DF1AA0053B73A /* Model */,
 			);
 			path = Tab;
@@ -329,6 +332,7 @@
 				B23230072843127E0048A717 /* ImageCache.swift in Sources */,
 				B2EE551428119AE6008A8DD5 /* TabbarView.swift in Sources */,
 				B2EE5529281233B2008A8DD5 /* TopicListView.swift in Sources */,
+				B2EFD6D5283CD41900D7A6A0 /* ProfileView.swift in Sources */,
 				B2EE568728125454008A8DD5 /* APIRequest.swift in Sources */,
 				B2644286283FAD8A00FBEDCE /* EndPoint.Category.swift in Sources */,
 			);

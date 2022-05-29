@@ -19,6 +19,28 @@ struct Failure: Error, Equatable {}
 
 struct APIService {
     // TODO: test code
+    
+    lazy var getUser: (EndPoint.User) -> Effect<UserResponse, Failure> = {
+        return { endpoint in
+            let path = endpoint.path
+            var components = URLComponents(string: "https://womenoverseas.com" + path)!
+            components.queryItems = endpoint.params.map { param in
+                URLQueryItem(name: param.key, value: "\(param.value)")
+            }
+            var urlRequest = URLRequest(url: components.url!)
+            urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")
+            return URLSession.shared.dataTaskPublisher(for: urlRequest)
+              .map { data, _ in data }
+              .decode(type: UserResponse.self, decoder: JSONDecoder())
+              .map({ response in response })
+              .mapError { error in
+                  print("error \(error)")
+                  return Failure() // TODO: error handling
+              }
+              .eraseToEffect()
+        }
+    }()
+    
     lazy var getTopics: (EndPoint.Topics) -> Effect<TopicListResponse, Failure> = {
         return { endpoint in
             let path = endpoint.path
