@@ -58,6 +58,10 @@ struct CategoryList: Decodable, Equatable {
         // TODO: support
 //        let topics: [Topic]
         
+        var displayName: String {
+            return name.components(separatedBy: .init(charactersIn: " (（")).first ?? name
+        }
+        
         enum CodingKeys: String, CodingKey {
             case id
             case name

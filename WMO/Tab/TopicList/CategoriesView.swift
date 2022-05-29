@@ -17,22 +17,17 @@ private let categoryCornerRadius: CGFloat = 16
 private let categoryBorderWidth: CGFloat = 1.5
 
 struct CategoriesView: View {
-    let store: Store<CategoryState, CategoryAction>
+    let categories: [CategoryList.Category]
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
-            makeScrollView(viewStore.categories)
-                .onAppear {
-                    viewStore.send(.refresh)
-                }
-        }
+        makeScrollView(categories)
     }
     
     func makeScrollView(_ categories: [CategoryList.Category]) -> some View {
         var scrollView = ScrollView(.horizontal) {
             HStack(spacing: categoriesSpacing) {
                 ForEach(categories, id: \.id) { cat in
-                    category(cat.name, color: cat.color, selected: false)
+                    category(cat.displayName, color: cat.color, selected: false)
                 }
             }
             .padding([.leading, .trailing], categoriespadding)
@@ -43,8 +38,7 @@ struct CategoriesView: View {
     
     private func category(_ title: String, color: String, selected: Bool) -> some View {
         let tint = Color(hex: color)
-        let trimmedTitle = title.components(separatedBy: .init(charactersIn: " (（")).first ?? title
-        return Text(trimmedTitle)
+        return Text(title)
             .font(.system(size: categoryFontSize))
             .foregroundColor(tint)
             .padding(categoryTextPadding)

@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 
+// TODO: remove
 struct CategoryState: Equatable {
     var categories: [CategoryList.Category] = []
 }

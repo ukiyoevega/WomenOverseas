@@ -9,10 +9,10 @@ import SwiftUI
 import ComposableArchitecture
 
 private let itemVerticalSpacing: CGFloat = 10
-private let titleFontSize: CGFloat = 14
+private let titleFontSize: CGFloat = 15
 private let titleLineSpacing: CGFloat = 3
-private let categoryFontSize: CGFloat = 12
-private let tagFontSize: CGFloat = 11
+private let categoryFontSize: CGFloat = 13
+private let tagFontSize: CGFloat = 12
 private let lastViewFontSize: CGFloat = 11
 private let rowPadding = EdgeInsets(top: 10, leading: 0, bottom: 5, trailing: 0)
 private let avatarWidth: CGFloat = 40
@@ -23,31 +23,29 @@ private let tagCornerRadius: CGFloat = 2
 struct TopicListView: View {
     let store: Store<TopicState, TopicAction>
     
-    private func row(topic: Topic, user: User.User?) -> some View {
-        return TopicRow(topic: topic, user: user)
-    }
-    
     var body: some View {
-        let categoriesStore = Store(initialState: CategoryState(),
-                                    reducer: categoryReducer,
-                                    environment: CategoryEnvironment())
-        let categoriesView = CategoriesView(store: categoriesStore)
         WithViewStore(self.store) { viewStore in
             List {
                 Section {
                     ForEach(viewStore.topicResponse, id: \.uuid) { res in
                         ForEach(res.topicList.topics) { topic in
-                            row(topic: topic, user: res.users.first(where: { $0.id == topic.posters.first?.uid }))
+                            TopicRow(topic: topic,
+                                     category: viewStore.categories.first(where: { $0.id == topic.categoryId }),
+                                     user: res.users.first(where: { $0.id == topic.posters.first?.uid })
+                            )
                         }
                     }
                 } header: {
-                    categoriesView
+                    CategoriesView(categories: viewStore.categories)
                         .listRowInsets(EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0))
+                        .onAppear {
+                            viewStore.send(.loadCategories)
+                        }
                 }
             }
             .listStyle(PlainListStyle())
             .onAppear {
-                viewStore.send(.refresh)
+                viewStore.send(.loadTopics)
             }
         }
     }
@@ -56,15 +54,15 @@ struct TopicListView: View {
 struct TopicRow: View {
     
     let topic: Topic
+    let category: CategoryList.Category?
     let user: User.User?
-//    let category: Category
 
-    private func category(_ type: Category) -> some View {
-        return Text(type.description)
+    private func category(_ categoryItem: CategoryList.Category) -> some View {
+        return Text(categoryItem.displayName)
             .font(.system(size: categoryFontSize))
             .foregroundColor(.white)
             .padding(.init(top: 3, leading: 8, bottom: 3, trailing: 8))
-            .background(Color("category_\(type.rawValue)", bundle: nil))
+            .background(Color(hex: categoryItem.color))
             .cornerRadius(categoryCornerRadius)
     }
     
@@ -88,7 +86,9 @@ struct TopicRow: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .lineSpacing(titleLineSpacing)
                     HStack() { // category_tags
-                        category(.study) // TODO: map by categoryId
+                        if let categoryItem = self.category {
+                            category(categoryItem)
+                        }
                         ForEach(topic.tags, id: \.hashValue) { tag in
                             label(tag)
                         }
@@ -185,7 +185,7 @@ struct HomeView_Previews : PreviewProvider {
                 CategoriesFakeView()
                 List {
                     ForEach(0..<50) { _ in
-                        TopicRow(topic: fakeTopic, user: nil)
+                        TopicRow(topic: fakeTopic, category: nil, user: nil)
                     }
                 }.listStyle(PlainListStyle())
             }.navigationBarTitle("首页")
