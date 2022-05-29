@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B2322FFF28430E700048A717 /* AsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2322FFE28430E700048A717 /* AsyncImage.swift */; };
+		B23230012843114F0048A717 /* DownloadTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23230002843114F0048A717 /* DownloadTask.swift */; };
+		B23230052843124C0048A717 /* ImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23230042843124C0048A717 /* ImageService.swift */; };
+		B23230072843127E0048A717 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23230062843127E0048A717 /* ImageCache.swift */; };
 		B2AA08762814330D0065A30E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA08752814330D0065A30E /* SceneDelegate.swift */; };
 		B2AA0878281433F80065A30E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA0877281433F80065A30E /* AppDelegate.swift */; };
 		B2EE551428119AE6008A8DD5 /* TabbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EE551328119AE6008A8DD5 /* TabbarView.swift */; };
@@ -26,6 +30,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B2322FFE28430E700048A717 /* AsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImage.swift; sourceTree = "<group>"; };
+		B23230002843114F0048A717 /* DownloadTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadTask.swift; sourceTree = "<group>"; };
+		B23230042843124C0048A717 /* ImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageService.swift; sourceTree = "<group>"; };
+		B23230062843127E0048A717 /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		B29E33BE2828DA2D00F6F548 /* WMO.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WMO.entitlements; sourceTree = "<group>"; };
 		B2AA08752814330D0065A30E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		B2AA0877281433F80065A30E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -58,6 +66,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B232300A284312E60048A717 /* AsyncImage */ = {
+			isa = PBXGroup;
+			children = (
+				B2322FFE28430E700048A717 /* AsyncImage.swift */,
+				B23230002843114F0048A717 /* DownloadTask.swift */,
+				B23230042843124C0048A717 /* ImageService.swift */,
+				B23230062843127E0048A717 /* ImageCache.swift */,
+			);
+			path = AsyncImage;
+			sourceTree = "<group>";
+		};
 		B2EE550728119AE6008A8DD5 = {
 			isa = PBXGroup;
 			children = (
@@ -125,6 +144,7 @@
 			isa = PBXGroup;
 			children = (
 				B2EE59A22813E594008A8DD5 /* WebView.swift */,
+				B232300A284312E60048A717 /* AsyncImage */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -210,16 +230,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				B2EE59A32813E594008A8DD5 /* WebView.swift in Sources */,
+				B23230012843114F0048A717 /* DownloadTask.swift in Sources */,
 				B2EE59852812B471008A8DD5 /* RSA+Header.swift in Sources */,
 				B2EE598B2812C5B6008A8DD5 /* URLEncoding.swift in Sources */,
 				B2EE553128124113008A8DD5 /* LoginView.swift in Sources */,
 				B2AA08762814330D0065A30E /* SceneDelegate.swift in Sources */,
 				B2EE552F28123451008A8DD5 /* CategoriesMenu.swift in Sources */,
 				B2EE5689281255C6008A8DD5 /* EndPoint.swift in Sources */,
+				B23230052843124C0048A717 /* ImageService.swift in Sources */,
 				B2AA0878281433F80065A30E /* AppDelegate.swift in Sources */,
+				B2322FFF28430E700048A717 /* AsyncImage.swift in Sources */,
 				B2EE59872812B507008A8DD5 /* ASN1Parser.swift in Sources */,
 				B2EE59892812BC1C008A8DD5 /* APIRequest.Key.swift in Sources */,
 				B2EE552728123363008A8DD5 /* APIService.swift in Sources */,
+				B23230072843127E0048A717 /* ImageCache.swift in Sources */,
 				B2EE551428119AE6008A8DD5 /* TabbarView.swift in Sources */,
 				B2EE5529281233B2008A8DD5 /* LatestView.swift in Sources */,
 				B2EE568728125454008A8DD5 /* APIRequest.swift in Sources */,
