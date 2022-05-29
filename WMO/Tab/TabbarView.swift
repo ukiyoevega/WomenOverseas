@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import ComposableArchitecture
 
 extension Notification.Name {
     static let triggerScrollToTopAndRefresh = Notification.Name(rawValue: "com.womenoverseas.webview.triggerScrollToTopAndRefresh")
@@ -58,8 +59,11 @@ struct TabbarView: View {
         
         return ZStack {
             TabView(selection: selection) {
-                Webview(type: .home,
-                        url: url("https://womenoverseas.com"))
+                TopicListView(store: Store(initialState: TopicState(),
+                                           reducer: topicReducer,
+                                           environment: TopicEnvironment()))
+//                Webview(type: .home,
+//                        url: url("https://womenoverseas.com"))
                     .tabItem {
                         self.tabbarItem(text: "Home", image: "house.fill")
                     }.tag(Tab.home)
