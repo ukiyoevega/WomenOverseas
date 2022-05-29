@@ -25,7 +25,7 @@ let categoryReducer = Reducer<CategoryState, CategoryAction, CategoryEnvironment
     switch action {
     case .refresh:
         state.categories.removeAll()
-        return APIService.shared.getCategories("")
+        return APIService.shared.getCategories()
             .receive(on: environment.mainQueue)
             .catchToEffect(CategoryAction.categoriesResponse)
     case .categoriesResponse(.success(let categories)):

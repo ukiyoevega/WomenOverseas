@@ -10,12 +10,14 @@ import ComposableArchitecture
 struct TopicState: Equatable {
     var topicResponse: [TopicListResponse] = []
     var categories: [CategoryList.Category] = []
+    var currentPage: Int = 0
+    var currentCategory: CategoryList.Category?
 }
 
 enum TopicAction {
+    case tapCategory(CategoryList.Category)
     case loadCategories
     case loadTopics
-    case loadMoreTopics
     case categoriesResponse(Result<[CategoryList.Category], Failure>)
     case topicsResponse(Result<TopicListResponse, Failure>)
 }
@@ -26,26 +28,47 @@ struct TopicEnvironment {
 
 let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, action, environment in
     switch action {
-    case .loadTopics:
-        break
-    case .loadCategories:
-        state.categories.removeAll()
-        return APIService.shared.getCategories("")
-            .receive(on: environment.mainQueue)
-            .catchToEffect(TopicAction.categoriesResponse)
-    case .loadMoreTopics:
-        break // TODO: load more
-
-    case .topicsResponse(.success(let topicResponse)):
-        state.topicResponse = [topicResponse]
-    case .topicsResponse(.failure):
-        break
-    case .categoriesResponse(.success(let categories)):
-        state.categories = categories
-        // trigger `getTopics` to update category label inside topic row
-        return APIService.shared.getTopics("")
+    case .tapCategory(let cat):
+        state.topicResponse = []
+        state.currentPage = 0
+        state.currentCategory = cat
+        return APIService.shared.getTopics(.category(slug: cat.slug, id: cat.id))
             .receive(on: environment.mainQueue)
             .catchToEffect(TopicAction.topicsResponse)
+        
+    case .loadCategories:
+        state.categories.removeAll()
+        return APIService.shared.getCategories()
+            .receive(on: environment.mainQueue)
+            .catchToEffect(TopicAction.categoriesResponse)
+        
+    case .loadTopics:
+        let endpoint: EndPoint.Topics
+        if let cat = state.currentCategory {
+            endpoint = .category(slug: cat.slug, id: cat.id, page: state.currentPage)
+        } else {
+            endpoint = .latest(by: .default, ascending: false, page: state.currentPage)
+        }
+        return APIService.shared.getTopics(endpoint)
+            .receive(on: environment.mainQueue)
+            .catchToEffect(TopicAction.topicsResponse)
+        
+    case .topicsResponse(.success(let res)):
+        state.currentPage += 1
+        state.topicResponse.append(res)
+        
+    case .topicsResponse(.failure):
+        break
+        
+    case .categoriesResponse(.success(let categories)):
+        state.categories = categories
+        state.topicResponse = []
+        state.currentPage = 0
+        // trigger `getTopics` to update category label inside topic row
+        return APIService.shared.getTopics(.latest(by: .default, ascending: false, page: 0))
+            .receive(on: environment.mainQueue)
+            .catchToEffect(TopicAction.topicsResponse)
+        
     case .categoriesResponse(.failure):
         break
     }

@@ -37,7 +37,7 @@ struct Topic: Decodable, Equatable, Identifiable {
     let highestPostNumber: Int
     let imageUrl: String?
     let createdAt: String
-    let lastPostedAt: String
+    let lastPostedAt: String?
     let bumped: Bool
     let bumpedAt: String
     let archetype: String

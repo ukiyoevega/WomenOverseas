@@ -19,14 +19,16 @@ struct Failure: Error, Equatable {}
 
 struct APIService {
     // TODO: test code
-    lazy var getTopics: (String) -> Effect<TopicListResponse, Failure> = {
-        return { paramPlaceholder in
-            let latest = EndPoint.Topics.latest(by: .default, ascending: false)
-            let path = latest.path
+    lazy var getTopics: (EndPoint.Topics) -> Effect<TopicListResponse, Failure> = {
+        return { endpoint in
+            let path = endpoint.path
+            // TODO: remove force unwrap
             var components = URLComponents(string: "https://womenoverseas.com" + path)!
+            components.queryItems = endpoint.params.map { param in
+                URLQueryItem(name: param.key, value: "\(param.value)")
+            }
             var urlRequest = URLRequest(url: components.url!)
             urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")
-            
             return URLSession.shared.dataTaskPublisher(for: urlRequest)
               .map { data, _ in data }
               .decode(type: TopicListResponse.self, decoder: JSONDecoder())
@@ -39,8 +41,8 @@ struct APIService {
         }
     }()
     
-    lazy var getCategories: (String) -> Effect<[CategoryList.Category], Failure> = {
-        return { paramPlaceholder in
+    lazy var getCategories: () -> Effect<[CategoryList.Category], Failure> = {
+        return {
             var components = URLComponents(string: "https://womenoverseas.com" + EndPoint.Category.list.path)!
             var urlRequest = URLRequest(url: components.url!)
             urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")

@@ -7,7 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
-
+/*
 private let categoriesSpacing: CGFloat = 5
 private let categoriespadding: CGFloat = 10
 private let categoryFontSize: CGFloat = 13
@@ -16,7 +16,7 @@ private let categoryBackgroundOpacity: CGFloat = 0.25
 private let categoryCornerRadius: CGFloat = 16
 private let categoryBorderWidth: CGFloat = 1.5
 
-struct CategoriesView: View {
+struct CategoriesFView: View {
     let categories: [CategoryList.Category]
     
     var body: some View {
@@ -78,3 +78,4 @@ extension Color {
         )
     }
 }
+*/

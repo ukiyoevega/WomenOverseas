@@ -18,8 +18,15 @@ private let lastViewFontSize: CGFloat = 11
 private let rowPadding = EdgeInsets(top: 10, leading: 0, bottom: 5, trailing: 0)
 private let avatarWidth: CGFloat = 40
 private let detailInfoSpacing: CGFloat = 4
-private let categoryCornerRadius: CGFloat = 10
+private let topicCategoryCornerRadius: CGFloat = 10
 private let tagCornerRadius: CGFloat = 2
+
+private let categoriesSpacing: CGFloat = 5
+private let categoriespadding: CGFloat = 10
+private let categoryTextPadding = EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10)
+private let categoryBackgroundOpacity: CGFloat = 0.25
+private let categoryCornerRadius: CGFloat = 16
+private let categoryBorderWidth: CGFloat = 1.5
 
 struct TopicListView: View {
     let store: Store<TopicState, TopicAction>
@@ -28,8 +35,17 @@ struct TopicListView: View {
         WithViewStore(self.store) { viewStore in
             NavigationView {
                 Group {
-                    CategoriesView(categories: viewStore.categories)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: categoriesSpacing) {
+                            ForEach(viewStore.categories, id: \.id) { cat in
+                                category(cat.displayName, color: cat.color, selected: false) {
+                                    viewStore.send(.tapCategory(cat))
+                                }
+                            }
+                        }
+                        .padding([.leading, .trailing], categoriespadding)
                         .listRowInsets(EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0))
+                    }
                     List {
                         ForEach(viewStore.topicResponse, id: \.uuid) { res in
                             ForEach(res.topicList.topics) { topic in
@@ -38,6 +54,11 @@ struct TopicListView: View {
                                          user: res.users.first(where: { $0.id == topic.posters.first?.uid })
                                 )
                             }
+                        }
+                        // TODO: The pagination is done by appending a invisible rectancle at the bottom of the list, and trigerining the next page load as it appear... hacky way for now
+                        if !viewStore.topicResponse.isEmpty {
+                            centeredProgressView
+                                .onAppear { viewStore.send(.loadTopics) }
                         }
                     }
                     .listStyle(PlainListStyle())
@@ -67,6 +88,39 @@ struct TopicListView: View {
             } // NavigationView
         }
     }
+    
+    @ViewBuilder
+    var centeredProgressView: some View {
+        let view = HStack(alignment: .center) {
+            Spacer()
+            ProgressView()
+            Spacer()
+        }
+        if #available(iOS 15.0, *) {
+            view.listRowSeparator(.hidden)
+        } else {
+            view
+        }
+    }
+    
+    private func category(_ title: String, color: String, selected: Bool, action: @escaping () -> Void) -> some View {
+        let tint = Color(hex: color)
+        let text = Text(title)
+            .font(.system(size: categoryFontSize))
+            .foregroundColor(tint)
+            .padding(categoryTextPadding)
+            .background(tint.opacity(categoryBackgroundOpacity))
+            .overlay(
+                RoundedRectangle(cornerRadius: categoryCornerRadius)
+                    .stroke(tint, lineWidth: selected ? categoryBorderWidth : 0)
+            )
+            .cornerRadius(categoryCornerRadius)
+        return Button(action: {
+            action()
+        }, label: {
+            text
+        })
+    }
 }
 
 struct TopicRow: View {
@@ -81,7 +135,7 @@ struct TopicRow: View {
             .foregroundColor(.white)
             .padding(.init(top: 3, leading: 8, bottom: 3, trailing: 8))
             .background(Color(hex: categoryItem.color))
-            .cornerRadius(categoryCornerRadius)
+            .cornerRadius(topicCategoryCornerRadius)
     }
     
     private func label(_ text: String) -> some View {
@@ -93,7 +147,8 @@ struct TopicRow: View {
             .cornerRadius(tagCornerRadius)
     }
     
-    private func lastPostedAt(_ iso8601: String) -> String {
+    private func lastPostedAt(_ iso8601: String?) -> String {
+        guard let iso8601 = iso8601 else { return "" }
         let formatter = Date.dateFormatter
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
         return formatter.date(from: iso8601)?.dateStringWithAgo ?? ""
@@ -124,13 +179,15 @@ struct TopicRow: View {
                     .replacingOccurrences(of: "{size}", with: "400")
                     .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
                     let avatarURL = URL(string: escapedString) {
-                    AsyncImage(url: avatarURL) { image in
-                        image.resizable()
-                    } placeholder: {
-                        Circle().fill(Color.blue.opacity(0.3)).frame(width: avatarWidth)
+                    VStack(alignment: .trailing) {
+                        AsyncImage(url: avatarURL) { image in
+                            image.resizable()
+                        } placeholder: {
+                            Circle().fill(Color.blue.opacity(0.3)).frame(width: avatarWidth)
+                        }
+                        .frame(width: avatarWidth, height: avatarWidth)
+                        .cornerRadius(avatarWidth / 2)
                     }
-                    .frame(width: avatarWidth, height: avatarWidth)
-                    .cornerRadius(avatarWidth / 2)
                 }
             }
             HStack(spacing: detailInfoSpacing) { // lastUpdated_viewCount_postCount
@@ -145,6 +202,34 @@ struct TopicRow: View {
         }.padding(rowPadding)
     }
 }
+
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3: // RGB (12-bit)
+            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: // RGB (24-bit)
+            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: // ARGB (32-bit)
+            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            (a, r, g, b) = (1, 1, 1, 0)
+        }
+        
+        self.init(
+            .sRGB,
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue:  Double(b) / 255,
+            opacity: Double(a) / 255
+        )
+    }
+}
+
 
 #if DEBUG
 let fakeTopic = Topic(id: 1,
