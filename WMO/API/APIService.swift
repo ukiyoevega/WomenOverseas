@@ -6,7 +6,15 @@
 //
 
 import Foundation
+import ComposableArchitecture
 
+enum APIError: Error {
+    case noResponse
+    case jsonDecodingError(error: Error)
+    case networkError(error: Error)
+}
+
+struct Failure: Error, Equatable {}
 
 public struct APIService {
     let baseURL = URL(string: "https://www.womenoverseas.com")!
@@ -19,33 +27,13 @@ public struct APIService {
 
         }
     }
-    public static var shared = APIService()
+    static var shared = APIService()
     let decoder = JSONDecoder()
     
-    public enum APIError: Error {
-        case noResponse
-        case jsonDecodingError(error: Error)
-        case networkError(error: Error)
-    }
-    
-    public enum Endpoint {
-        case videos(movie: Int)
-        case discover
-        
-        func path() -> String {
-            switch self {
-            case let .videos(movie):
-                return "movie/\(String(movie))/videos"
-            case .discover:
-                return "discover/movie"
-            }
-        }
-    }
-
-    public func GET<T: Codable>(endpoint: Endpoint,
-                         params: [String: String]?,
-                         completionHandler: @escaping (Result<T, APIError>) -> Void) {
-        let queryURL = baseURL.appendingPathComponent(endpoint.path())
+    func GET<T: Codable>(endpoint: RESTful,
+                                params: [String: String]?,
+                                completionHandler: @escaping (Result<T, APIError>) -> Void) {
+        let queryURL = baseURL.appendingPathComponent(endpoint.path)
         var components = URLComponents(url: queryURL, resolvingAgainstBaseURL: true)!
         components.queryItems = [
            URLQueryItem(name: "api_key", value: apiKey),
