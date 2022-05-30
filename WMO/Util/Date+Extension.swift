@@ -23,24 +23,24 @@ extension Date {
 
         if monthsDiff >= 1 || daysDiff >= 10 { // if longer than 10 days
             if calendar.isDate(self, equalTo: now, toGranularity: .year) {
-                return self.generateDateString(of: "MM/dd")
+                return self.generateDateString(of: "MM/dd") + "更新"
             } else {
-                return self.exactDateString
+                return self.exactDateString + "更新"
             }
         } else { // if within 10 days
             // 1. if daysDiff >= 1, aka >= 24 hours
             if daysDiff >= 1 {
-                return "\(daysDiff)天前"
+                return "\(daysDiff)天前更新"
                 
             // 2. if within 24 hours, and hoursDiff >= 1
             } else if hoursDiff >= 1 {
-                return "\(hoursDiff)小时前"
+                return "\(hoursDiff)小时前更新"
                 
             // 3. if within 1 hour, but minutes diff >= 1
             } else if minutesDiff >= 1 {
-                return "\(minutesDiff)分钟前"
+                return "\(minutesDiff)分钟前更新"
             } else {
-                return "刚刚"
+                return "刚刚更新"
             }
         }
     }

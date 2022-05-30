@@ -10,7 +10,7 @@ import Foundation
 extension EndPoint {
     enum Topics {
         case latest(by: Order = .default, ascending: Bool = false, page: Int = 0)
-        case top(by: Order = .default, period: Period = .all)
+        case top(by: Order = .default, period: Period = .all, page: Int = 0)
         case category(slug: String, id: Int, page: Int = 0)
         case tag(by: Tag) // TODO: more params
 
@@ -52,8 +52,8 @@ extension EndPoint.Topics: RESTful {
         switch self {
         case .latest(let order, let ascending, let page):
             return ["order": order.rawValue, "ascending": ascending, "page": page]
-        case .top(let order, let period):
-            return ["order": order.rawValue, "period": period.rawValue]
+        case .top(let order, let period, let page):
+            return ["order": order.rawValue, "period": period.rawValue, "page": page]
         case .category(_, _, let page):
             return ["page": page]
         default:

@@ -30,6 +30,7 @@ private let categoryBorderWidth: CGFloat = 1.5
 
 struct TopicListView: View {
     let store: Store<TopicState, TopicAction>
+    @State private var showingAlert = false
     
     var body: some View {
         WithViewStore(self.store) { viewStore in
@@ -38,7 +39,7 @@ struct TopicListView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: categoriesSpacing) {
                             ForEach(viewStore.categories, id: \.id) { cat in
-                                category(cat.displayName, color: cat.color, selected: false) {
+                                category(cat.displayName, color: cat.color, selected: viewStore.currentCategory?.id == cat.id) {
                                     viewStore.send(.tapCategory(cat))
                                 }
                             }
@@ -65,25 +66,47 @@ struct TopicListView: View {
                 } // workaround for icon-style navigation bar title
                 .navigationBarTitle(Text(""))
                 .navigationBarTitleDisplayMode(.inline)
-                .navigationBarItems(
-                    leading:
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
                         Image("wo_icon")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: iconWidth, height: 40, alignment: .center)
-                            .padding(UIScreen.main.bounds.size.width / 2 - iconWidth / 2),
+                    }
+                }
+                .navigationBarItems(
                     trailing:
                         HStack {
                             Button(action: {
-                                // TODO: add filter
+                                showingAlert = true
+                                print("showingAlert \(showingAlert)")
                             }) {
-                                Image(systemName: "square.grid.2x2")
-                                    .font(.system(size: 15, weight: .medium))
+                                Image(systemName: "arrow.up.arrow.down.square")
+                                    .font(.system(size: 16, weight: .medium))
                             }.foregroundColor(Color(hex: "D8805E")) // icon color
-                        }.padding(.trailing, 30)
+                        }
                 )
                 .onAppear {
                     viewStore.send(.loadCategories)
+                }
+                .actionSheet(isPresented: $showingAlert) {
+                    ActionSheet(
+                        title: Text("话题排序"),
+                        buttons: [
+                            .default(Text("按浏览量排序")) {
+                                viewStore.send(.tapOrder(.views))
+                            },
+                            .default(Text("按喜欢排序")) {
+                                viewStore.send(.tapOrder(.likes))
+                            },
+                            .default(Text("按回复量排序")) {
+                                viewStore.send(.tapOrder(.posts))
+                            },
+                            .default(Text("按热门排序")) {
+                                viewStore.send(.tapOrder(.default))
+                            },
+                            .cancel()]
+                    )
                 }
             } // NavigationView
         }
@@ -198,6 +221,9 @@ struct TopicRow: View {
                 Image(systemName: "circle.fill").font(.system(size: 2.5))
                 Image(systemName: "text.bubble.fill").font(.system(size: lastViewFontSize))
                 Text("\(topic.postsCount)").font(.system(size: lastViewFontSize))
+                Image(systemName: "circle.fill").font(.system(size: 2.5))
+                Image(systemName: "heart.fill").font(.system(size: lastViewFontSize))
+                Text("\(topic.likeCount)").font(.system(size: lastViewFontSize))
             }.foregroundColor(Color(UIColor.lightGray))
         }.padding(rowPadding)
     }

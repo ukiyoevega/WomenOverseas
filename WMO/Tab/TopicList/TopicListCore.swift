@@ -12,10 +12,13 @@ struct TopicState: Equatable {
     var categories: [CategoryList.Category] = []
     var currentPage: Int = 0
     var currentCategory: CategoryList.Category?
+    var currentOrder: EndPoint.Topics.Order?
 }
 
 enum TopicAction {
     case tapCategory(CategoryList.Category)
+    case tapOrder(EndPoint.Topics.Order)
+    case tapPeriod(EndPoint.Topics.Period)
     case loadCategories
     case loadTopics
     case categoriesResponse(Result<[CategoryList.Category], Failure>)
@@ -28,14 +31,27 @@ struct TopicEnvironment {
 
 let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, action, environment in
     switch action {
+    case .tapPeriod(let period):
+        break
+        
     case .tapCategory(let cat):
         state.topicResponse = []
         state.currentPage = 0
         state.currentCategory = cat
+        state.currentOrder = nil // TODO: remove mutual exclusive
         return APIService.shared.getTopics(.category(slug: cat.slug, id: cat.id))
             .receive(on: environment.mainQueue)
             .catchToEffect(TopicAction.topicsResponse)
         
+    case .tapOrder(let order):
+        state.topicResponse = []
+        state.currentPage = 0
+        state.currentOrder = order
+        state.currentCategory = nil  // TODO: remove mutual exclusive
+        return APIService.shared.getTopics(.top(by: order, period: .all))
+            .receive(on: environment.mainQueue)
+            .catchToEffect(TopicAction.topicsResponse)
+
     case .loadCategories:
         state.categories.removeAll()
         return APIService.shared.getCategories()
@@ -46,6 +62,8 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
         let endpoint: EndPoint.Topics
         if let cat = state.currentCategory {
             endpoint = .category(slug: cat.slug, id: cat.id, page: state.currentPage)
+        } else if let order = state.currentOrder {  // TODO: remove mutual exclusive
+            endpoint = .top(by: order, period: .all, page: state.currentPage)
         } else {
             endpoint = .latest(by: .default, ascending: false, page: state.currentPage)
         }
