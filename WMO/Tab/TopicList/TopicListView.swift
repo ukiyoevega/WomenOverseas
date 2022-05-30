@@ -32,6 +32,10 @@ struct TopicListView: View {
     let store: Store<TopicState, TopicAction>
     @State private var showingAlert = false
     
+    private func webview(_ string: String?) -> some View {
+        Webview(type: .none, url: URL(string: string ?? "") ?? URL(string: "https://womenoverseas.com/404")! )
+    }
+    
     var body: some View {
         WithViewStore(self.store) { viewStore in
             NavigationView {
@@ -50,10 +54,12 @@ struct TopicListView: View {
                     List {
                         ForEach(viewStore.topicResponse, id: \.uuid) { res in
                             ForEach(res.topicList.topics) { topic in
-                                TopicRow(topic: topic,
-                                         category: viewStore.categories.first(where: { $0.id == topic.categoryId }),
-                                         user: res.users.first(where: { $0.id == topic.posters.first?.uid })
-                                )
+                                NavigationLink(destination: self.webview("https://womenoverseas.com/t/topic/\(topic.id)")) {
+                                    TopicRow(topic: topic,
+                                             category: viewStore.categories.first(where: { $0.id == topic.categoryId }),
+                                             user: res.users.first(where: { $0.id == topic.posters.first?.uid })
+                                    )
+                                }
                             }
                         }
                         // TODO: The pagination is done by appending a invisible rectancle at the bottom of the list, and trigerining the next page load as it appear... hacky way for now
@@ -87,7 +93,9 @@ struct TopicListView: View {
                         }
                 )
                 .onAppear {
-                    viewStore.send(.loadCategories)
+                    if viewStore.categories.isEmpty {
+                        viewStore.send(.loadCategories)
+                    }
                 }
                 .actionSheet(isPresented: $showingAlert) {
                     ActionSheet(

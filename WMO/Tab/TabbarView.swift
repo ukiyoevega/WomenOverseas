@@ -17,6 +17,10 @@ struct TabbarView: View {
     @State var selectedTab: Tab
     @State var shouldPresentLink: Bool = false
     let link: String?
+    
+    let topicListView = TopicListView(store: Store(initialState: TopicState(),
+                                                   reducer: topicReducer,
+                                                   environment: TopicEnvironment())) // reference to avoid reload on tab
 
     init(tab: Tab, link: String? = nil) {
         self.selectedTab = tab
@@ -61,9 +65,7 @@ struct TabbarView: View {
         
         return ZStack {
             TabView(selection: selection) {
-                TopicListView(store: Store(initialState: TopicState(),
-                                           reducer: topicReducer,
-                                           environment: TopicEnvironment()))
+                topicListView
 //                Webview(type: .home,
 //                        url: url("https://womenoverseas.com"))
                     .tabItem {
