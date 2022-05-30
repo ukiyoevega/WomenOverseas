@@ -22,6 +22,7 @@ enum UploadType: String {
 
 extension EndPoint {
     enum User {
+        case getUser(name: String)
         case summary(username: String)
         case activity(username: String) // N/A
         // detailed
@@ -39,6 +40,7 @@ extension EndPoint.User: RESTful {
     
     var path: String {
         switch self {
+        case .getUser(let name): return "/u/\(name).json"
         case .summary(let name): return "/u/\(name)/summary.json"
         case .activity(let name): return "/u/\(name)/activity.json"
         case .followings(let name): return "/u/\(name)/follow/following.json"

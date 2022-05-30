@@ -10,8 +10,44 @@ import Foundation
 // moving to the standard that Apple have created without having to bring in another library
 enum User {
     
-    struct Badge: Decodable {
+    struct Badge: Decodable, Equatable {
+        let id: Int
         let name: String
+        /*
+         "description": "\u003ca href=\"https://blog.discourse.org/2018/06/understanding-discourse-trust-levels/\"\u003e授予\u003c/a\u003e所有基础社区功能",
+         "grant_count": 9516,
+         "allow_title": true,
+         "multiple_grant": false,
+         "icon": "fa-user",
+         "image_url": null,
+         "listable": true,
+         "enabled": true,
+         "badge_grouping_id": 4,
+         "system": true,
+         "slug": "-",
+         "manually_grantable": false,
+         "badge_type_id": 3
+         */
+    }
+    
+    struct UserBadge: Decodable, Equatable {
+        let id: Int
+        let grantedAt: String
+        let createdAt: String
+        let count: Int
+        let badgeId: Int
+        let userId: Int
+        let grantedById: Int
+        
+        enum CodingKeys: String, CodingKey {
+            case id
+            case grantedAt = "granted_at"
+            case createdAt = "created_at"
+            case count
+            case badgeId = "badge_id"
+            case userId = "user_id"
+            case grantedById = "granted_by_id"
+        }
     }
     
     struct User: Decodable, Equatable {
@@ -36,7 +72,7 @@ enum User {
         }
     }
     
-    struct Summary: Decodable {
+    struct Summary: Decodable, Equatable {
         let likesGivens: Int
         let likesReceived: Int
         let topicsEntered: Int
@@ -49,6 +85,7 @@ enum User {
         let bookmarkCount: Int
         let canSeeSummaryStats: Bool
         let solvedCount: Int
+        let badges: [UserBadge]
 
         enum CodingKeys: String, CodingKey {
             case likesGivens = "likes_given"
@@ -63,6 +100,15 @@ enum User {
             case bookmarkCount = "bookmark_count"
             case canSeeSummaryStats = "can_see_summary_stats"
             case solvedCount = "solved_count"
+            case badges
+        }
+        
+        var statisticEntries: [(title: String, count: Int)] {
+            return [("访问天数", daysVisited),
+                    ("阅读时间", timeRead), ("最近阅读时间", recentTimeRead),
+                    ("浏览的话题", topicsEntered), ("已读帖子", postsReadCount),
+                    ("已送出", likesGivens), ("已收到", likesReceived),
+                    ("话题数", topicCount), ("发帖量", postCount)] // bookmarkCount
         }
     }
 }

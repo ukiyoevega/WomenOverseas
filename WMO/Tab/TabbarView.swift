@@ -86,7 +86,8 @@ struct TabbarView: View {
                     .tabItem {
                         self.tabbarItem(text: "Events", image: "calendar")
                     }.tag(Tab.event)
-                ProfileView()
+                ProfileView(store: Store(initialState: ProfileState(),
+                                         reducer: profileReducer, environment: ()))
                     .tabItem {
                         self.tabbarItem(text: "Me", image: "person.fill")
                     }.tag(Tab.profile)
