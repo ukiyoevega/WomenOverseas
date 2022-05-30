@@ -7,25 +7,50 @@
 
 import ComposableArchitecture
 
-// MARK: - Summary
+// MARK: - Header
 
-struct ProfileSummaryState: Equatable {
+struct ProfileEnvironment {
+    let mainQueue: AnySchedulerOf<DispatchQueue> = .main
+}
+
+struct ProfileHeaderState: Equatable {
     var userResponse: UserResponse = .empty
 }
 
-enum ProfileSummaryAction {
+enum ProfileHeaderAction {
     case refresh
     case userResponse(Result<UserResponse, Failure>)
 }
 
-struct ProfileSummaryEnvironment {
-    let mainQueue: AnySchedulerOf<DispatchQueue> = .main
-}
-
-let profileSummaryReducer = Reducer<ProfileSummaryState, ProfileSummaryAction, ProfileSummaryEnvironment> { state, action, environment in
+let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, ProfileEnvironment> { state, action, environment in
     switch action {
     case .refresh:
-        return APIService.shared.getUser(.summary(username: "weijia"))
+        return APIService.shared.getUser(.getUser(name: "weijia"))
+            .receive(on: environment.mainQueue)
+            .catchToEffect(ProfileHeaderAction.userResponse)
+    case .userResponse(.success(let userResponse)):
+        state.userResponse = userResponse
+    case .userResponse(.failure):
+        break // TODO: error handling
+    }
+    return .none // Effect<ProfileAction, Never>
+}
+
+// MARK: - Summary
+
+struct ProfileSummaryState: Equatable {
+    var userResponse: UserSummaryResponse = .empty
+}
+
+enum ProfileSummaryAction {
+    case refresh
+    case userResponse(Result<UserSummaryResponse, Failure>)
+}
+
+let profileSummaryReducer = Reducer<ProfileSummaryState, ProfileSummaryAction, ProfileEnvironment> { state, action, environment in
+    switch action {
+    case .refresh:
+        return APIService.shared.getUserSummary(.summary(username: "weijia"))
             .receive(on: environment.mainQueue)
             .catchToEffect(ProfileSummaryAction.userResponse)
     case .userResponse(.success(let userResponse)):
@@ -41,10 +66,12 @@ let profileSummaryReducer = Reducer<ProfileSummaryState, ProfileSummaryAction, P
 
 struct ProfileState: Equatable {
     var profileSummaryState = ProfileSummaryState()
+    var profileHeaderState = ProfileHeaderState()
 }
 
 enum ProfileAction {
     case summary(ProfileSummaryAction)
+    case header(ProfileHeaderAction)
 }
 
 // TODO: reducer should not be global instance
@@ -52,11 +79,16 @@ let profileReducer = Reducer<ProfileState, ProfileAction, Void>.combine(
     profileSummaryReducer.pullback(
       state: \ProfileState.profileSummaryState,
       action: /ProfileAction.summary,
-      environment: { ProfileSummaryEnvironment() }
+      environment: { ProfileEnvironment() }
+    ),
+    profileHeaderReducer.pullback(
+      state: \ProfileState.profileHeaderState,
+      action: /ProfileAction.header,
+      environment: { ProfileEnvironment() }
     ),
     Reducer { state, action, _ in
         switch action {
-        case .summary:
+        case .summary, .header:
             return .none
         }
     }

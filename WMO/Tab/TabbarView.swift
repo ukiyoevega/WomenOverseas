@@ -18,6 +18,8 @@ struct TabbarView: View {
     @State var shouldPresentLink: Bool = false
     let link: String?
     
+    let profileView = ProfileView(store: Store(initialState: ProfileState(),
+                                               reducer: profileReducer, environment: ()))
     let topicListView = TopicListView(store: Store(initialState: TopicState(),
                                                    reducer: topicReducer,
                                                    environment: TopicEnvironment())) // reference to avoid reload on tab
@@ -86,8 +88,7 @@ struct TabbarView: View {
                     .tabItem {
                         self.tabbarItem(text: "Events", image: "calendar")
                     }.tag(Tab.event)
-                ProfileView(store: Store(initialState: ProfileState(),
-                                         reducer: profileReducer, environment: ()))
+                profileView
                     .tabItem {
                         self.tabbarItem(text: "Me", image: "person.fill")
                     }.tag(Tab.profile)

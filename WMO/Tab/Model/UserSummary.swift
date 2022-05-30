@@ -55,20 +55,59 @@ enum User {
         let username: String
         let name: String?
         let avatarTemplate: String
-        let flairName: String?
+        let flairName: String? // LGBTQ
+        
+        let email: String?
+        let lastPostedAt: String?
+        let lastSeenAt: String?
+        let createdAt: String?
+        let timezone: String?
+        let canUploadProfileHeader: Bool?
+        let canUploadUserCardBackground: Bool?
+        let canChangeBio: Bool?
+        let canChangeLocation: Bool?
+        let canChangeWebsite: Bool?
+        let canChangeTrackingPreference: Bool?
+        let birthday: String?
+
         let admin: Bool?
         let moderator: Bool?
         let trustLevel: Int
-        
+        let bioRaw: String?
+        let flairURL: String?
+        let title: String?
+        let customAvatarTemplate: String?
+        let systemAvatarTemplate: String?
+
         enum CodingKeys: String, CodingKey {
             case id
             case username
             case name
             case avatarTemplate = "avatar_template"
             case flairName = "flair_name"
+            
             case admin
             case moderator
             case trustLevel = "trust_level"
+            case bioRaw = "bio_raw"
+            case flairURL = "flair_url"
+            case title
+            case customAvatarTemplate = "custom_avatar_template"
+            case systemAvatarTemplate = "system_avatar_template"
+            
+            case email
+            case lastPostedAt = "last_posted_at"
+            case lastSeenAt = "last_seen_at"
+            case createdAt = "created_at"
+            case timezone
+            
+            case canUploadProfileHeader = "can_upload_profile_header"
+            case canUploadUserCardBackground = "can_upload_user_card_background"
+            case canChangeBio = "can_change_bio"
+            case canChangeLocation = "can_change_location"
+            case canChangeWebsite = "can_change_website"
+            case canChangeTrackingPreference = "can_change_tracking_preferences"
+            case birthday = "date_of_birth"
         }
     }
     
@@ -95,8 +134,8 @@ enum User {
             case daysVisited = "days_visited"
             case topicCount = "topic_count"
             case postCount = "post_count"
-            case timeRead = "time_read"
-            case recentTimeRead = "recent_time_read"
+            case timeRead = "time_read" //
+            case recentTimeRead = "recent_time_read" //
             case bookmarkCount = "bookmark_count"
             case canSeeSummaryStats = "can_see_summary_stats"
             case solvedCount = "solved_count"

@@ -8,54 +8,39 @@
 import ComposableArchitecture
 import SwiftUI
 
-private let leadingSpace: CGFloat = 15
 private let settingEntrySize: CGFloat = 22
 private let settingEntryFontSize: CGFloat = 14
 private let settingEntryIconTitleSpacing: CGFloat = 8
 private let settingDetailSize: CGFloat = 15
-private let roleFontSize: CGFloat = 13
-private let flairSpacing: CGFloat = 5
-private let tagFontSize: CGFloat = 12
-private let tagCornerRadius: CGFloat = 2
-private let topContentSpacing: CGFloat = 15
-private let editCornerRadius: CGFloat = 15
-private let bioFontSize: CGFloat = 14
-private let bioLineSpacing: CGFloat = 3
-private let badgeIconSize: CGFloat = 16
 
 struct ProfileView: View {
     let store: Store<ProfileState, ProfileAction>
-    
-    private func label(_ text: String) -> some View {
-        return Text(text)
-            .font(.system(size: tagFontSize))
-            .foregroundColor(Color("tag_text", bundle: nil))
-            .padding(.init(top: 2, leading: 5, bottom: 2, trailing: 5))
-            .background(Color("tag_bg", bundle: nil))
-            .cornerRadius(tagCornerRadius)
-    }
-    
+        
     var body: some View {
         WithViewStore(self.store) { viewStore in
             NavigationView {
                 ListWithoutSepatorsAndMargins {
                     Group {
+                        ProfileHeaderView(store: self.store.scope(state: \.profileHeaderState, action: ProfileAction.header))
                         ProfileSummaryView(store: self.store.scope(state: \.profileSummaryState, action: ProfileAction.summary))
-                                            .padding([.top, .bottom]) // 2. Statistic Section
+                            .padding([.top, .bottom]) // 2. Statistic Section
                         ForEach(SettingEntry.allCases) { entry in
-                            HStack(spacing: settingEntryIconTitleSpacing) {
-                                Image(systemName: entry.iconName)
-                                    .frame(width: settingEntrySize)
-                                    .foregroundColor(Color.gray)
-                                Text(entry.description)
-                                    .font(.system(size: settingEntryFontSize, weight: .semibold))
-                                    .foregroundColor(Color.black)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: settingDetailSize))
-                                    .foregroundColor(Color.gray)
-                            }.padding([.top, .bottom])
-                        } // 3. Entries
+                            NavigationLink(destination: entryView(entry)) {
+                                HStack(spacing: settingEntryIconTitleSpacing) {
+                                    Image(systemName: entry.iconName)
+                                        .frame(width: settingEntrySize)
+                                        .foregroundColor(Color.gray)
+                                    Text(entry.description)
+                                        .font(.system(size: settingEntryFontSize, weight: .semibold))
+                                        .foregroundColor(Color.black)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: settingDetailSize))
+                                        .foregroundColor(Color.gray)
+                                }
+                                .padding([.top, .bottom])
+                            }
+                        }
                     }
                 }
                 .padding()
@@ -63,8 +48,27 @@ struct ProfileView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .onAppear {
                     viewStore.send(.summary(.refresh))
+                    viewStore.send(.header(.refresh))
                 }
             }
+        }
+    }
+    
+    @ViewBuilder
+    func entryView(_ entry: SettingEntry) -> some View {
+        switch entry {
+        case .account:
+            Text(entry.description)
+        case .notification:
+            Text(entry.description)
+        case .theme:
+            Text(entry.description)
+        case .settings:
+            Text(entry.description)
+        case .aboutUs:
+            Text(entry.description)
+        case .donation:
+            Webview(type: .none, url: "https://womenoverseas.com/t/topic/11426")
         }
     }
 }
@@ -101,11 +105,11 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     
     case account
     case notification
-    case donation
-    case settings
     case theme
+    case settings
     case aboutUs
-    
+    case donation
+
     var description: String {
         get {
             switch self {
