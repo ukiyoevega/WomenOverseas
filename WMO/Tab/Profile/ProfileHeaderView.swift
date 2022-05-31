@@ -26,9 +26,9 @@ struct ProfileHeaderView: View {
     private func label(_ text: String) -> some View {
         return Text(text)
             .font(.system(size: tagFontSize))
-            .foregroundColor(Color("tag_text", bundle: nil))
+            .foregroundColor(Color.tagText)
             .padding(.init(top: 2, leading: 5, bottom: 2, trailing: 5))
-            .background(Color("tag_bg", bundle: nil))
+            .background(Color.tagBackground)
             .cornerRadius(tagCornerRadius)
     }
     
@@ -73,7 +73,7 @@ struct ProfileHeaderView: View {
                         // TODO: route to edit page
                     }) {
                         RoundedRectangle(cornerRadius: editCornerRadius)
-                            .foregroundColor(Color("button_pink", bundle: nil))
+                            .foregroundColor(Color.accentForeground)
                             .frame(width: 80, height: 30)
                             .overlay(
                                 HStack(spacing: 3) {

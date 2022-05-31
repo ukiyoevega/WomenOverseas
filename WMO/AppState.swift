@@ -9,5 +9,4 @@ import Foundation
 
 struct AppState {
     let topicState = TopicState()
-    let categoryState = CategoryState()
 }

@@ -31,95 +31,85 @@ private let categoryBorderWidth: CGFloat = 1.5
 struct TopicListView: View {
     let store: Store<TopicState, TopicAction>
     @State private var showingAlert = false
-    
-    private func webview(_ string: String?) -> some View {
-        Webview(type: .none, url: URL(string: string ?? "") ?? URL(string: "https://womenoverseas.com/404")! )
-    }
-    
+
     var body: some View {
         WithViewStore(self.store) { viewStore in
-            NavigationView {
-                Group {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: categoriesSpacing) {
-                            ForEach(viewStore.categories, id: \.id) { cat in
-                                category(cat.displayName, color: cat.color, selected: viewStore.currentCategory?.id == cat.id) {
-                                    viewStore.send(.tapCategory(cat))
-                                }
+            Group {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: categoriesSpacing) {
+                        ForEach(viewStore.categories, id: \.id) { cat in
+                            category(cat.displayName, color: cat.color, selected: viewStore.currentCategory?.id == cat.id) {
+                                viewStore.send(.tapCategory(cat))
                             }
                         }
-                        .padding([.leading, .trailing], categoriespadding)
-                        .listRowInsets(EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0))
                     }
-                    List {
-                        ForEach(viewStore.topicResponse, id: \.uuid) { res in
-                            ForEach(res.topicList.topics) { topic in
-                                NavigationLink(destination: self.webview("https://womenoverseas.com/t/topic/\(topic.id)")) {
-                                    TopicRow(topic: topic,
-                                             category: viewStore.categories.first(where: { $0.id == topic.categoryId }),
-                                             user: res.users.first(where: { $0.id == topic.posters.first?.uid })
-                                    )
-                                }
-                            }
-                        }
-                        // TODO: The pagination is done by appending a invisible rectancle at the bottom of the list, and trigerining the next page load as it appear... hacky way for now
-                        if !viewStore.topicResponse.isEmpty {
-                            centeredProgressView
-                                .onAppear { viewStore.send(.loadTopics) }
+                    .padding([.leading, .trailing], categoriespadding)
+                    .listRowInsets(EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0))
+                } // categories
+                List {
+                    ForEach(viewStore.topicResponse, id: \.uuid) { res in
+                        ForEach(res.topicList.topics) { topic in
+                            TopicRow(topic: topic,
+                                     category: viewStore.categories.first(where: { $0.id == topic.categoryId }),
+                                     user: res.users.first(where: { $0.id == topic.posters.first?.uid })
+                            )
                         }
                     }
-                    .listStyle(PlainListStyle())
-                } // workaround for icon-style navigation bar title
-                .navigationBarTitle(Text(""))
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Image("wo_icon")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: iconWidth, height: 40, alignment: .center)
+                    /// The pagination is done by appending a invisible rectancle at the bottom of the list, and trigerining the next page load as it appear... hacky way for now
+                    if !viewStore.topicResponse.isEmpty {
+                        centeredProgressView
+                            .onAppear { viewStore.send(.loadTopics) }
                     }
                 }
-                .navigationBarItems(
-                    trailing:
-                        HStack {
-                            Button(action: {
-                                showingAlert = true
-                                print("showingAlert \(showingAlert)")
-                            }) {
-                                Image(systemName: "arrow.up.arrow.down.square")
-                                    .font(.system(size: 16, weight: .medium))
-                            }.foregroundColor(Color(hex: "D8805E")) // icon color
-                        }
+                .listStyle(PlainListStyle())
+            } // workaround for icon-style navigation bar title
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Image("wo_icon")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: iconWidth, height: 40, alignment: .center)
+                }
+            }
+            .navigationBarItems(
+                trailing:
+                    HStack {
+                        Button(action: {
+                            showingAlert = true
+                        }) {
+                            Image(systemName: "arrow.up.arrow.down.square")
+                                .font(.system(size: 16, weight: .medium))
+                        }.foregroundColor(Color.mainIcon)
+                    }
+            )
+            .onAppear {
+                if viewStore.categories.isEmpty {
+                    viewStore.send(.loadCategories)
+                }
+            }
+            .actionSheet(isPresented: $showingAlert) {
+                ActionSheet(
+                    title: Text("话题排序"),
+                    buttons: [
+                        .default(Text("按浏览量排序")) {
+                            viewStore.send(.tapOrder(.views))
+                        },
+                        .default(Text("按喜欢排序")) {
+                            viewStore.send(.tapOrder(.likes))
+                        },
+                        .default(Text("按回复量排序")) {
+                            viewStore.send(.tapOrder(.posts))
+                        },
+                        .default(Text("按热门排序")) {
+                            viewStore.send(.tapOrder(.default))
+                        },
+                        .cancel()]
                 )
-                .onAppear {
-                    if viewStore.categories.isEmpty {
-                        viewStore.send(.loadCategories)
-                    }
-                }
-                .actionSheet(isPresented: $showingAlert) {
-                    ActionSheet(
-                        title: Text("话题排序"),
-                        buttons: [
-                            .default(Text("按浏览量排序")) {
-                                viewStore.send(.tapOrder(.views))
-                            },
-                            .default(Text("按喜欢排序")) {
-                                viewStore.send(.tapOrder(.likes))
-                            },
-                            .default(Text("按回复量排序")) {
-                                viewStore.send(.tapOrder(.posts))
-                            },
-                            .default(Text("按热门排序")) {
-                                viewStore.send(.tapOrder(.default))
-                            },
-                            .cancel()]
-                    )
-                }
-            } // NavigationView
+            }
         }
     }
-    
+
     @ViewBuilder
     var centeredProgressView: some View {
         let view = HStack(alignment: .center) {
@@ -133,7 +123,7 @@ struct TopicListView: View {
             view
         }
     }
-    
+
     private func category(_ title: String, color: String, selected: Bool, action: @escaping () -> Void) -> some View {
         let tint = Color(hex: color)
         let text = Text(title)
@@ -155,7 +145,7 @@ struct TopicListView: View {
 }
 
 struct TopicRow: View {
-    
+
     let topic: Topic
     let category: CategoryList.Category?
     let user: User.User?
@@ -168,102 +158,79 @@ struct TopicRow: View {
             .background(Color(hex: categoryItem.color))
             .cornerRadius(topicCategoryCornerRadius)
     }
-    
+
     private func label(_ text: String) -> some View {
         return Text(text)
             .font(.system(size: tagFontSize))
-            .foregroundColor(Color("tag_text", bundle: nil))
+            .foregroundColor(Color.tagText)
             .padding(.init(top: 2, leading: 5, bottom: 2, trailing: 5))
-            .background(Color("tag_bg", bundle: nil))
+            .background(Color.tagBackground)
             .cornerRadius(tagCornerRadius)
     }
-    
+
     private func lastPostedAt(_ iso8601: String?) -> String {
         guard let iso8601 = iso8601 else { return "" }
         let formatter = Date.dateFormatter
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
         return formatter.date(from: iso8601)?.dateStringWithAgo ?? ""
     }
-    
+
     var body: some View {
-        
-        VStack(spacing: itemVerticalSpacing) { // content_bottomRow
-            HStack(alignment: .top) { // titleTags_avatar
-                VStack(alignment: .leading, spacing: itemVerticalSpacing) { // title + tags
-                    Text(topic.title)
-                        .foregroundColor(.black)
-                        .font(.system(size: titleFontSize))
-                        .fixedSize(horizontal: false, vertical: true)
-                        .lineSpacing(titleLineSpacing)
-                    HStack() { // category_tags
-                        if let categoryItem = self.category {
-                            category(categoryItem)
+        ZStack {
+            NavigationLink(destination: Webview(type: .home, url: "https://womenoverseas.com/t/topic/\(topic.id)")) {
+                EmptyView()
+            }.opacity(0)
+            VStack(spacing: itemVerticalSpacing) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: itemVerticalSpacing) {
+                        Text(topic.title)
+                            .foregroundColor(.black)
+                            .font(.system(size: titleFontSize))
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineSpacing(titleLineSpacing)
+                        HStack() { // category_tags
+                            if let categoryItem = self.category {
+                                category(categoryItem)
+                            }
+                            ForEach(topic.tags, id: \.hashValue) { tag in
+                                label(tag)
+                            }
                         }
-                        ForEach(topic.tags, id: \.hashValue) { tag in
-                            label(tag)
+                    } // title, tags
+                    Spacer()
+                    if let user = self.user,
+                       let escapedString = String("https://womenoverseas.com" + user.avatarTemplate)
+                        .replacingOccurrences(of: "{size}", with: "400")
+                        .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+                       let avatarURL = URL(string: escapedString) {
+                        VStack(alignment: .trailing) {
+                            AsyncImage(url: avatarURL) { image in
+                                image.resizable()
+                            } placeholder: {
+                                Circle().fill(Color.blue.opacity(0.3)).frame(width: avatarWidth)
+                            }
+                            .frame(width: avatarWidth, height: avatarWidth)
+                            .cornerRadius(avatarWidth / 2)
                         }
                     }
-                }
-                Spacer()
-                if let user = self.user,
-                    let escapedString = String("https://womenoverseas.com" + user.avatarTemplate)
-                    .replacingOccurrences(of: "{size}", with: "400")
-                    .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-                    let avatarURL = URL(string: escapedString) {
-                    VStack(alignment: .trailing) {
-                        AsyncImage(url: avatarURL) { image in
-                            image.resizable()
-                        } placeholder: {
-                            Circle().fill(Color.blue.opacity(0.3)).frame(width: avatarWidth)
-                        }
-                        .frame(width: avatarWidth, height: avatarWidth)
-                        .cornerRadius(avatarWidth / 2)
-                    }
-                }
-            }
-            HStack(spacing: detailInfoSpacing) { // lastUpdated_viewCount_postCount
-                Text(lastPostedAt(topic.lastPostedAt)).font(.system(size: lastViewFontSize))
-                Spacer()
-                Image(systemName: "eye.fill").font(.system(size: lastViewFontSize))
-                Text("\(topic.views)").font(.system(size: lastViewFontSize))
-                Image(systemName: "circle.fill").font(.system(size: 2.5))
-                Image(systemName: "text.bubble.fill").font(.system(size: lastViewFontSize))
-                Text("\(topic.postsCount)").font(.system(size: lastViewFontSize))
-                Image(systemName: "circle.fill").font(.system(size: 2.5))
-                Image(systemName: "heart.fill").font(.system(size: lastViewFontSize))
-                Text("\(topic.likeCount)").font(.system(size: lastViewFontSize))
-            }.foregroundColor(Color(UIColor.lightGray))
-        }.padding(rowPadding)
-    }
-}
-
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (1, 1, 1, 0)
+                } // title, tags, avatar
+                HStack(spacing: detailInfoSpacing) {
+                    Text(lastPostedAt(topic.lastPostedAt)).font(.system(size: lastViewFontSize))
+                    Spacer()
+                    Image(systemName: "eye.fill").font(.system(size: lastViewFontSize))
+                    Text("\(topic.views)").font(.system(size: lastViewFontSize))
+                    Image(systemName: "circle.fill").font(.system(size: 2.5))
+                    Image(systemName: "text.bubble.fill").font(.system(size: lastViewFontSize))
+                    Text("\(topic.postsCount)").font(.system(size: lastViewFontSize))
+                    Image(systemName: "circle.fill").font(.system(size: 2.5))
+                    Image(systemName: "heart.fill").font(.system(size: lastViewFontSize))
+                    Text("\(topic.likeCount)").font(.system(size: lastViewFontSize))
+                } // lastUpdated, views, posts, likes
+                .foregroundColor(Color(UIColor.lightGray))
+            }.padding(rowPadding)
         }
-        
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue:  Double(b) / 255,
-            opacity: Double(a) / 255
-        )
     }
 }
-
 
 #if DEBUG
 let fakeTopic = Topic(id: 1,
@@ -291,9 +258,9 @@ let fakeTopic = Topic(id: 1,
 
 
 struct CategoriesFakeView: View {
-    
+
     private func category(_ type: Category, selected: Bool) -> some View {
-        let tint = Color("category_\(type.rawValue)", bundle: nil)
+        let tint = Color.orange
         return Text(type.description)
             .font(.system(size: 13))
             .foregroundColor(tint)
@@ -305,7 +272,7 @@ struct CategoriesFakeView: View {
             )
             .cornerRadius(16)
     }
-    
+
     var body: some View {
         var scrollView = ScrollView(.horizontal) {
             HStack(spacing: 4) {

@@ -14,11 +14,11 @@ private let refDropHeight: CGFloat = 70
 
 struct Webview: UIViewControllerRepresentable {
         
-    let type: TabbarView.Tab
-    let url: URL
+    let type: Tab
+    let url: String
     let secKey: SecKey?
     
-    init(type: TabbarView.Tab, url: URL, secKey: SecKey? = nil) {
+    init(type: Tab, url: String, secKey: SecKey? = nil) {
         self.type = type
         self.url = url
         self.secKey = secKey
@@ -26,7 +26,8 @@ struct Webview: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> WebviewController {
         let webviewController = WebviewController(seckKey: self.secKey, type: type, preloadLatest: false)
-        var urlRequest = URLRequest(url: self.url)
+        let URL = URL(string: self.url) ?? URL(string: "https://womenoverseas.com")!
+        var urlRequest = URLRequest(url: URL)
         if !APIService.shared.apiKey.isEmpty {
             urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")
         }
@@ -47,14 +48,14 @@ class WebviewController: UIViewController {
     }
     
     private let secKey: SecKey?
-    private let type: TabbarView.Tab
+    private let type: Tab
     private let refreshControl = UIRefreshControl()
     private var webViewTopConstraint: NSLayoutConstraint?
     
     lazy public var webview: WKWebView = WKWebView()
     lazy private var progressbar: UIProgressView = UIProgressView()
     
-    init(seckKey: SecKey?, type: TabbarView.Tab, preloadLatest: Bool = false) {
+    init(seckKey: SecKey?, type: Tab, preloadLatest: Bool = false) {
         self.secKey = seckKey
         self.type = type
         super.init(nibName: nil, bundle: nil)
@@ -116,7 +117,7 @@ class WebviewController: UIViewController {
             self?.setProgressBarPosition()
         }
         NotificationCenter.default.addObserver(forName: .triggerScrollToTopAndRefresh, object: nil, queue: .main) { [weak self] noti in
-            guard let triggeredTab = noti.userInfo?["tab"] as? TabbarView.Tab, triggeredTab == self?.type else { return }
+            guard let triggeredTab = noti.userInfo?["tab"] as? Tab, triggeredTab == self?.type else { return }
             self?.refreshControl.endRefreshing()
             self?.webview.scrollView.setContentOffset(CGPoint(x: 0, y: -refDropHeight), animated: true)
         }
@@ -149,7 +150,6 @@ extension WebviewController: UIScrollViewDelegate {
 extension WebviewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        print("route to \(navigationAction.request.url)")
         var payloadDecrypted = false
         if let url = webView.url, let secKey = self.secKey,
            let components = URLComponents(string: url.absoluteString),
@@ -200,7 +200,7 @@ extension WebviewController: WKNavigationDelegate {
         else {
             return
         }
-        let tabview = TabbarView(tab: .home, link: nil).accentColor(Color("button_pink", bundle: nil))
+        let tabview = TabBarView(selectedTab: .home, link: nil).accentColor(Color.accentForeground)
         sceneDelegate.window?.rootViewController = UIHostingController(rootView: tabview)
     }
     
@@ -242,4 +242,45 @@ extension WebviewController: WKNavigationDelegate {
             throw error
         }
     }
+}
+
+
+struct NavigationBarModifier: ViewModifier {
+    
+    var backgroundColor: UIColor?
+    var textColor: UIColor?
+    
+    init(backgroundColor: UIColor?, textColor: UIColor?) {
+        // assign
+        self.backgroundColor = backgroundColor
+        self.textColor = textColor
+        // configure
+        let coloredAppearance = UINavigationBarAppearance()
+        coloredAppearance.configureWithTransparentBackground()
+        coloredAppearance.backgroundColor = .clear
+        if let textColor = self.textColor {
+            coloredAppearance.titleTextAttributes = [.foregroundColor: textColor]
+            coloredAppearance.largeTitleTextAttributes = [.foregroundColor: textColor]
+        }
+        // change appearance
+        UINavigationBar.appearance().standardAppearance = coloredAppearance
+        UINavigationBar.appearance().compactAppearance = coloredAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = coloredAppearance
+        UINavigationBar.appearance().tintColor = textColor
+    }
+    
+    func body(content: Content) -> some View {
+        ZStack{
+            content
+            VStack {
+                GeometryReader { geometry in
+                    Color(backgroundColor ?? .white) // This is Color so we can reference frame
+                        .frame(height: geometry.safeAreaInsets.top)
+                        .edgesIgnoringSafeArea(.top)
+                    Spacer()
+                }
+            }
+        }
+    }
+    
 }

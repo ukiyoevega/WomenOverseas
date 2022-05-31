@@ -15,9 +15,9 @@ struct LoginView: View {
     var body: some View {
         ZStack {
             if #available(iOS 14, *) {
-                Color("background_pink", bundle: nil).ignoresSafeArea()
+                Color.accentBackground.ignoresSafeArea()
             } else {
-                Color("background_pink", bundle: nil).edgesIgnoringSafeArea(.all)
+                Color.accentBackground.edgesIgnoringSafeArea(.all)
             }
             VStack(alignment: .center, spacing: 6) {
                 Image("login_background", bundle: nil)
@@ -34,14 +34,14 @@ struct LoginView: View {
                 })
                 .padding(20)
                 .background(
-                    Color("button_pink", bundle: nil)
+                    Color.accentForeground
                         .frame(width: 343, height: 52)
                         .cornerRadius(20)
                 )
                 .sheet(isPresented: $showWebView) {
                     let request = ApiKeyRequest()
                     if let url = try? request.absoluteURL(), let secKey = request.keyPair {
-                        Webview(type: .none, url: url, secKey: secKey)
+                        Webview(type: .home, url: url.absoluteString, secKey: secKey)
                     }
                 }
                 HStack(spacing: 2) {

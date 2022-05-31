@@ -15,41 +15,43 @@ private let settingDetailSize: CGFloat = 15
 
 struct ProfileView: View {
     let store: Store<ProfileState, ProfileAction>
-        
+
     var body: some View {
         WithViewStore(self.store) { viewStore in
-            NavigationView {
-                ListWithoutSepatorsAndMargins {
-                    Group {
-                        ProfileHeaderView(store: self.store.scope(state: \.profileHeaderState, action: ProfileAction.header))
-                        ProfileSummaryView(store: self.store.scope(state: \.profileSummaryState, action: ProfileAction.summary))
-                            .padding([.top, .bottom]) // 2. Statistic Section
-                        ForEach(SettingEntry.allCases) { entry in
-                            NavigationLink(destination: entryView(entry)) {
-                                HStack(spacing: settingEntryIconTitleSpacing) {
-                                    Image(systemName: entry.iconName)
-                                        .frame(width: settingEntrySize)
-                                        .foregroundColor(Color.gray)
-                                    Text(entry.description)
-                                        .font(.system(size: settingEntryFontSize, weight: .semibold))
-                                        .foregroundColor(Color.black)
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .font(.system(size: settingDetailSize))
-                                        .foregroundColor(Color.gray)
-                                }
-                                .padding([.top, .bottom])
+            ListWithoutSepatorsAndMargins {
+                Group {
+                    ProfileHeaderView(store: self.store.scope(state: \.profileHeaderState, action: ProfileAction.header))
+                    ProfileSummaryView(store: self.store.scope(state: \.profileSummaryState, action: ProfileAction.summary))
+                        .padding([.top, .bottom])
+                    ForEach(SettingEntry.allCases) { entry in
+                        NavigationLink(destination: entryView(entry)) {
+                            HStack(spacing: settingEntryIconTitleSpacing) {
+                                Image(systemName: entry.iconName)
+                                    .frame(width: settingEntrySize)
+                                    .foregroundColor(Color.gray)
+                                Text(entry.description)
+                                    .font(.system(size: settingEntryFontSize, weight: .semibold))
+                                    .foregroundColor(Color.black)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: settingDetailSize))
+                                    .foregroundColor(Color.gray)
                             }
+                            .padding([.top, .bottom])
                         }
                     }
                 }
-                .padding()
-                .navigationBarTitle(Text("个人"))
-                .navigationBarTitleDisplayMode(.inline)
-                .onAppear {
-                    viewStore.send(.summary(.refresh))
-                    viewStore.send(.header(.refresh))
+            }
+            .padding()
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("个人").foregroundColor(Color.black)
                 }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                viewStore.send(.summary(.refresh))
+                viewStore.send(.header(.refresh))
             }
         }
     }
@@ -68,7 +70,7 @@ struct ProfileView: View {
         case .aboutUs:
             Text(entry.description)
         case .donation:
-            Webview(type: .none, url: "https://womenoverseas.com/t/topic/11426")
+            Webview(type: .home, url: "https://womenoverseas.com/t/topic/11426")
         }
     }
 }
@@ -109,7 +111,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     case settings
     case aboutUs
     case donation
-
+    
     var description: String {
         get {
             switch self {
@@ -136,12 +138,12 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
         }
     }
 }
-/*
+
 #if DEBUG
 struct ProfileView_Previews : PreviewProvider {
     static var previews: some View {
-        ProfileView()
+        ProfileView(store: Store(initialState: ProfileState(),
+                                 reducer: profileReducer, environment: ()))
     }
 }
 #endif
-*/

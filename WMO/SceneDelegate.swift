@@ -21,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             if key.isEmpty {
                 window.rootViewController = UIHostingController(rootView: contentView)
             } else {
-                let tab = TabbarView(tab: .home, link: nil).accentColor(Color("button_pink", bundle: nil))
+                let tab = TabBarView(selectedTab: .home, link: nil).accentColor(Color.accentForeground)
                 window.rootViewController = UIHostingController(rootView: tab)
             }
             self.window = window
@@ -30,10 +30,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        print("UIApplication continue userActivity \(userActivity.webpageURL?.absoluteString)")
         if let url = userActivity.webpageURL, url.path.contains("topic") {
-            print("UIApplication continue userActivity done \(userActivity)")
-            let tabview = TabbarView(tab: .latest, link: url.absoluteString).accentColor(Color("button_pink", bundle: nil))
+            let tabview = TabBarView(selectedTab: .latest, link: url.absoluteString).accentColor(Color.accentForeground)
             self.window?.rootViewController = UIHostingController(rootView: tabview)
         }
     }
