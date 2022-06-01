@@ -19,84 +19,53 @@ struct Failure: Error, Equatable {}
 
 struct APIService {
     // TODO: test code. decoder reuse issue
-    
-    lazy var getUser: (EndPoint.User) -> Effect<UserResponse, Failure> = {
-        return { endpoint in
-            let path = endpoint.path
-            var components = URLComponents(string: "https://womenoverseas.com" + path)!
-            components.queryItems = endpoint.params.map { param in
-                URLQueryItem(name: param.key, value: "\(param.value)")
-            }
-            var urlRequest = URLRequest(url: components.url!)
-            urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")
-            return URLSession.shared.dataTaskPublisher(for: urlRequest)
-              .map { data, _ in data }
-              .decode(type: UserResponse.self, decoder: JSONDecoder())
-              .map({ response in response })
-              .mapError { error in
-                  print("error \(error)")
-                  return Failure() // TODO: error handling
-              }
-              .eraseToEffect()
+
+    private static func generateRequest(endpoint: RESTful) -> URLRequest {
+        var components = URLComponents(string: "https://womenoverseas.com" + endpoint.path)!
+        components.queryItems = endpoint.params.map { param in
+            URLQueryItem(name: param.key, value: "\(param.value)")
         }
+        var urlRequest = URLRequest(url: components.url!) // TODO: remove force unwrap
+        urlRequest.httpMethod = endpoint.method.rawValue
+        urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")
+        return urlRequest
+    }
+
+    private static func generateDataTaskPublisher<ResponseType: Decodable>(endpoint: RESTful) -> Effect<ResponseType, Failure> {
+        return URLSession.shared.dataTaskPublisher(for: generateRequest(endpoint: endpoint))
+          .map { data, _ in data }
+          .decode(type: ResponseType.self, decoder: JSONDecoder())
+          .mapError { error in
+              print("error \(error)")
+              return Failure() // TODO: error handling
+          }
+          .eraseToEffect()
+    }
+
+    lazy var updateUser: (EndPoint.User) -> Effect<UserResponse, Failure> = {
+        return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
+    }()
+
+    lazy var getUser: (EndPoint.User) -> Effect<UserResponse, Failure> = {
+        return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
     }()
     
     lazy var getUserSummary: (EndPoint.User) -> Effect<UserSummaryResponse, Failure> = {
-        return { endpoint in
-            let path = endpoint.path
-            var components = URLComponents(string: "https://womenoverseas.com" + path)!
-            components.queryItems = endpoint.params.map { param in
-                URLQueryItem(name: param.key, value: "\(param.value)")
-            }
-            var urlRequest = URLRequest(url: components.url!)
-            urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")
-            return URLSession.shared.dataTaskPublisher(for: urlRequest)
-              .map { data, _ in data }
-              .decode(type: UserSummaryResponse.self, decoder: JSONDecoder())
-              .map({ response in response })
-              .mapError { error in
-                  print("error \(error)")
-                  return Failure() // TODO: error handling
-              }
-              .eraseToEffect()
-        }
+        return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
     }()
     
     lazy var getTopics: (EndPoint.Topics) -> Effect<TopicListResponse, Failure> = {
-        return { endpoint in
-            let path = endpoint.path
-            // TODO: remove force unwrap
-            var components = URLComponents(string: "https://womenoverseas.com" + path)!
-            components.queryItems = endpoint.params.map { param in
-                URLQueryItem(name: param.key, value: "\(param.value)")
-            }
-            var urlRequest = URLRequest(url: components.url!)
-            urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")
-            return URLSession.shared.dataTaskPublisher(for: urlRequest)
-              .map { data, _ in data }
-              .decode(type: TopicListResponse.self, decoder: JSONDecoder())
-              .map({ response in response })
-              .mapError { error in
-                  print("error \(error)")
-                  return Failure() // TODO: error handling
-              }
-              .eraseToEffect()
-        }
+        return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
     }()
     
-    lazy var getCategories: () -> Effect<[CategoryList.Category], Failure> = {
-        return {
-            var components = URLComponents(string: "https://womenoverseas.com" + EndPoint.Category.list.path)!
-            var urlRequest = URLRequest(url: components.url!)
-            urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")
-            
-            return URLSession.shared.dataTaskPublisher(for: urlRequest)
+    lazy var getCategories: (EndPoint.Category) -> Effect<[CategoryList.Category], Failure> = {
+        return { endpoint in
+            return URLSession.shared.dataTaskPublisher(for: APIService.generateRequest(endpoint: endpoint))
               .map { data, _ in data }
               .decode(type: CategoriesResponse.self, decoder: JSONDecoder())
               .map({ response in response.categoryList.categories })
               .mapError { error in
-                  print("error \(error)")
-                  return Failure() // TODO: error handling
+                  return Failure()
               }
               .eraseToEffect()
         }

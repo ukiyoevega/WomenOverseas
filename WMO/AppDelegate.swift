@@ -56,7 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("UIApplication continue userActivity \(userActivity)")
         if let url = userActivity.webpageURL?.path {
             print("continue userActivity \(url)")
-            let tabview = TabBarView(selectedTab: .latest, link: url).accentColor(Color.accentForeground)
+            let tabview = TabBarView(selectedTab: .latest, link: url)
             self.window?.rootViewController = UIHostingController(rootView: tabview)
             return true
         }

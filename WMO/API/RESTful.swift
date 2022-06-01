@@ -9,7 +9,7 @@ import Foundation
 
 enum EndPoint {}
 
-enum HTTPMethod {
+enum HTTPMethod: String {
     case GET
     case HEAD
     

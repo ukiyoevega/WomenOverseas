@@ -54,7 +54,7 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
 
     case .loadCategories:
         state.categories.removeAll()
-        return APIService.shared.getCategories()
+        return APIService.shared.getCategories(.list)
             .receive(on: environment.mainQueue)
             .catchToEffect(TopicAction.categoriesResponse)
         

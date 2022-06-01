@@ -30,6 +30,7 @@ extension EndPoint {
         case followers(username: String)
         case badges(username: String)
         // settings
+        case update(username: String, name: String, value: String)
         case preference(name: String, type: String, payload: String)
         case upload(file: Data, type: UploadType, uid: Int)
     }
@@ -48,13 +49,14 @@ extension EndPoint.User: RESTful {
         case .badges(let name): return "/user-badges/\(name).json"
         case .preference(let name, let type, _): return "/u/\(name)/preferences/\(type).json"
         case .upload: return "/uploads.json"
+        case .update(let username, _, _): return "/u/\(username).json"
         }
     }
     
     var method: HTTPMethod {
         switch self {
         case .upload: return .POST
-        case .preference: return .PUT
+        case .preference, .update: return .PUT
         default: return .GET
         }
     }
@@ -63,6 +65,8 @@ extension EndPoint.User: RESTful {
         switch self {
         case .preference(let name, let type, let payload):
             return ["username": name, type: payload]
+        case .update(_, let name, let value):
+            return [name: value]
         case .upload(let file, let type, let uid):
             return ["type": type.rawValue, "user_id": uid, "file": file] // TODO: decode data
         default:

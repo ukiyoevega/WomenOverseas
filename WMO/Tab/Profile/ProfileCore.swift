@@ -15,15 +15,33 @@ struct ProfileEnvironment {
 
 struct ProfileHeaderState: Equatable {
     var userResponse: UserResponse = .empty
+    var successMessage: String? = nil
 }
 
 enum ProfileHeaderAction {
     case refresh
+    case dismissToast
     case userResponse(Result<UserResponse, Failure>)
+
+    case update(name: String, value: String)
+    case updateResponse(Result<UserResponse, Failure>)
 }
 
 let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, ProfileEnvironment> { state, action, environment in
     switch action {
+    case .update(let name, let value):
+        return APIService.shared.updateUser(.update(username: "weijia", name: name, value: value))
+            .receive(on: environment.mainQueue)
+            .catchToEffect(ProfileHeaderAction.userResponse)
+    case .updateResponse(.success(let userResponse)):
+        state.successMessage = "更新成功"
+//        state.userResponse = userResponse
+    case .dismissToast:
+        state.successMessage = nil
+
+    case .updateResponse(.failure):
+        break // TODO: errer handling
+
     case .refresh:
         return APIService.shared.getUser(.getUser(name: "weijia"))
             .receive(on: environment.mainQueue)
@@ -65,6 +83,7 @@ let profileSummaryReducer = Reducer<ProfileSummaryState, ProfileSummaryAction, P
 // MARK: - Profile
 
 struct ProfileState: Equatable {
+    var isNativeMode: Bool = true
     var profileSummaryState = ProfileSummaryState()
     var profileHeaderState = ProfileHeaderState()
 }
@@ -72,6 +91,7 @@ struct ProfileState: Equatable {
 enum ProfileAction {
     case summary(ProfileSummaryAction)
     case header(ProfileHeaderAction)
+    case toggleNativeMode(Bool)
 }
 
 // TODO: reducer should not be global instance
@@ -90,6 +110,8 @@ let profileReducer = Reducer<ProfileState, ProfileAction, Void>.combine(
         switch action {
         case .summary, .header:
             return .none
+        case .toggleNativeMode(let isNative):
+            return .none // TODO: 
         }
     }
 )

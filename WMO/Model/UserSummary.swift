@@ -51,6 +51,26 @@ enum User {
     }
     
     struct User: Decodable, Equatable {
+
+        func getInfo(_ infoEntry: EditEntry) -> String? {
+            switch infoEntry {
+            case .avatar:
+                return nil
+            case .name:
+                return self.name
+            case .bio:
+                return self.bioRaw
+            case .title:
+                return self.title
+            case .group:
+                return self.flairName
+            case .site:
+                return self.websiteName
+            case .birthday:
+                return self.birthday
+            }
+        }
+
         let id: Int
         let username: String
         let name: String?
@@ -69,6 +89,8 @@ enum User {
         let canChangeWebsite: Bool?
         let canChangeTrackingPreference: Bool?
         let birthday: String?
+        let website: String?
+        let websiteName: String?
 
         let admin: Bool?
         let moderator: Bool?
@@ -108,6 +130,8 @@ enum User {
             case canChangeWebsite = "can_change_website"
             case canChangeTrackingPreference = "can_change_tracking_preferences"
             case birthday = "date_of_birth"
+            case website
+            case websiteName = "website_name"
         }
     }
     

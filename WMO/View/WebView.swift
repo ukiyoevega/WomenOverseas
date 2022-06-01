@@ -200,7 +200,7 @@ extension WebviewController: WKNavigationDelegate {
         else {
             return
         }
-        let tabview = TabBarView(selectedTab: .home, link: nil).accentColor(Color.accentForeground)
+        let tabview = TabBarView(selectedTab: .home, link: nil)
         sceneDelegate.window?.rootViewController = UIHostingController(rootView: tabview)
     }
     

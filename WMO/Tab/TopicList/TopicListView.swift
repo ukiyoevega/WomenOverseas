@@ -179,7 +179,9 @@ struct TopicRow: View {
         ZStack {
             NavigationLink(destination: Webview(type: .home, url: "https://womenoverseas.com/t/topic/\(topic.id)")) {
                 EmptyView()
-            }.opacity(0)
+            }
+            .opacity(0)
+            .navigationBarTitle("") // remove back button title
             VStack(spacing: itemVerticalSpacing) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: itemVerticalSpacing) {

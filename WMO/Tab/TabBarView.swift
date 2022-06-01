@@ -20,6 +20,12 @@ struct TabBarView : View {
 
     let link: String?
 
+    init(selectedTab: Tab, link: String? = nil) {
+        self.selectedTab = selectedTab
+        self.link = link
+        self.setupAppearance()
+    }
+
     let topicList = TopicListView(store: Store(initialState: TopicState(),
                                                    reducer: topicReducer,
                                                    environment: TopicEnvironment()))
@@ -34,14 +40,16 @@ struct TabBarView : View {
     var body: some View {
         
         NavigationView {
-            VStack {
+            VStack(spacing: 0) {
                 ZStack {
                     switch selectedTab {
                     case .home: topicList
                     case .latest: latestWeb
                             .modifier(statusBarModifier)
+                            .navigationBarHidden(true)
                     case .events: eventsWeb
                             .modifier(statusBarModifier)
+                            .navigationBarHidden(true)
                     case .profile: profile
                     }
                 }
@@ -68,6 +76,11 @@ struct TabBarView : View {
                 }
             }
         }
+        .accentColor(Color.mainIcon) // webview loading color
+    }
+
+    private func setupAppearance() {
+        UINavigationBar.appearance().tintColor = UIColor(hex: "D8805E")
     }
 }
 

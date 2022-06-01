@@ -25,33 +25,40 @@ struct ProfileView: View {
                         .padding([.top, .bottom])
                     ForEach(SettingEntry.allCases) { entry in
                         NavigationLink(destination: entryView(entry)) {
-                            HStack(spacing: settingEntryIconTitleSpacing) {
-                                Image(systemName: entry.iconName)
-                                    .frame(width: settingEntrySize)
-                                    .foregroundColor(Color.gray)
-                                Text(entry.description)
-                                    .font(.system(size: settingEntryFontSize, weight: .semibold))
-                                    .foregroundColor(Color.black)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: settingDetailSize))
-                                    .foregroundColor(Color.gray)
-                            }
+                            entryRow(entry, toggle: viewStore
+                                        .binding(get: \.isNativeMode, send: ProfileAction.toggleNativeMode))
                             .padding([.top, .bottom])
                         }
+                        .navigationBarTitle("") // remove back button title
                     }
                 }
             }
-            .padding()
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("个人").foregroundColor(Color.black)
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
+            .padding([.leading, .trailing, .top])
             .onAppear {
                 viewStore.send(.summary(.refresh))
                 viewStore.send(.header(.refresh))
+            }
+        }
+    }
+
+    @ViewBuilder
+    func entryRow(_ entry: SettingEntry, toggle: Binding<Bool>) -> some View {
+        HStack(spacing: settingEntryIconTitleSpacing) {
+            Image(systemName: entry.iconName)
+                .frame(width: settingEntrySize)
+                .foregroundColor(Color.gray)
+            Text(entry.description)
+                .font(.system(size: settingEntryFontSize, weight: .semibold))
+                .foregroundColor(Color.black)
+            Spacer()
+
+            if entry == .theme {
+                Toggle(isOn: toggle) { }
+                        .toggleStyle(SmallToggleStyle())
+            } else {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: settingDetailSize))
+                    .foregroundColor(Color.gray)
             }
         }
     }
@@ -86,7 +93,7 @@ struct ListWithoutSepatorsAndMargins<Content: View>: View {
     
     var body: some View {
         if #available(iOS 14.0, *) {
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: 0) {
                     self.content()
                 }
@@ -135,6 +142,37 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
             case .aboutUs: return "info.circle"
             case .theme: return "switch.2"
             }
+        }
+    }
+}
+
+struct SmallToggleStyle: ToggleStyle {
+
+    private let toggleWidth: CGFloat = 35
+    private let toggleHeight: CGFloat = 21
+    private let circlePadding: CGFloat = 3
+    private let circleOffset: CGFloat = 7
+
+    var circleHeight: CGFloat {
+        toggleHeight - circlePadding * 2
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        HStack {
+            configuration.label
+            Spacer()
+            Rectangle()
+                .foregroundColor(configuration.isOn ? Color.mainIcon : .gray)
+                .frame(width: toggleWidth, height: toggleHeight, alignment: .center)
+                .overlay(
+                    Circle()
+                        .foregroundColor(.white)
+                        .padding(.all, circlePadding)
+                        .offset(x: configuration.isOn ? circleOffset : -circleOffset, y: 0)
+                        .animation(Animation.linear(duration: 0.1))
+
+                ).cornerRadius(circleHeight)
+                .onTapGesture { configuration.isOn.toggle() }
         }
     }
 }
