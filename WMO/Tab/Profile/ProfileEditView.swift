@@ -59,9 +59,11 @@ struct ProfileEditView: View {
             ProfileSelectionView(selectedId: resp.user.flairGroupId ?? -1, items: resp.user.groups ?? [], updateAction: { selectedId in
                 viewStore.send(.update(name: "flair_group_id", value: selectedId == -1 ? "" : "\(selectedId)"))
             })
-        case .date_of_birth: // 1904-06-27
-            EmptyView()
-        default:
+        case .date_of_birth:
+            ProfileDateView(updateAction: { dateString in
+                viewStore.send(.update(name: "date_of_birth", value: dateString))
+            })
+        case .avatar:
             EmptyView()
         }
     }
@@ -143,6 +145,39 @@ fileprivate struct ProfileSelectionView<Item: CustomStringConvertible & CustomId
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
                     updateAction(self.selectedId)
+                } label: {
+                    Text("完成")
+                        .font(.system(size: toolbarItemSize, weight: .bold))
+                        .foregroundColor(Color.mainIcon)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - ProfileDateView
+
+fileprivate struct ProfileDateView: View {
+    @State var birthDate = Date()
+    let updateAction: (String) -> Void
+
+    var body: some View {
+        Form {
+            VStack {
+                DatePicker("Date of Birth", selection: $birthDate, in: ...Date(), displayedComponents: .date)
+                    .datePickerStyle(WheelDatePickerStyle())
+                    .environment(\.locale, .init(identifier: "zh-Hans"))
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("编辑生日")
+                    .font(.system(size: toolbarItemSize, weight: .semibold))
+                    .foregroundColor(Color.black)
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    updateAction(self.birthDate.exactDateString)
                 } label: {
                     Text("完成")
                         .font(.system(size: toolbarItemSize, weight: .bold))
