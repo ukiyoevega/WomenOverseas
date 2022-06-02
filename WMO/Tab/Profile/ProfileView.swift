@@ -13,6 +13,8 @@ private let settingEntryFontSize: CGFloat = 14
 private let settingEntryIconTitleSpacing: CGFloat = 8
 private let settingDetailSize: CGFloat = 15
 
+// 关注者 8 - 正在关注 1 - 加入日期： 20 年 0 月 4 日 - 最后一个帖子 23 小时 - 最后活动 4 分钟 - 浏览量 627
+// https://womenoverseas.com/u/merry_go_round/summary
 struct ProfileView: View {
     let store: Store<ProfileState, ProfileAction>
 
@@ -66,8 +68,6 @@ struct ProfileView: View {
     @ViewBuilder
     func entryView(_ entry: SettingEntry) -> some View {
         switch entry {
-        case .account:
-            Text(entry.description)
         case .notification:
             Text(entry.description)
         case .theme:
@@ -75,7 +75,7 @@ struct ProfileView: View {
         case .settings:
             Text(entry.description)
         case .aboutUs:
-            Text(entry.description)
+            AboutView()
         case .donation:
             Webview(type: .home, url: "https://womenoverseas.com/t/topic/11426")
         }
@@ -112,7 +112,7 @@ struct ListWithoutSepatorsAndMargins<Content: View>: View {
 enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     var id: String { self.rawValue }
     
-    case account
+//    case account
     case notification
     case theme
     case settings
@@ -122,12 +122,12 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     var description: String {
         get {
             switch self {
-            case .account: return "我的账号"
+//            case .account: return "我的账号"
             case .notification: return "我的通知"
-            case .donation: return "捐助"
+            case .theme: return "切换到原生模式"
             case .settings: return "设置"
             case .aboutUs: return "关于我们"
-            case .theme: return "切换到原生模式"
+            case .donation: return "捐助"
             }
         }
     }
@@ -135,7 +135,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     var iconName: String {
         get {
             switch self {
-            case .account: return "person.crop.artframe"
+//            case .account: return "person.crop.artframe"
             case .notification: return "envelope"
             case .donation: return "yensign.circle"
             case .settings: return "gearshape.2"

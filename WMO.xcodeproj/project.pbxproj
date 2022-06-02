@@ -31,6 +31,7 @@
 		B2AA64A228445793006F50C0 /* ProfileCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA64A128445793006F50C0 /* ProfileCore.swift */; };
 		B2AA679F28448743006F50C0 /* ProfileHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA679E28448743006F50C0 /* ProfileHeaderView.swift */; };
 		B2AA67A128459D10006F50C0 /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA67A028459D10006F50C0 /* Color+Extension.swift */; };
+		B2AFEE9428486ECE0053DE32 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AFEE9328486ECE0053DE32 /* AboutView.swift */; };
 		B2EE551428119AE6008A8DD5 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EE551328119AE6008A8DD5 /* TabBarView.swift */; };
 		B2EE551828119AE9008A8DD5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2EE551728119AE9008A8DD5 /* Assets.xcassets */; };
 		B2EE551B28119AE9008A8DD5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2EE551A28119AE9008A8DD5 /* Preview Assets.xcassets */; };
@@ -74,6 +75,7 @@
 		B2AA64A128445793006F50C0 /* ProfileCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCore.swift; sourceTree = "<group>"; };
 		B2AA679E28448743006F50C0 /* ProfileHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHeaderView.swift; sourceTree = "<group>"; };
 		B2AA67A028459D10006F50C0 /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
+		B2AFEE9328486ECE0053DE32 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		B2EE551028119AE6008A8DD5 /* WMO.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WMO.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2EE551328119AE6008A8DD5 /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
 		B2EE551728119AE9008A8DD5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -148,6 +150,7 @@
 				B2AA679E28448743006F50C0 /* ProfileHeaderView.swift */,
 				B2014BF82845D3430051E1B4 /* ProfileEditView.swift */,
 				B2322FF8284263130048A717 /* ProfileCustomViews.swift */,
+				B2AFEE9328486ECE0053DE32 /* AboutView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -334,6 +337,7 @@
 				B2AA67A128459D10006F50C0 /* Color+Extension.swift in Sources */,
 				B23230052843124C0048A717 /* ImageService.swift in Sources */,
 				B2014BF92845D3430051E1B4 /* ProfileEditView.swift in Sources */,
+				B2AFEE9428486ECE0053DE32 /* AboutView.swift in Sources */,
 				B2EE552F28123451008A8DD5 /* UserSummary.swift in Sources */,
 				B2644288283FB3E100FBEDCE /* EndPoint.User.swift in Sources */,
 				B2A48371283E41380053B73A /* TopicList.swift in Sources */,
