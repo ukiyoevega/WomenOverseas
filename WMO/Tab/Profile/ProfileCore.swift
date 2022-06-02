@@ -15,7 +15,7 @@ struct ProfileEnvironment {
 
 struct ProfileHeaderState: Equatable {
     var userResponse: UserResponse = .empty
-    var successMessage: String? = nil
+    var successMessage: String = ""
 }
 
 enum ProfileHeaderAction {
@@ -30,14 +30,16 @@ enum ProfileHeaderAction {
 let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, ProfileEnvironment> { state, action, environment in
     switch action {
     case .update(let name, let value):
+        state.successMessage = ""
         return APIService.shared.updateUser(.update(username: "weijia", name: name, value: value))
             .receive(on: environment.mainQueue)
-            .catchToEffect(ProfileHeaderAction.userResponse)
+            .catchToEffect(ProfileHeaderAction.updateResponse)
     case .updateResponse(.success(let userResponse)):
+        state.userResponse.user = userResponse.user
         state.successMessage = "更新成功"
-//        state.userResponse = userResponse
+        break
     case .dismissToast:
-        state.successMessage = nil
+        state.successMessage = ""
 
     case .updateResponse(.failure):
         break // TODO: errer handling
@@ -105,7 +107,7 @@ let profileReducer = Reducer<ProfileState, ProfileAction, Void>.combine(
       state: \ProfileState.profileHeaderState,
       action: /ProfileAction.header,
       environment: { ProfileEnvironment() }
-    ),
+    ).debug(),
     Reducer { state, action, _ in
         switch action {
         case .summary, .header:

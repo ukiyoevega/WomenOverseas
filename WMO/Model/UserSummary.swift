@@ -13,23 +13,22 @@ enum User {
     struct Badge: Decodable, Equatable {
         let id: Int
         let name: String
-        /*
-         "description": "\u003ca href=\"https://blog.discourse.org/2018/06/understanding-discourse-trust-levels/\"\u003e授予\u003c/a\u003e所有基础社区功能",
-         "grant_count": 9516,
-         "allow_title": true,
-         "multiple_grant": false,
-         "icon": "fa-user",
-         "image_url": null,
-         "listable": true,
-         "enabled": true,
-         "badge_grouping_id": 4,
-         "system": true,
-         "slug": "-",
-         "manually_grantable": false,
-         "badge_type_id": 3
-         */
     }
-    
+
+    struct FlairGroup: Decodable, Equatable {
+        let id: Int
+        let name: String
+        let flairURL: String?
+        let fullName: String?
+
+        enum CodingKeys: String, CodingKey {
+            case id
+            case name
+            case flairURL = "flair_url"
+            case fullName = "full_name"
+        }
+    }
+
     struct UserBadge: Decodable, Equatable {
         let id: Int
         let grantedAt: String
@@ -58,15 +57,15 @@ enum User {
                 return nil
             case .name:
                 return self.name
-            case .bio:
+            case .bio_raw:
                 return self.bioRaw
             case .title:
                 return self.title
             case .group:
                 return self.flairName
-            case .site:
+            case .website:
                 return self.websiteName
-            case .birthday:
+            case .date_of_birth:
                 return self.birthday
             }
         }
@@ -76,6 +75,8 @@ enum User {
         let name: String?
         let avatarTemplate: String
         let flairName: String? // LGBTQ
+        let flairGroupId: Int?
+        let groups: [FlairGroup]?
         
         let email: String?
         let lastPostedAt: String?
@@ -107,6 +108,8 @@ enum User {
             case name
             case avatarTemplate = "avatar_template"
             case flairName = "flair_name"
+            case flairGroupId = "flair_group_id"
+            case groups
             
             case admin
             case moderator

@@ -14,6 +14,7 @@ extension Color {
     static let accentBackground = Color("background_pink", bundle: nil)
     static let tagBackground = Color("tag_bg", bundle: nil)
     static let tagText = Color("tag_text", bundle: nil)
+    static let systemGroup = Color(hex: "F2F2F6")
 
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)

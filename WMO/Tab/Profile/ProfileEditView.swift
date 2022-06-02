@@ -16,16 +16,18 @@ private let textFieldTextInset: CGFloat = 12
 private let toolbarItemSize: CGFloat = 15
 private let avatarWidth: CGFloat = 40
 
+// MARK: - ProfileEditView
+
 struct ProfileEditView: View {
 
     let store: Store<ProfileHeaderState, ProfileHeaderAction>
-    let user: User.User
+    let user: User.User // TODO: remove
 
     var body: some View {
         WithViewStore(self.store) { viewStore in
             ListWithoutSepatorsAndMargins {
                 ForEach(EditEntry.allCases) { entry in
-                    NavigationLink(destination: ProfileEditingView(editingText: viewStore.userResponse.user.getInfo(entry) ?? "", store: self.store, editEntry: entry)) {
+                    NavigationLink(destination: destination(viewStore: viewStore, entry: entry)) {
                         entryRow(entry)
                             .padding([.top, .bottom])
                     }
@@ -44,6 +46,27 @@ struct ProfileEditView: View {
     }
 
     @ViewBuilder
+    func destination(viewStore: ViewStore<ProfileHeaderState, ProfileHeaderAction>, entry: EditEntry) -> some View {
+        let resp = viewStore.userResponse
+        switch entry {
+        case .name, .bio_raw, .website:
+            ProfileEditingView(editingText: resp.user.getInfo(entry) ?? "", store: self.store, editEntry: entry)
+        case .title:
+            ProfileSelectionView(selectedId: resp.selectedBadge.id, items: resp.badges ?? [], updateAction: { selectedId in
+                viewStore.send(.update(name: entry.rawValue, value: viewStore.userResponse.updatedBadgeName(id: selectedId)))
+            })
+        case .group:
+            ProfileSelectionView(selectedId: resp.user.flairGroupId ?? -1, items: resp.user.groups ?? [], updateAction: { selectedId in
+                viewStore.send(.update(name: "flair_group_id", value: selectedId == -1 ? "" : "\(selectedId)"))
+            })
+        case .date_of_birth: // 1904-06-27
+            EmptyView()
+        default:
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder
     func entryRow(_ entry: EditEntry) -> some View {
         HStack {
             Text(entry.description)
@@ -58,7 +81,7 @@ struct ProfileEditView: View {
             if entry == .avatar, !user.avatarTemplate.isEmpty,
                let escapedString = String("https://womenoverseas.com" + user.avatarTemplate)
                 .replacingOccurrences(of: "{size}", with: "400")
-               .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
                let avatarURL = URL(string: escapedString) {
                 AsyncImage(url: avatarURL) { image in
                     image.resizable()
@@ -75,7 +98,64 @@ struct ProfileEditView: View {
     }
 }
 
-struct ProfileEditingView: View {
+// MARK: - ProfileSelectionView
+
+fileprivate struct ProfileSelectionView<Item: CustomStringConvertible & CustomIdentifiable>: View {
+
+    @State var selectedId: Int
+    let items: [Item]
+    let updateAction: (Int) -> Void
+
+    func button(id: Int, name: String) -> some View {
+        Button {
+            self.selectedId = id
+        } label: {
+            HStack {
+                Text(name)
+                    .foregroundColor(Color.black)
+                    .font(.system(size: settingEditingFontSize, weight: .semibold))
+                Spacer()
+                if (self.selectedId == id) {
+                    Image(systemName: "checkmark")
+                        .resizable()
+                        .font(.system(size: toolbarItemSize, weight: .bold))
+                        .frame(width: 20, height: 15)
+                        .foregroundColor(Color.mainIcon)
+
+                }
+            }
+        }
+    }
+
+    public var body: some View {
+        Form {
+            button(id: -1, name: "无")
+            ForEach(items, id: \.identifier) { item in
+                button(id: item.identifier, name: item.description)
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("编辑头衔")
+                    .font(.system(size: toolbarItemSize, weight: .semibold))
+                    .foregroundColor(Color.black)
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    updateAction(self.selectedId)
+                } label: {
+                    Text("完成")
+                        .font(.system(size: toolbarItemSize, weight: .bold))
+                        .foregroundColor(Color.mainIcon)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - ProfileEditingView
+
+fileprivate struct ProfileEditingView: View {
 
     @State var editingText: String = ""
 
@@ -94,6 +174,11 @@ struct ProfileEditingView: View {
                         .accentColor(Color.accentForeground)
                         .font(.system(size: settingEditingFontSize, weight: .semibold))
                 }
+                /*
+                .hud(isPresented: viewStore.binding(get: \.successMessage, send: .dismissToast)) {
+                    Label(viewStore.successMessage, systemImage: "star.fill")
+                }
+                 */
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -105,7 +190,7 @@ struct ProfileEditingView: View {
                     Button {
                         viewStore.send(.update(name: self.editEntry.rawValue, value: self.editingText))
                     } label: {
-                        Image(systemName: "checkmark")
+                        Text("完成")
                             .font(.system(size: toolbarItemSize, weight: .bold))
                             .foregroundColor(editingText.isEmpty ? Color.gray.opacity(0.5) : Color.mainIcon)
                     }
@@ -116,28 +201,43 @@ struct ProfileEditingView: View {
     }
 }
 
+// MARK: - Extensions
+
+fileprivate protocol CustomIdentifiable {
+    var identifier: Int { get }
+}
+
+extension User.Badge: CustomStringConvertible, CustomIdentifiable {
+    var identifier: Int { self.id }
+    var description: String { self.name }
+}
+extension User.FlairGroup: CustomStringConvertible, CustomIdentifiable {
+    var identifier: Int { self.id }
+    var description: String { self.name }
+}
+
 enum EditEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     var id: String { self.rawValue }
 
     case avatar
     case name
-    case bio
+    case bio_raw
     // case timezone
     case title
     case group // 资历
-    case site
-    case birthday
+    case website
+    case date_of_birth
 
     var description: String {
         get {
             switch self {
             case .avatar: return "头像"
             case .name: return "姓名"
-            case .bio: return "自我介绍"
+            case .bio_raw: return "自我介绍"
             case .title: return "头衔"
             case .group: return "资历"
-            case .site: return "网站"
-            case .birthday: return "出生日期"
+            case .website: return "网站"
+            case .date_of_birth: return "出生日期"
             }
         }
     }
@@ -147,9 +247,9 @@ enum EditEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
             switch self {
             case .name:
                 return "您的全名（可选）"
-            case .bio:
+            case .bio_raw:
                 return "自我介绍"
-            case .site:
+            case .website:
                 return "网站"
             default:
                 return nil
@@ -162,7 +262,7 @@ enum EditEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
 struct ProfileEditView_Previews : PreviewProvider {
     static var previews: some View {
         ProfileEditingView(store: Store(initialState: ProfileHeaderState(), reducer: profileHeaderReducer, environment: ProfileEnvironment()), editEntry: .name)
-            .hud(isPresented: .constant(true)) {
+            .hud(isPresented: .constant("safs")) {
                 Text("hud message")
             }
     }
