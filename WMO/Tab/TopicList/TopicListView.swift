@@ -48,10 +48,10 @@ struct TopicListView: View {
                 } // categories
                 List {
                     ForEach(viewStore.topicResponse, id: \.uuid) { res in
-                        ForEach(res.topicList.topics) { topic in
+                        ForEach(res.topicList.topics ?? []) { topic in
                             TopicRow(topic: topic,
                                      category: viewStore.categories.first(where: { $0.id == topic.categoryId }),
-                                     user: res.users.first(where: { $0.id == topic.posters.first?.uid })
+                                     user: res.users.first(where: { $0.id == topic.posters?.first?.uid })
                             )
                         }
                     }
@@ -194,7 +194,7 @@ struct TopicRow: View {
                             if let categoryItem = self.category {
                                 category(categoryItem)
                             }
-                            ForEach(topic.tags, id: \.hashValue) { tag in
+                            ForEach(topic.tags ?? [], id: \.hashValue) { tag in
                                 label(tag)
                             }
                         }
@@ -220,7 +220,7 @@ struct TopicRow: View {
                     Text(lastPostedAt(topic.lastPostedAt)).font(.system(size: lastViewFontSize))
                     Spacer()
                     Image(systemName: "eye.fill").font(.system(size: lastViewFontSize))
-                    Text("\(topic.views)").font(.system(size: lastViewFontSize))
+                    Text("\(topic.views ?? 0)").font(.system(size: lastViewFontSize))
                     Image(systemName: "circle.fill").font(.system(size: 2.5))
                     Image(systemName: "text.bubble.fill").font(.system(size: lastViewFontSize))
                     Text("\(topic.postsCount)").font(.system(size: lastViewFontSize))

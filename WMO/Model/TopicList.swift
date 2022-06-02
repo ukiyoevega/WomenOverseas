@@ -8,7 +8,7 @@
 import Foundation
 
 struct TopicList: Decodable, Equatable {
-    let topics: [Topic]
+    let topics: [Topic]?
     let perPage: Int
     let canCreatTopics: Bool
     let loadMoreKey: String
@@ -33,37 +33,37 @@ struct Topic: Decodable, Equatable, Identifiable {
     let fancyTitle: String
     let slug: String
     let postsCount: Int
-    let replyCount: Int
-    let highestPostNumber: Int
+    let replyCount: Int?
+    let highestPostNumber: Int?
     let imageUrl: String?
     let createdAt: String
     let lastPostedAt: String?
-    let bumped: Bool
-    let bumpedAt: String
-    let archetype: String
-    let unseen: Bool
+    let bumped: Bool?
+    let bumpedAt: String?
+    let archetype: String?
+    let unseen: Bool?
     let lastReadPostNumber: Int?
     let unread: Int?
     let newPosts: Int?
     let unreadPosts: Int?
-    let pinned: Bool
+    let pinned: Bool?
     let unpinned: Int?
-    let visible: Bool
-    let closed: Bool
-    let archived: Bool
+    let visible: Bool?
+    let closed: Bool?
+    let archived: Bool?
     let notificationLevel: Int?
     let bookmarked: Bool?
     let liked: Bool?
-    let tags: [String]
-    let views: Int
+    let tags: [String]?
+    let views: Int?
     let likeCount: Int
-    let hasSummary: Bool
-    let lastPosterUsername: String
+    let hasSummary: Bool?
+    let lastPosterUsername: String?
     let categoryId: Int
-    let pinnedGlobally: Bool
+    let pinnedGlobally: Bool?
     let featuredLink: String?
-    let hasAcceptedAnswer: Bool
-    let posters: [Poster]
+    let hasAcceptedAnswer: Bool?
+    let posters: [Poster]?
 
     enum CodingKeys: String, CodingKey {
         case id

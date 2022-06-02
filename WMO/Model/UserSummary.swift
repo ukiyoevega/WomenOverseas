@@ -148,7 +148,7 @@ enum User {
         let postCount: Int
         let timeRead: Int
         let recentTimeRead: Int
-        let bookmarkCount: Int
+        let bookmarkCount: Int?
         let canSeeSummaryStats: Bool
         let solvedCount: Int
         let badges: [UserBadge]

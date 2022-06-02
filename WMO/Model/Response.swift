@@ -47,7 +47,7 @@ struct UserResponse: Decodable, Equatable {
 struct UserSummaryResponse: Decodable, Equatable {
     let badges: [User.Badge]
     let users: [User.User]
-    let topics: [Topic]
+    let topics: [Topic]?
     let summary: User.Summary
     
     enum CodingKeys: String, CodingKey {
