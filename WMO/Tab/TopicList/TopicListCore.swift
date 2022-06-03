@@ -11,7 +11,7 @@ struct TopicState: Equatable {
     var topicResponse: [TopicListResponse] = []
     var categories: [CategoryList.Category] = []
     var currentPage: Int = 0
-    var currentCategory: CategoryList.Category?
+    var currentCategory: CategoryList.Category = .all
     var currentOrder: EndPoint.Topics.Order?
 }
 
@@ -39,15 +39,20 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
         state.currentPage = 0
         state.currentCategory = cat
         state.currentOrder = nil // TODO: remove mutual exclusive
-        return APIService.shared.getTopics(.category(slug: cat.slug, id: cat.id))
+        let endpoint: EndPoint.Topics
+        if cat.id != -1 {
+            endpoint = .category(slug: cat.slug, id: cat.id)
+        } else {
+            endpoint = .latest(by: .default, ascending: false, page: state.currentPage)
+        }
+        return APIService.shared.getTopics(endpoint)
             .receive(on: environment.mainQueue)
             .catchToEffect(TopicAction.topicsResponse)
-        
     case .tapOrder(let order):
         state.topicResponse = []
         state.currentPage = 0
         state.currentOrder = order
-        state.currentCategory = nil  // TODO: remove mutual exclusive
+        state.currentCategory = .all  // TODO: remove mutual exclusive
         return APIService.shared.getTopics(.top(by: order, period: .all))
             .receive(on: environment.mainQueue)
             .catchToEffect(TopicAction.topicsResponse)
@@ -60,8 +65,8 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
         
     case .loadTopics:
         let endpoint: EndPoint.Topics
-        if let cat = state.currentCategory {
-            endpoint = .category(slug: cat.slug, id: cat.id, page: state.currentPage)
+        if state.currentCategory.id != -1 {
+            endpoint = .category(slug: state.currentCategory.slug, id: state.currentCategory.id, page: state.currentPage)
         } else if let order = state.currentOrder {  // TODO: remove mutual exclusive
             endpoint = .top(by: order, period: .all, page: state.currentPage)
         } else {
@@ -79,7 +84,7 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
         break
         
     case .categoriesResponse(.success(let categories)):
-        state.categories = categories
+        state.categories = [CategoryList.Category.all] + categories
         state.topicResponse = []
         state.currentPage = 0
         // trigger `getTopics` to update category label inside topic row

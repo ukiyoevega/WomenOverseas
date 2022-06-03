@@ -20,6 +20,9 @@ struct CategoryList: Decodable, Equatable {
     }
 
     struct Category: Decodable, Equatable {
+
+        static let all = Category(id: -1, name: "所有", slug: "", color: "D8805E", textColor: "", topicCount: 0, postCount: 0, position: 0, description: nil, descriptionText: nil, descriptionExcerpt: nil, topicUrl: "", readRestricted: false, permission: 0, notificationLevel: 0, topicTemplate: "", hasChildren: false, sortOrder: "", sortAscending: false, showSubcategoryList: false, numFeaturedTopics: 0, defaultView: "", subcategoryListStyle: "", defaultTopPeriod: "", defaultListFilter: "", minimumRequiredTags: 0, navigateToFirstPostAfterRead: false, topicsDay: 0, topicsWeek: 0, topicsMonth: 0, topicsYear: 0, topicsAllTime: 0, subcategoryIds: [], uploadedLogo: nil, uploadedBackground: nil)
+
         let id: Int
         let name: String // 论坛活动(Events), 职业生涯(Career)
         let slug: String // events, career
@@ -98,38 +101,6 @@ struct CategoryList: Decodable, Equatable {
             case subcategoryIds = "subcategory_ids"
             case uploadedLogo = "uploaded_logo"
             case uploadedBackground = "uploaded_background"
-        }
-    }
-}
-
-enum Category: String, CustomStringConvertible, CaseIterable, Identifiable {
-    var id: String { self.rawValue }
-    
-    case activity
-    case meetup
-    case study
-    case career
-    case development
-    case relationship
-    case recreation
-    case lifeshare
-    case showup
-    case feedback
-    
-    var description: String {
-        get {
-            switch self {
-            case.activity: return "论坛活动"
-            case.meetup: return "她乡同城"
-            case.study: return "海外学习"
-            case.career: return "职业生涯"
-            case.development: return "自我发展"
-            case.relationship: return "人际关系"
-            case.recreation: return "书影音游"
-            case.lifeshare: return "生活分享"
-            case.showup: return "打卡专区"
-            case.feedback: return "站点反馈"
-            }
         }
     }
 }

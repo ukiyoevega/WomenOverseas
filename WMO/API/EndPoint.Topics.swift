@@ -26,6 +26,21 @@ extension EndPoint {
             case posts
             // N/A
             case category, op_likes
+
+            var icon: String {
+                switch self {
+                case .likes:
+                    return "heart.fill"
+                case .views:
+                    return "eye.fill"
+                case .posts:
+                    return "text.bubble.fill"
+                case .`default`:
+                    return "flame.fill"
+                default:
+                    return ""
+                }
+            }
         }
         
         enum Period: String {

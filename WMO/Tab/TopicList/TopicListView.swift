@@ -32,20 +32,25 @@ struct TopicListView: View {
     let store: Store<TopicState, TopicAction>
     @State private var showingAlert = false
 
+    @ViewBuilder
+    func categories(_ viewStore: ViewStore<TopicState, TopicAction>) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: categoriesSpacing) {
+                ForEach(viewStore.categories, id: \.id) { cat in
+                    category(cat.displayName, color: cat.color, selected: viewStore.currentCategory.id == cat.id) {
+                        viewStore.send(.tapCategory(cat))
+                    }
+                }
+            }
+            .padding([.leading, .trailing], categoriespadding)
+            .listRowInsets(EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0))
+        } // categories
+    }
+
     var body: some View {
         WithViewStore(self.store) { viewStore in
             Group {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: categoriesSpacing) {
-                        ForEach(viewStore.categories, id: \.id) { cat in
-                            category(cat.displayName, color: cat.color, selected: viewStore.currentCategory?.id == cat.id) {
-                                viewStore.send(.tapCategory(cat))
-                            }
-                        }
-                    }
-                    .padding([.leading, .trailing], categoriespadding)
-                    .listRowInsets(EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0))
-                } // categories
+                categories(viewStore)
                 List {
                     ForEach(viewStore.topicResponse, id: \.uuid) { res in
                         ForEach(res.topicList.topics ?? []) { topic in
@@ -78,8 +83,15 @@ struct TopicListView: View {
                         Button(action: {
                             showingAlert = true
                         }) {
-                            Image(systemName: "arrow.up.arrow.down.square")
-                                .font(.system(size: 16, weight: .medium))
+                            ZStack(alignment: .bottomTrailing) {
+                                Image(systemName: "arrow.up.arrow.down.square")
+                                    .font(.system(size: 17, weight: .medium))
+                                if let order = viewStore.currentOrder {
+                                    Image(systemName: order.icon)
+                                    .font(.system(size: 10, weight: .medium))
+                                    .offset(x: 10)
+                                }
+                            }
                         }.foregroundColor(Color.mainIcon)
                     }
             )
@@ -104,7 +116,10 @@ struct TopicListView: View {
                         .default(Text("按热门排序")) {
                             viewStore.send(.tapOrder(.default))
                         },
-                        .cancel()]
+                        .default(Text("恢复默认")) {
+                            viewStore.send(.tapCategory(.all))
+                        },
+                        .cancel(Text("取消"))]
                 )
             }
         }
@@ -258,43 +273,10 @@ let fakeTopic = Topic(id: 1,
                       posters: []
 )
 
-
-struct CategoriesFakeView: View {
-
-    private func category(_ type: Category, selected: Bool) -> some View {
-        let tint = Color.orange
-        return Text(type.description)
-            .font(.system(size: 13))
-            .foregroundColor(tint)
-            .padding(.init(top: 6, leading: 10, bottom: 6, trailing: 10))
-            .background(tint.opacity(0.25))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(tint, lineWidth: selected ? 1.5 : 0)
-            )
-            .cornerRadius(16)
-    }
-
-    var body: some View {
-        var scrollView = ScrollView(.horizontal) {
-            HStack(spacing: 4) {
-                ForEach(Category.allCases) { cat in
-                    category(cat, selected: cat == .study)
-                }
-            }
-            .padding([.leading, .trailing], 15)
-            .padding([.bottom], 6)
-        }
-        scrollView.showsIndicators = false
-        return scrollView
-    }
-}
-
 struct HomeView_Previews : PreviewProvider {
     static var previews: some View {
         NavigationView {
             VStack(spacing: 0) {
-                CategoriesFakeView()
                 List {
                     ForEach(0..<50) { _ in
                         TopicRow(topic: fakeTopic, category: nil, user: nil)
