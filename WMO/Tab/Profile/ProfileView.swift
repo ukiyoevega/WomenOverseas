@@ -54,26 +54,26 @@ struct ProfileView: View {
                 .foregroundColor(Color.black)
             Spacer()
 
-            if entry == .theme {
-                Toggle(isOn: toggle) { }
-                        .toggleStyle(SmallToggleStyle())
-            } else {
+//            if entry == .theme {
+//                Toggle(isOn: toggle) { }
+//                        .toggleStyle(SmallToggleStyle())
+//            } else {
                 Image(systemName: "chevron.right")
                     .font(.system(size: settingDetailSize))
                     .foregroundColor(Color.gray)
-            }
+//            }
         }
     }
     
     @ViewBuilder
     func entryView(_ entry: SettingEntry) -> some View {
         switch entry {
-        case .notification:
-            Text(entry.description)
-        case .theme:
-            Text(entry.description)
-        case .settings:
-            Text(entry.description)
+//        case .notification:
+//            Text(entry.description)
+//        case .theme:
+//            Text(entry.description)
+//        case .settings:
+//            Text(entry.description)
         case .aboutUs:
             AboutView()
         case .donation:
@@ -113,9 +113,9 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     var id: String { self.rawValue }
     
 //    case account
-    case notification
-    case theme
-    case settings
+//    case notification
+//    case theme
+//    case settings
     case aboutUs
     case donation
     
@@ -123,9 +123,9 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
         get {
             switch self {
 //            case .account: return "我的账号"
-            case .notification: return "我的通知"
-            case .theme: return "切换到原生模式"
-            case .settings: return "设置"
+//            case .notification: return "我的通知"
+//            case .theme: return "切换到原生模式"
+//            case .settings: return "设置"
             case .aboutUs: return "关于我们"
             case .donation: return "捐助"
             }
@@ -136,11 +136,11 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
         get {
             switch self {
 //            case .account: return "person.crop.artframe"
-            case .notification: return "envelope"
+//            case .notification: return "envelope"
             case .donation: return "yensign.circle"
-            case .settings: return "gearshape.2"
+//            case .settings: return "gearshape.2"
             case .aboutUs: return "info.circle"
-            case .theme: return "switch.2"
+//            case .theme: return "switch.2"
             }
         }
     }

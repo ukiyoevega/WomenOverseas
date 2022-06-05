@@ -27,10 +27,10 @@ struct AboutView: View {
             .init(title: "👁‍🗨 微博", link: "https://weibo.com/u/7574581372?refer_flag=1005055010_&is_all=1", detail: "@WomenOverseas_她乡"),
         ]),
         (title: "关于她乡", rows: [
-            .init(title: "捐助", link: "", detail: ""),
-            .init(title: "公开账目", link: "", detail: ""),
-            .init(title: "站点反馈", link: "", detail: ""),
-            .init(title: "隐私条款", link: "", detail: ""),
+            .init(title: "捐助", link: "https://womenoverseas.com/t/topic/11426", detail: ""),
+            .init(title: "公开账目", link: "https://womenoverseas.com/t/topic/13901", detail: ""),
+            .init(title: "站点反馈", link: "https://womenoverseas.com/t/topic/291", detail: ""),
+            .init(title: "隐私条款", link: "https://womenoverseas.com/privacy", detail: ""),
         ]),
     ]
 
