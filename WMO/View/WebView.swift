@@ -148,6 +148,13 @@ extension WebviewController: UIScrollViewDelegate {
 }
 
 extension WebviewController: WKNavigationDelegate {
+
+    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+        if let urlResponse = navigationResponse.response as? HTTPURLResponse, let username = urlResponse.allHeaderFields["x-discourse-username"] {
+            UserDefaults.standard.set(username, forKey: "com.womenoverseas.username")
+        }
+        return .allow
+    }
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         var payloadDecrypted = false
@@ -215,13 +222,8 @@ extension WebviewController: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        guard let url = webview.url?.absoluteString else { return }
-        let featured = "精华贴".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "featured"
         removeElement(.tabbar)
-        let headerAvoiding = ["latest", featured, "topic", "upcoming-events"]
-        if headerAvoiding.map(url.contains).contains(true) && self.type != .home {
-            removeElement(.header)
-        }
+        removeElement(.header)
     }
     
     private func removeElement(_ type: RemoveElement) {

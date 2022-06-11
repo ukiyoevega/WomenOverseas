@@ -28,10 +28,11 @@ enum ProfileHeaderAction {
 }
 
 let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, ProfileEnvironment> { state, action, environment in
+    let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username") ?? ""
     switch action {
     case .update(let name, let value):
         state.successMessage = ""
-        return APIService.shared.updateUser(.update(username: "weijia", name: name, value: value))
+        return APIService.shared.updateUser(.update(username: username, name: name, value: value))
             .receive(on: environment.mainQueue)
             .catchToEffect(ProfileHeaderAction.updateResponse)
     case .updateResponse(.success(let userResponse)):
@@ -45,7 +46,7 @@ let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, Prof
         break // TODO: errer handling
 
     case .refresh:
-        return APIService.shared.getUser(.getUser(name: "weijia"))
+        return APIService.shared.getUser(.getUser(name: username))
             .receive(on: environment.mainQueue)
             .catchToEffect(ProfileHeaderAction.userResponse)
     case .userResponse(.success(let userResponse)):
@@ -70,7 +71,8 @@ enum ProfileSummaryAction {
 let profileSummaryReducer = Reducer<ProfileSummaryState, ProfileSummaryAction, ProfileEnvironment> { state, action, environment in
     switch action {
     case .refresh:
-        return APIService.shared.getUserSummary(.summary(username: "weijia"))
+        let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username") ?? ""
+        return APIService.shared.getUserSummary(.summary(username: username))
             .receive(on: environment.mainQueue)
             .catchToEffect(ProfileSummaryAction.userResponse)
     case .userResponse(.success(let userResponse)):
