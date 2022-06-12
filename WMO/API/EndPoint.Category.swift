@@ -10,6 +10,7 @@ import Foundation
 extension EndPoint {
     enum Category {
         case list
+        case sublist(parentId: Int)
     }
     
     enum Tag {
@@ -20,7 +21,7 @@ extension EndPoint {
 extension EndPoint.Category: RESTful {
     var path: String {
         switch self {
-        case .list: return "/categories.json"
+        case .list, .sublist: return "/categories.json"
         }
     }
     
@@ -31,6 +32,7 @@ extension EndPoint.Category: RESTful {
     var params: [String : Any] {
         switch self {
         case .list: return [:]
+        case .sublist(let parentId): return ["parent_category_id": parentId]
         }
     }
 }

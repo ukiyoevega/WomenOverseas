@@ -51,22 +51,28 @@ struct TopicListView: View {
         WithViewStore(self.store) { viewStore in
             Group {
                 categories(viewStore)
-                List {
-                    ForEach(viewStore.topicResponse, id: \.uuid) { res in
-                        ForEach(res.topicList.topics ?? []) { topic in
-                            TopicRow(topic: topic,
-                                     category: viewStore.categories.first(where: { $0.id == topic.categoryId }),
-                                     user: res.users.first(where: { $0.id == topic.posters?.first?.uid })
-                            )
+                if (!viewStore.topicResponse.isEmpty) {
+                    List {
+                        ForEach(viewStore.topicResponse, id: \.uuid) { res in
+                            ForEach(res.topicList.topics ?? []) { topic in
+                                TopicRow(topic: topic,
+                                         category: viewStore.categories.first(where: { $0.id == topic.categoryId }),
+                                         user: res.users.first(where: { $0.id == topic.posters?.first?.uid })
+                                )
+                            }
+                        }
+                        /// The pagination is done by appending a invisible rectancle at the bottom of the list, and trigerining the next page load as it appear... hacky way for now
+                        if !viewStore.topicResponse.isEmpty {
+                            centeredProgressView
+                                .onAppear { viewStore.send(.loadTopics) }
                         }
                     }
-                    /// The pagination is done by appending a invisible rectancle at the bottom of the list, and trigerining the next page load as it appear... hacky way for now
-                    if !viewStore.topicResponse.isEmpty {
-                        centeredProgressView
-                            .onAppear { viewStore.send(.loadTopics) }
-                    }
+                    .listStyle(PlainListStyle())
+                } else {
+                    Spacer()
+                    centeredProgressView
+                    Spacer()
                 }
-                .listStyle(PlainListStyle())
             } // workaround for icon-style navigation bar title
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -82,6 +88,9 @@ struct TopicListView: View {
                     HStack {
                         Button(action: {
                             showingAlert = true
+//                            let x = viewStore.binding({ state in
+//                                state.toastMessage?.isEmpty ?? false
+//                            }, sending: .dismissToast)
                         }) {
                             ZStack(alignment: .bottomTrailing) {
                                 Image(systemName: "arrow.up.arrow.down.square")
@@ -122,6 +131,13 @@ struct TopicListView: View {
                         .cancel(Text("取消"))]
                 )
             }
+            .toast(message: viewStore.toastMessage ?? "",
+                   isShowing:  viewStore.binding(get: { state in
+                print("state.toastMessage \(state.toastMessage)")
+                return !(state.toastMessage ?? "").isEmpty
+
+            }, send: .dismissToast),
+                   duration: Toast.short)
         }
     }
 
@@ -287,3 +303,92 @@ struct HomeView_Previews : PreviewProvider {
     }
 }
 #endif
+
+
+struct Toast: ViewModifier {
+  // these correspond to Android values f
+  // or DURATION_SHORT and DURATION_LONG
+  static let short: TimeInterval = 2
+  static let long: TimeInterval = 3.5
+
+  let message: String
+  @Binding var isShowing: Bool
+  let config: Config
+
+  func body(content: Content) -> some View {
+    ZStack {
+      content
+      toastView
+    }
+  }
+
+  private var toastView: some View {
+    VStack {
+      Spacer()
+      if isShowing {
+        Group {
+          Text(message)
+            .multilineTextAlignment(.center)
+            .foregroundColor(config.textColor)
+            .font(config.font)
+            .padding(8)
+        }
+        .background(config.backgroundColor)
+        .cornerRadius(8)
+        .onTapGesture {
+          isShowing = false
+        }
+        .onAppear {
+          DispatchQueue.main.asyncAfter(deadline: .now() + config.duration) {
+            isShowing = false
+          }
+        }
+      }
+    }
+    .padding(.horizontal, 16)
+    .padding(.bottom, 18)
+    .animation(config.animation, value: isShowing)
+    .transition(config.transition)
+  }
+
+  struct Config {
+    let textColor: Color
+    let font: Font
+    let backgroundColor: Color
+    let duration: TimeInterval
+    let transition: AnyTransition
+    let animation: Animation
+
+    init(textColor: Color = .white,
+         font: Font = .system(size: 14),
+         backgroundColor: Color = .black.opacity(0.588),
+         duration: TimeInterval = Toast.short,
+         transition: AnyTransition = .opacity,
+         animation: Animation = .linear(duration: 0.3)) {
+      self.textColor = textColor
+      self.font = font
+      self.backgroundColor = backgroundColor
+      self.duration = duration
+      self.transition = transition
+      self.animation = animation
+    }
+  }
+}
+
+extension View {
+  func toast(message: String,
+             isShowing: Binding<Bool>,
+             config: Toast.Config) -> some View {
+    self.modifier(Toast(message: message,
+                        isShowing: isShowing,
+                        config: config))
+  }
+
+  func toast(message: String,
+             isShowing: Binding<Bool>,
+             duration: TimeInterval) -> some View {
+    self.modifier(Toast(message: message,
+                        isShowing: isShowing,
+                        config: .init(duration: duration)))
+  }
+}

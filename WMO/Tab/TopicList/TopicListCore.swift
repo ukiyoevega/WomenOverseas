@@ -13,6 +13,7 @@ struct TopicState: Equatable {
     var currentPage: Int = 0
     var currentCategory: CategoryList.Category = .all
     var currentOrder: EndPoint.Topics.Order?
+    var toastMessage: String?
 }
 
 enum TopicAction {
@@ -23,6 +24,7 @@ enum TopicAction {
     case loadTopics
     case categoriesResponse(Result<[CategoryList.Category], Failure>)
     case topicsResponse(Result<TopicListResponse, Failure>)
+    case dismissToast
 }
 
 struct TopicEnvironment {
@@ -33,7 +35,11 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
     switch action {
     case .tapPeriod(let period):
         break
-        
+
+    case .dismissToast:
+        state.toastMessage = nil
+        break
+
     case .tapCategory(let cat):
         state.topicResponse = []
         state.currentPage = 0
@@ -80,9 +86,9 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
         state.currentPage += 1
         state.topicResponse.append(res)
         
-    case .topicsResponse(.failure):
-        break
-        
+    case .topicsResponse(.failure(let failure)):
+        state.toastMessage = "\(failure.error)"
+
     case .categoriesResponse(.success(let categories)):
         state.categories = [CategoryList.Category.all] + categories
         state.topicResponse = []
@@ -92,8 +98,8 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
             .receive(on: environment.mainQueue)
             .catchToEffect(TopicAction.topicsResponse)
         
-    case .categoriesResponse(.failure):
-        break
+    case .categoriesResponse(.failure(let failure)):
+        state.toastMessage = "\(failure.error)"
     }
     return .none // Effect<TopicAction, Never>
 }

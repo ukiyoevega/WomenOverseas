@@ -14,7 +14,9 @@ enum APIError: Error {
     case networkError(error: Error)
 }
 
-struct Failure: Error, Equatable {}
+struct Failure: Error {
+    let error: Error
+}
 
 
 struct APIService {
@@ -37,7 +39,7 @@ struct APIService {
           .decode(type: ResponseType.self, decoder: JSONDecoder())
           .mapError { error in
               print("error \(error)")
-              return Failure() // TODO: error handling
+              return Failure(error: error)
           }
           .eraseToEffect()
     }
@@ -65,7 +67,8 @@ struct APIService {
               .decode(type: CategoriesResponse.self, decoder: JSONDecoder())
               .map({ response in response.categoryList.categories })
               .mapError { error in
-                  return Failure()
+                  print("error \(error)")
+                  return Failure(error: error)
               }
               .eraseToEffect()
         }

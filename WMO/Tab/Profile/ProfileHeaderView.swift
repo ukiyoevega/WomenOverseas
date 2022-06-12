@@ -34,7 +34,6 @@ struct ProfileSummaryView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: statisticSpacing) {
                     ForEach(viewStore.userResponse.summary.statisticEntries, id: \.0) { item in
-
                         VStack(spacing: statisticNumberTitleSpacing) {
                             Text("\(item.count)")
                                 .font(.system(size: statisticNumberSize, weight: .semibold, design: .default))
@@ -49,6 +48,9 @@ struct ProfileSummaryView: View {
                     }
                 }
             }
+            .toast(message: viewStore.toastMessage ?? "",
+                   isShowing:  viewStore.binding(get: { state in state.toastMessage?.isEmpty ?? false }, send: .dismissToast),
+                   duration: Toast.short)
         }
     }
 }

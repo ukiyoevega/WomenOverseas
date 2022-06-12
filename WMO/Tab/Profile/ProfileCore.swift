@@ -16,6 +16,7 @@ struct ProfileEnvironment {
 struct ProfileHeaderState: Equatable {
     var userResponse: UserResponse = .empty
     var successMessage: String = ""
+    var toastMessage: String? = nil
 }
 
 enum ProfileHeaderAction {
@@ -28,7 +29,7 @@ enum ProfileHeaderAction {
 }
 
 let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, ProfileEnvironment> { state, action, environment in
-    let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username") ?? ""
+    let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username")?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
     switch action {
     case .update(let name, let value):
         state.successMessage = ""
@@ -51,8 +52,8 @@ let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, Prof
             .catchToEffect(ProfileHeaderAction.userResponse)
     case .userResponse(.success(let userResponse)):
         state.userResponse = userResponse
-    case .userResponse(.failure):
-        break // TODO: error handling
+    case .userResponse(.failure(let failure)):
+        state.toastMessage = "\(failure.error)"
     }
     return .none // Effect<ProfileAction, Never>
 }
@@ -61,24 +62,28 @@ let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, Prof
 
 struct ProfileSummaryState: Equatable {
     var userResponse: UserSummaryResponse = .empty
+    var toastMessage: String? = nil
 }
 
 enum ProfileSummaryAction {
     case refresh
+    case dismissToast
     case userResponse(Result<UserSummaryResponse, Failure>)
 }
 
 let profileSummaryReducer = Reducer<ProfileSummaryState, ProfileSummaryAction, ProfileEnvironment> { state, action, environment in
     switch action {
     case .refresh:
-        let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username") ?? ""
+        let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username")?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
         return APIService.shared.getUserSummary(.summary(username: username))
             .receive(on: environment.mainQueue)
             .catchToEffect(ProfileSummaryAction.userResponse)
     case .userResponse(.success(let userResponse)):
         state.userResponse = userResponse
-    case .userResponse(.failure):
-        break // TODO: error handling
+    case .userResponse(.failure(let failure)):
+        state.toastMessage = "\(failure.error)"
+    case .dismissToast:
+        state.toastMessage = nil
     }
     return .none // Effect<ProfileAction, Never>
 }
