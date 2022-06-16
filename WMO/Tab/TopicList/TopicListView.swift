@@ -47,6 +47,15 @@ struct TopicListView: View {
         } // categories
     }
 
+    private func getTopicCategory(topic: Topic, _ viewStore: ViewStore<TopicState, TopicAction>) -> CategoryList.Category? {
+        if let parentCategory = viewStore.categories.first(where: { $0.id == topic.categoryId }) {
+            return parentCategory
+        } else {
+            let currentCategoryId = viewStore.currentCategory.id
+            return viewStore.subCategories[currentCategoryId]?.first(where: { $0.id == topic.categoryId })
+        }
+    }
+
     var body: some View {
         WithViewStore(self.store) { viewStore in
             Group {
@@ -56,7 +65,7 @@ struct TopicListView: View {
                         ForEach(viewStore.topicResponse, id: \.uuid) { res in
                             ForEach(res.topicList?.topics ?? []) { topic in
                                 TopicRow(topic: topic,
-                                         category: viewStore.categories.first(where: { $0.id == topic.categoryId }),
+                                         category: getTopicCategory(topic: topic, viewStore),
                                          user: res.users?.first(where: { $0.id == topic.posters?.first?.uid })
                                 )
                             }

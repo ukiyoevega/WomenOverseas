@@ -6,10 +6,12 @@
 //
 
 import ComposableArchitecture
+import Combine
 
 struct TopicState: Equatable {
     var topicResponse: [TopicListResponse] = []
     var categories: [CategoryList.Category] = []
+    var subCategories: [Int: [CategoryList.Category]] = [:]
     var currentPage: Int = 0
     var currentCategory: CategoryList.Category = .all
     var currentOrder: EndPoint.Topics.Order?
@@ -31,6 +33,7 @@ enum TopicAction {
     case loadTopics
     case categoriesResponse(Result<[CategoryList.Category], Failure>)
     case topicsResponse(Result<TopicListResponse, Failure>)
+    case topicsCategriesResponse(Result<([CategoryList.Category], TopicListResponse), Failure>)
     case dismissToast
 }
 
@@ -57,9 +60,19 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
         } else {
             endpoint = .latest(by: .default, ascending: false, page: state.currentPage)
         }
-        return APIService.shared.getTopics(endpoint)
-            .receive(on: environment.mainQueue)
-            .catchToEffect(TopicAction.topicsResponse)
+        let topicEffect = APIService.shared.getTopics(endpoint)
+        let subCatEffect = APIService.shared.getCategories(.sublist(parentId: cat.id))
+        if cat.id != -1, state.subCategories[cat.id] == nil {
+            return Publishers
+                .Zip(subCatEffect.upstream, topicEffect.upstream)
+                .receive(on: environment.mainQueue)
+                .catchToEffect(TopicAction.topicsCategriesResponse)
+        } else {
+            return topicEffect
+                .receive(on: environment.mainQueue)
+                .catchToEffect(TopicAction.topicsResponse)
+        }
+
     case .tapOrder(let order):
         state.reset()
         state.currentOrder = order
@@ -93,6 +106,7 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
         if res.topicList?.topics?.isEmpty == true {
             state.reachEnd = true
         }
+
     case .topicsResponse(.failure(let failure)):
         state.toastMessage = "\(failure.error)"
 
@@ -105,6 +119,15 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
             .catchToEffect(TopicAction.topicsResponse)
         
     case .categoriesResponse(.failure(let failure)):
+        state.toastMessage = "\(failure.error)"
+
+    case .topicsCategriesResponse(.success(let (subCategories, topicResponse))):
+        state.subCategories[state.currentCategory.id] = subCategories
+        print("subCategoriessubCategories \(subCategories)")
+        state.topicResponse.append(topicResponse)
+        break
+
+    case .topicsCategriesResponse(.failure(let failure)):
         state.toastMessage = "\(failure.error)"
     }
     return .none // Effect<TopicAction, Never>
