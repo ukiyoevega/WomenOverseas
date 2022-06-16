@@ -32,7 +32,7 @@ enum User {
     struct UserBadge: Decodable, Equatable {
         let id: Int
         let grantedAt: String
-        let createdAt: String
+        let createdAt: String?
         let count: Int
         let badgeId: Int
         let userId: Int

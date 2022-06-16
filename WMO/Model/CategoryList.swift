@@ -27,35 +27,35 @@ struct CategoryList: Decodable, Equatable {
         let name: String // 论坛活动(Events), 职业生涯(Career)
         let slug: String // events, career
         let color: String
-        let textColor: String
-        let topicCount: Int
-        let postCount: Int
-        let position: Int
+        let textColor: String?
+        let topicCount: Int?
+        let postCount: Int?
+        let position: Int?
         let description: String?
         let descriptionText: String?
         let descriptionExcerpt: String?
-        let topicUrl: String
-        let readRestricted: Bool
-        let permission: Int
+        let topicUrl: String?
+        let readRestricted: Bool?
+        let permission: Int?
         let notificationLevel: Int?
-        let topicTemplate: String
-        let hasChildren: Bool
-        let sortOrder: String
+        let topicTemplate: String?
+        let hasChildren: Bool?
+        let sortOrder: String?
         let sortAscending: Bool?
-        let showSubcategoryList: Bool
-        let numFeaturedTopics: Int
-        let defaultView: String
-        let subcategoryListStyle: String
-        let defaultTopPeriod: String
-        let defaultListFilter: String
+        let showSubcategoryList: Bool?
+        let numFeaturedTopics: Int?
+        let defaultView: String?
+        let subcategoryListStyle: String?
+        let defaultTopPeriod: String?
+        let defaultListFilter: String?
         let minimumRequiredTags: Int
-        let navigateToFirstPostAfterRead: Bool
-        let topicsDay: Int
-        let topicsWeek: Int
-        let topicsMonth: Int
-        let topicsYear: Int
-        let topicsAllTime: Int
-        let subcategoryIds: [Int]
+        let navigateToFirstPostAfterRead: Bool?
+        let topicsDay: Int?
+        let topicsWeek: Int?
+        let topicsMonth: Int?
+        let topicsYear: Int?
+        let topicsAllTime: Int?
+        let subcategoryIds: [Int]?
         let uploadedLogo: String?
         let uploadedBackground: String?
         // TODO: support

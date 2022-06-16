@@ -11,7 +11,7 @@ struct TopicList: Decodable, Equatable {
     let topics: [Topic]?
     let perPage: Int
     let canCreatTopics: Bool
-    let loadMoreKey: String
+    let loadMoreKey: String?
     let topTags: [String]
     
     enum CodingKeys: String, CodingKey {
@@ -36,7 +36,7 @@ struct Topic: Decodable, Equatable, Identifiable {
     let replyCount: Int?
     let highestPostNumber: Int?
     let imageUrl: String?
-    let createdAt: String
+    let createdAt: String?
     let lastPostedAt: String?
     let bumped: Bool?
     let bumpedAt: String?
@@ -56,10 +56,10 @@ struct Topic: Decodable, Equatable, Identifiable {
     let liked: Bool?
     let tags: [String]?
     let views: Int?
-    let likeCount: Int
+    let likeCount: Int?
     let hasSummary: Bool?
     let lastPosterUsername: String?
-    let categoryId: Int
+    let categoryId: Int?
     let pinnedGlobally: Bool?
     let featuredLink: String?
     let hasAcceptedAnswer: Bool?

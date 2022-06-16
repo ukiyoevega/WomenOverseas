@@ -54,10 +54,10 @@ struct TopicListView: View {
                 if (!viewStore.topicResponse.isEmpty) {
                     List {
                         ForEach(viewStore.topicResponse, id: \.uuid) { res in
-                            ForEach(res.topicList.topics ?? []) { topic in
+                            ForEach(res.topicList?.topics ?? []) { topic in
                                 TopicRow(topic: topic,
                                          category: viewStore.categories.first(where: { $0.id == topic.categoryId }),
-                                         user: res.users.first(where: { $0.id == topic.posters?.first?.uid })
+                                         user: res.users?.first(where: { $0.id == topic.posters?.first?.uid })
                                 )
                             }
                         }
@@ -257,7 +257,7 @@ struct TopicRow: View {
                     Text("\(topic.postsCount)").font(.system(size: lastViewFontSize))
                     Image(systemName: "circle.fill").font(.system(size: 2.5))
                     Image(systemName: "heart.fill").font(.system(size: lastViewFontSize))
-                    Text("\(topic.likeCount)").font(.system(size: lastViewFontSize))
+                    Text("\(topic.likeCount ?? 0)").font(.system(size: lastViewFontSize))
                 } // lastUpdated, views, posts, likes
                 .foregroundColor(Color(UIColor.lightGray))
             }.padding(rowPadding)

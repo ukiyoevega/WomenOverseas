@@ -8,8 +8,8 @@
 import Foundation
 
 struct TopicListResponse: Decodable, Equatable {
-    let users: [User.User]
-    let topicList: TopicList
+    let users: [User.User]?
+    let topicList: TopicList?
     let uuid = UUID().uuidString
     
     enum CodingKeys: String, CodingKey {
@@ -46,7 +46,7 @@ struct UserResponse: Decodable, Equatable {
 
 struct UserSummaryResponse: Decodable, Equatable {
     let badges: [User.Badge]
-    let users: [User.User]
+    let users: [User.User]?
     let topics: [Topic]?
     let summary: User.Summary
     
