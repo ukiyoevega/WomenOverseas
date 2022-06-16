@@ -14,6 +14,13 @@ struct TopicState: Equatable {
     var currentCategory: CategoryList.Category = .all
     var currentOrder: EndPoint.Topics.Order?
     var toastMessage: String?
+    var reachEnd = false
+
+    mutating func reset() {
+        self.currentPage = 0
+        self.topicResponse = []
+        self.reachEnd = false
+    }
 }
 
 enum TopicAction {
@@ -41,8 +48,7 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
         break
 
     case .tapCategory(let cat):
-        state.topicResponse = []
-        state.currentPage = 0
+        state.reset()
         state.currentCategory = cat
         state.currentOrder = nil // TODO: remove mutual exclusive
         let endpoint: EndPoint.Topics
@@ -55,8 +61,7 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
             .receive(on: environment.mainQueue)
             .catchToEffect(TopicAction.topicsResponse)
     case .tapOrder(let order):
-        state.topicResponse = []
-        state.currentPage = 0
+        state.reset()
         state.currentOrder = order
         state.currentCategory = .all  // TODO: remove mutual exclusive
         return APIService.shared.getTopics(.top(by: order, period: .all))
@@ -85,14 +90,15 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
     case .topicsResponse(.success(let res)):
         state.currentPage += 1
         state.topicResponse.append(res)
-        
+        if res.topicList?.topics?.isEmpty == true {
+            state.reachEnd = true
+        }
     case .topicsResponse(.failure(let failure)):
         state.toastMessage = "\(failure.error)"
 
     case .categoriesResponse(.success(let categories)):
         state.categories = [CategoryList.Category.all] + categories
-        state.topicResponse = []
-        state.currentPage = 0
+        state.reset()
         // trigger `getTopics` to update category label inside topic row
         return APIService.shared.getTopics(.latest(by: .default, ascending: false, page: 0))
             .receive(on: environment.mainQueue)

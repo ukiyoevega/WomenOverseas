@@ -88,7 +88,7 @@ struct ProfileEditView: View {
                 AsyncImage(url: avatarURL) { image in
                     image.resizable()
                 } placeholder: {
-                    Circle().fill(Color.blue.opacity(0.3)).frame(width: avatarWidth, height: avatarWidth)
+                    Circle().fill(Color.avatarPlaceholder).frame(width: avatarWidth, height: avatarWidth)
                 }
                 .frame(width: avatarWidth, height: avatarWidth)
                 .cornerRadius(avatarWidth / 2)

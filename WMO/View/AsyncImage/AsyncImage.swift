@@ -28,7 +28,7 @@ public enum AsyncImageStatus {
 public struct AsyncImage<Content: View>: View {
     @ObservedObject var loader: ImageLoader
     var content: ((AsyncImageStatus) -> Content)?
-    
+    @State var loaded: Bool = false
     @ViewBuilder
     var contentOrImage: some View {
         if let content = content {
@@ -42,8 +42,14 @@ public struct AsyncImage<Content: View>: View {
     
     public var body: some View {
         contentOrImage
-            .onAppear { loader.loadImage() }
-            .onDisappear { loader.cancelDownload() }
+            .onAppear {
+                if !loaded {
+                    loader.loadImage()
+                    loaded = true
+                }
+            }
+        // TODO: cancel logic
+//            .onDisappear { loader.cancelDownload() }
     }
     
     public init(url: URL, scale: CGFloat = 1) where Content == Image {

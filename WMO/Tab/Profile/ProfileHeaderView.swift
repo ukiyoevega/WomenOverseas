@@ -71,16 +71,12 @@ struct ProfileHeaderView: View {
         WithViewStore(self.store) { viewStore in
             VStack(alignment: .leading, spacing: topContentSpacing) {
                 HStack {
-                    if !viewStore.userResponse.user.avatarTemplate.isEmpty,
-                        let escapedString = String("https://womenoverseas.com" + viewStore.userResponse.user.avatarTemplate)
-                        .replacingOccurrences(of: "{size}", with: "400")
-                        .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-                        let avatarURL = URL(string: escapedString) {
+                    if let escapedString = viewStore.userAvatar, let avatarURL = URL(string: escapedString) {
                         ZStack(alignment: .bottomTrailing) {
                             AsyncImage(url: avatarURL) { image in
                                 image.resizable()
                             } placeholder: {
-                                Circle().fill(Color.blue.opacity(0.3)).frame(width: avatarWidth, height: avatarWidth)
+                                Circle().fill(Color.avatarPlaceholder).frame(width: avatarWidth, height: avatarWidth)
                             }
                             .frame(width: avatarWidth, height: avatarWidth)
                             .cornerRadius(avatarWidth / 2)
@@ -91,7 +87,7 @@ struct ProfileHeaderView: View {
                                 AsyncImage(url: flairURL) { image in
                                     image.resizable()
                                 } placeholder: {
-                                    Circle().fill(Color.blue.opacity(0.3)).frame(width: flairWidth, height: flairWidth)
+                                    Circle().fill(Color.avatarPlaceholder).frame(width: flairWidth, height: flairWidth)
                                 }
                                 .frame(width: flairWidth, height: flairWidth)
                                 .cornerRadius(flairWidth / 2)

@@ -61,16 +61,24 @@ struct TopicListView: View {
                                 )
                             }
                         }
-                        /// The pagination is done by appending a invisible rectancle at the bottom of the list, and trigerining the next page load as it appear... hacky way for now
-                        if !viewStore.topicResponse.isEmpty {
-                            centeredProgressView
+                        if viewStore.reachEnd {
+                            center {
+                                Text("已经到底啦")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Color(UIColor.lightGray))
+                                    .padding()
+                            }
+
+                        } else if !viewStore.topicResponse.isEmpty {
+                            /// The pagination is done by appending a invisible rectancle at the bottom of the list, and trigerining the next page load as it appear... hacky way for now
+                            center { ProgressView() }
                                 .onAppear { viewStore.send(.loadTopics) }
                         }
                     }
                     .listStyle(PlainListStyle())
                 } else {
                     Spacer()
-                    centeredProgressView
+                    center { ProgressView() }
                     Spacer()
                 }
             } // workaround for icon-style navigation bar title
@@ -133,7 +141,6 @@ struct TopicListView: View {
             }
             .toast(message: viewStore.toastMessage ?? "",
                    isShowing:  viewStore.binding(get: { state in
-                print("state.toastMessage \(state.toastMessage)")
                 return !(state.toastMessage ?? "").isEmpty
 
             }, send: .dismissToast),
@@ -142,10 +149,10 @@ struct TopicListView: View {
     }
 
     @ViewBuilder
-    var centeredProgressView: some View {
+    func center<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         let view = HStack(alignment: .center) {
             Spacer()
-            ProgressView()
+            content()
             Spacer()
         }
         if #available(iOS 15.0, *) {
@@ -240,7 +247,7 @@ struct TopicRow: View {
                             AsyncImage(url: avatarURL) { image in
                                 image.resizable()
                             } placeholder: {
-                                Circle().fill(Color.blue.opacity(0.3)).frame(width: avatarWidth)
+                                Circle().fill(Color.avatarPlaceholder).frame(width: avatarWidth)
                             }
                             .frame(width: avatarWidth, height: avatarWidth)
                             .cornerRadius(avatarWidth / 2)
