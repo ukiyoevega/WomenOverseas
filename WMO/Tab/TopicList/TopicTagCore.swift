@@ -13,6 +13,7 @@ struct TagState: Equatable {
     var toastMessage: String?
     var topicResponse: [TopicListResponse] = []
     var currentPage: Int = 0
+    var currentTag: String?
     var reachEnd = false
 }
 
@@ -21,21 +22,32 @@ enum TagAction {
     case tagsResponse(Result<[Tag], Failure>)
     case tapTagOrder(TagOrder)
 
-    case loadMoreTopics
+    case loadTopics(onStart: Bool, tag: String)
     case tagTopicResponse(Result<TopicListResponse, Failure>)
     case dismissToast
 }
 
 let tagReducer = Reducer<TagState, TagAction, TopicEnvironment> { state, action, environment in
     switch action {
-    case .loadMoreTopics:
-        break
+    case .loadTopics(let onStart, let tag):
+        state.currentTag = tag
+        if onStart {
+            state.topicResponse = []
+            state.currentPage = 0
+        }
+        return APIService.shared.getTopics(.tag(by: tag, page: state.currentPage))
+            .receive(on: environment.mainQueue)
+            .catchToEffect(TagAction.tagTopicResponse)
 
     case .tagTopicResponse(.success(let response)):
-        break
+        state.currentPage += 1
+        state.topicResponse.append(response)
+        if response.topicList?.topics?.isEmpty == true {
+            state.reachEnd = true
+        }
 
     case .tagTopicResponse(.failure(let failure)):
-        break
+        state.toastMessage = "\(failure.error)"
 
     case .dismissToast:
         state.toastMessage = nil
