@@ -59,6 +59,10 @@ struct APIService {
     lazy var getTopics: (EndPoint.Topics) -> Effect<TopicListResponse, Failure> = {
         return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
     }()
+
+    lazy var getTags: (EndPoint.Tag) -> Effect<TagsResponse, Failure> = {
+        return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
+    }()
     
     lazy var getCategories: (EndPoint.Category) -> Effect<[CategoryList.Category], Failure> = {
         return { endpoint in

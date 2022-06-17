@@ -16,7 +16,6 @@ struct TopicListResponse: Decodable, Equatable {
         case topicList = "topic_list"
         case users
     }
-    
 }
 
 struct CategoriesResponse: Decodable {
@@ -25,7 +24,10 @@ struct CategoriesResponse: Decodable {
     enum CodingKeys: String, CodingKey {
         case categoryList = "category_list"
     }
-    
+}
+
+struct TagsResponse: Decodable {
+    let tags: [Tag]
 }
 
 struct UserResponse: Decodable, Equatable {

@@ -76,33 +76,9 @@ struct DropdownMenu<Item: CustomStringConvertible & Identifiable>: View {
     }
 }
 
-extension View {
-    func hud<Content: View>(isPresented: Binding<String>, @ViewBuilder content: () -> Content) -> some View {
-        ZStack(alignment: .top) {
-            self
-            if !isPresented.wrappedValue.isEmpty {
-                content()
-                    .padding(.horizontal, 12)
-                    .padding(16)
-                    .background(
-                        Capsule()
-                            .foregroundColor(Color.white)
-                            .shadow(color: Color(.black).opacity(0.16), radius: 12, x: 0, y: 5)
-                    )
-                    .transition(AnyTransition.move(edge: .top).combined(with: .opacity))
-                    .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            withAnimation {
-                                isPresented.wrappedValue = ""
-                            }
-                        }
-                    }.zIndex(1)
-            }
-        } // ZSstack
-    }
-}
+#if DEBUG
+extension User.Badge: Identifiable { }
 
-/*
 struct DropdownMenu_Previews: PreviewProvider {
     static let options: [User.Badge] = [
         .init(id: 1, name: "hhssssss"),
@@ -122,4 +98,4 @@ struct DropdownMenu_Previews: PreviewProvider {
             .padding(.horizontal)
     }
 }
-*/
+#endif

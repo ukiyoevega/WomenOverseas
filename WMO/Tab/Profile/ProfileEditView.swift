@@ -298,9 +298,6 @@ enum EditEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
 struct ProfileEditView_Previews : PreviewProvider {
     static var previews: some View {
         ProfileEditingView(store: Store(initialState: ProfileHeaderState(), reducer: profileHeaderReducer, environment: ProfileEnvironment()), editEntry: .name)
-            .hud(isPresented: .constant("safs")) {
-                Text("hud message")
-            }
     }
 }
 #endif

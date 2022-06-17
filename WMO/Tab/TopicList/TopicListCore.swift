@@ -28,7 +28,6 @@ struct TopicState: Equatable {
 enum TopicAction {
     case tapCategory(CategoryList.Category)
     case tapOrder(EndPoint.Topics.Order)
-    case tapPeriod(EndPoint.Topics.Period)
     case loadCategories
     case loadTopics
     case categoriesResponse(Result<[CategoryList.Category], Failure>)
@@ -43,12 +42,8 @@ struct TopicEnvironment {
 
 let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, action, environment in
     switch action {
-    case .tapPeriod(let period):
-        break
-
     case .dismissToast:
         state.toastMessage = nil
-        break
 
     case .tapCategory(let cat):
         state.resetResponse()
@@ -130,7 +125,6 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
     case .topicsCategriesResponse(.success(let (subCategories, topicResponse))):
         state.subCategories[state.currentCategory.id] = subCategories
         state.topicResponse.append(topicResponse)
-        break
 
     case .topicsCategriesResponse(.failure(let failure)):
         state.toastMessage = "\(failure.error)"
