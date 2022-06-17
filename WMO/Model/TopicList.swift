@@ -47,7 +47,7 @@ struct Topic: Decodable, Equatable, Identifiable {
     let newPosts: Int?
     let unreadPosts: Int?
     let pinned: Bool?
-    let unpinned: Int?
+    let unpinned: Bool?
     let visible: Bool?
     let closed: Bool?
     let archived: Bool?

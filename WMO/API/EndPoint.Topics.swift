@@ -11,7 +11,7 @@ extension EndPoint {
     enum Topics {
         case latest(by: Order = .default, ascending: Bool = false, page: Int = 0)
         case top(by: Order = .default, period: Period = .all, page: Int = 0)
-        case category(slug: String, id: Int, page: Int = 0)
+        case category(slug: String, id: Int, page: Int = 0, order: Order? = nil)
         case tag(by: Tag) // TODO: more params
 
         enum Order: String {
@@ -54,7 +54,7 @@ extension EndPoint.Topics: RESTful {
         switch self {
         case .latest: return "/latest.json"
         case .top: return "/top.json"
-        case .category(let slug, let id, _): return "/c/\(slug)/\(id).json"
+        case .category(let slug, let id, _, _): return "/c/\(slug)/\(id).json"
         case .tag(let tag): return "/tag/\(tag).json"
         }
     }
@@ -69,8 +69,12 @@ extension EndPoint.Topics: RESTful {
             return ["order": order.rawValue, "ascending": ascending, "page": page]
         case .top(let order, let period, let page):
             return ["order": order.rawValue, "period": period.rawValue, "page": page]
-        case .category(_, _, let page):
-            return ["page": page]
+        case .category(_, _, let page, let order):
+            var params: [String: Any] = ["page": page]
+            if let order = order {
+                params["order"] = order.rawValue
+            }
+            return params
         default:
             return [:]
         }

@@ -18,7 +18,7 @@ struct TopicState: Equatable {
     var toastMessage: String?
     var reachEnd = false
 
-    mutating func reset() {
+    mutating func resetResponse() {
         self.currentPage = 0
         self.topicResponse = []
         self.reachEnd = false
@@ -51,14 +51,14 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
         break
 
     case .tapCategory(let cat):
-        state.reset()
+        state.resetResponse()
+        state.currentOrder = nil
         state.currentCategory = cat
-        state.currentOrder = nil // TODO: remove mutual exclusive
         let endpoint: EndPoint.Topics
-        if cat.id != -1 {
-            endpoint = .category(slug: cat.slug, id: cat.id)
-        } else {
+        if cat.isAllCategories {
             endpoint = .latest(by: .default, ascending: false, page: state.currentPage)
+        } else {
+            endpoint = .category(slug: cat.slug, id: cat.id)
         }
         let topicEffect = APIService.shared.getTopics(endpoint)
         let subCatEffect = APIService.shared.getCategories(.sublist(parentId: cat.id))
@@ -74,12 +74,17 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
         }
 
     case .tapOrder(let order):
-        state.reset()
+        state.resetResponse()
         state.currentOrder = order
-        state.currentCategory = .all  // TODO: remove mutual exclusive
-        return APIService.shared.getTopics(.top(by: order, period: .all))
-            .receive(on: environment.mainQueue)
-            .catchToEffect(TopicAction.topicsResponse)
+        if state.currentCategory.isAllCategories {
+            return APIService.shared.getTopics(.top(by: order, period: .all))
+                .receive(on: environment.mainQueue)
+                .catchToEffect(TopicAction.topicsResponse)
+        } else {
+            return APIService.shared.getTopics(.category(slug: state.currentCategory.slug, id: state.currentCategory.id, order: order))
+                .receive(on: environment.mainQueue)
+                .catchToEffect(TopicAction.topicsResponse)
+        }
 
     case .loadCategories:
         state.categories.removeAll()
@@ -89,12 +94,13 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
         
     case .loadTopics:
         let endpoint: EndPoint.Topics
-        if state.currentCategory.id != -1 {
-            endpoint = .category(slug: state.currentCategory.slug, id: state.currentCategory.id, page: state.currentPage)
-        } else if let order = state.currentOrder {  // TODO: remove mutual exclusive
-            endpoint = .top(by: order, period: .all, page: state.currentPage)
-        } else {
+        switch (state.currentOrder, state.currentCategory.isAllCategories) {
+        case (let optionalOrder, false):
+            endpoint = .category(slug: state.currentCategory.slug, id: state.currentCategory.id, page: state.currentPage, order: optionalOrder)
+        case (nil, true):
             endpoint = .latest(by: .default, ascending: false, page: state.currentPage)
+        case (.some(let order), true):
+            endpoint = .top(by: order, period: .all, page: state.currentPage)
         }
         return APIService.shared.getTopics(endpoint)
             .receive(on: environment.mainQueue)
@@ -112,7 +118,7 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
 
     case .categoriesResponse(.success(let categories)):
         state.categories = [CategoryList.Category.all] + categories
-        state.reset()
+        state.resetResponse()
         // trigger `getTopics` to update category label inside topic row
         return APIService.shared.getTopics(.latest(by: .default, ascending: false, page: 0))
             .receive(on: environment.mainQueue)
@@ -123,7 +129,6 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
 
     case .topicsCategriesResponse(.success(let (subCategories, topicResponse))):
         state.subCategories[state.currentCategory.id] = subCategories
-        print("subCategoriessubCategories \(subCategories)")
         state.topicResponse.append(topicResponse)
         break
 

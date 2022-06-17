@@ -64,6 +64,10 @@ struct CategoryList: Decodable, Equatable {
         var displayName: String {
             return name.components(separatedBy: .init(charactersIn: " (（")).first ?? name
         }
+
+        var isAllCategories: Bool {
+            return id == -1
+        }
         
         enum CodingKeys: String, CodingKey {
             case id

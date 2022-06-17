@@ -107,8 +107,8 @@ struct TopicListView: View {
                             showingAlert = true
                         }) {
                             ZStack(alignment: .bottomTrailing) {
-                                Image(systemName: "arrow.up.arrow.down.square")
-                                    .font(.system(size: 17, weight: .medium))
+                                Image(systemName: "arrow.up.arrow.down")
+                                    .font(.system(size: 15, weight: .medium))
                                 if let order = viewStore.currentOrder {
                                     Image(systemName: order.icon)
                                     .font(.system(size: 10, weight: .medium))
@@ -219,6 +219,14 @@ struct TopicRow: View {
         return formatter.date(from: iso8601)?.dateStringWithAgo ?? ""
     }
 
+    private func titleText(_ topic: Topic) -> Text {
+        if topic.pinned == true {
+            return Text(Image(systemName: "pin")) + Text(topic.title)
+        } else {
+            return Text(topic.title)
+        }
+    }
+
     var body: some View {
         ZStack {
             NavigationLink(destination: Webview(type: .home, url: "https://womenoverseas.com/t/topic/\(topic.id)")) {
@@ -229,7 +237,7 @@ struct TopicRow: View {
             VStack(spacing: itemVerticalSpacing) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: itemVerticalSpacing) {
-                        Text(topic.title)
+                        titleText(topic)
                             .foregroundColor(.black)
                             .font(.system(size: titleFontSize))
                             .fixedSize(horizontal: false, vertical: true)
@@ -287,7 +295,7 @@ let fakeTopic = Topic(id: 1,
                       createdAt: "2021", lastPostedAt: "2022", bumped: false, bumpedAt: "2022",
                       archetype: "arche", unseen: false,
                       lastReadPostNumber: 0, unread: 0, newPosts: 0, unreadPosts: 0,
-                      pinned: false, unpinned: 0,
+                      pinned: false, unpinned: false,
                       visible: false, closed: false, archived: false,
                       notificationLevel: 1,
                       bookmarked: false, liked: false,
