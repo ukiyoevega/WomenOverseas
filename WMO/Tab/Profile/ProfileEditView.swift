@@ -209,11 +209,12 @@ fileprivate struct ProfileEditingView: View {
                         .accentColor(Color.accentForeground)
                         .font(.system(size: settingEditingFontSize, weight: .semibold))
                 }
-                /*
-                .hud(isPresented: viewStore.binding(get: \.successMessage, send: .dismissToast)) {
-                    Label(viewStore.successMessage, systemImage: "star.fill")
-                }
-                 */
+                .toast(message: viewStore.toastMessage ?? "",
+                       isShowing:  viewStore.binding(get: { state in
+                    return !(state.toastMessage ?? "").isEmpty
+
+                }, send: .dismissToast),
+                       duration: Toast.short)
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {

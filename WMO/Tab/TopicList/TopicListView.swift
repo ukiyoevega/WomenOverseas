@@ -105,9 +105,6 @@ struct TopicListView: View {
                     HStack {
                         Button(action: {
                             showingAlert = true
-//                            let x = viewStore.binding({ state in
-//                                state.toastMessage?.isEmpty ?? false
-//                            }, sending: .dismissToast)
                         }) {
                             ZStack(alignment: .bottomTrailing) {
                                 Image(systemName: "arrow.up.arrow.down.square")

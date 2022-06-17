@@ -16,7 +16,6 @@ struct ProfileEnvironment {
 struct ProfileHeaderState: Equatable {
     var userResponse: UserResponse = .empty
     var userAvatar: String? = nil
-    var successMessage: String = ""
     var toastMessage: String? = nil
 }
 
@@ -33,19 +32,19 @@ let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, Prof
     let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username")?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
     switch action {
     case .update(let name, let value):
-        state.successMessage = ""
         return APIService.shared.updateUser(.update(username: username, name: name, value: value))
             .receive(on: environment.mainQueue)
             .catchToEffect(ProfileHeaderAction.updateResponse)
+
     case .updateResponse(.success(let userResponse)):
         state.userResponse.user = userResponse.user
-        state.successMessage = "更新成功"
-        break
-    case .dismissToast:
-        state.successMessage = ""
+//        state.toastMessage = "更新成功"
 
-    case .updateResponse(.failure):
-        break // TODO: errer handling
+    case .dismissToast:
+        state.toastMessage = nil
+
+    case .updateResponse(.failure(let failure)):
+        state.toastMessage = "\(failure.error)"
 
     case .refresh:
         return APIService.shared.getUser(.getUser(name: username))

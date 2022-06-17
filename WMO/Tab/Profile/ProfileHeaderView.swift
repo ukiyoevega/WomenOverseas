@@ -137,6 +137,12 @@ struct ProfileHeaderView: View {
                     }
                 }
             }
+            .toast(message: viewStore.toastMessage ?? "",
+                   isShowing:  viewStore.binding(get: { state in
+                return !(state.toastMessage ?? "").isEmpty
+
+            }, send: .dismissToast),
+                   duration: Toast.short)
         }
     }
 }
