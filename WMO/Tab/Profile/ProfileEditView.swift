@@ -21,14 +21,13 @@ private let avatarWidth: CGFloat = 40
 struct ProfileEditView: View {
 
     let store: Store<ProfileHeaderState, ProfileHeaderAction>
-    let user: User.User // TODO: remove
 
     var body: some View {
         WithViewStore(self.store) { viewStore in
             ListWithoutSepatorsAndMargins {
                 ForEach(EditEntry.allCases) { entry in
                     NavigationLink(destination: destination(viewStore: viewStore, entry: entry)) {
-                        entryRow(entry)
+                        entryRow(viewStore: viewStore, entry)
                             .padding([.top, .bottom])
                     }
                     .navigationBarTitle("") // remove back button title
@@ -69,19 +68,19 @@ struct ProfileEditView: View {
     }
 
     @ViewBuilder
-    func entryRow(_ entry: EditEntry) -> some View {
+    func entryRow(viewStore: ViewStore<ProfileHeaderState, ProfileHeaderAction>, _ entry: EditEntry) -> some View {
         HStack {
             Text(entry.description)
                 .font(.system(size: settingTitleFontSize, weight: .semibold))
                 .foregroundColor(Color.black)
             Spacer()
-            if let info = self.user.getInfo(entry) {
+            if let info = viewStore.userResponse.user.getInfo(entry) {
                 Text(info)
                     .font(.system(size: settingDetailFontSize))
                     .foregroundColor(Color.black)
             }
-            if entry == .avatar, !user.avatarTemplate.isEmpty,
-               let escapedString = String("https://womenoverseas.com" + user.avatarTemplate)
+            if entry == .avatar, !viewStore.userResponse.user.avatarTemplate.isEmpty,
+               let escapedString = String("https://womenoverseas.com" + viewStore.userResponse.user.avatarTemplate)
                 .replacingOccurrences(of: "{size}", with: "400")
                 .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
                let avatarURL = URL(string: escapedString) {

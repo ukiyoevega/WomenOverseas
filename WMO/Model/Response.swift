@@ -7,6 +7,21 @@
 
 import Foundation
 
+// https://meta.discourse.org/t/how-to-get-notifications-via-the-api/120951
+struct NotificationResponse: Decodable {
+    let total: Int?
+    let seenId: Int?
+    let loadMoreKey: String?
+    let notifications: [NotificationMessage]
+
+    enum CodingKeys: String, CodingKey {
+        case total = "total_rows_notifications"
+        case seenId = "seen_notification_id"
+        case loadMoreKey = "load_more_notifications"
+        case notifications
+    }
+}
+
 struct TopicListResponse: Decodable, Equatable {
     let users: [User.User]?
     let topicList: TopicList?

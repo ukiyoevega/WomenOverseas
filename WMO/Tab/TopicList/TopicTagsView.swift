@@ -27,12 +27,18 @@ struct TopicTagsView: View {
     var body: some View {
         WithViewStore(self.store) { viewStore in
             ScrollView(.vertical) {
-                VFlow(alignment: .leading, horizontalSpacing: itemSpacing, verticalSpacing: itemSpacing) {
-                    ForEach(viewStore.tags, id: \.id) { tag in
-                        tagButton(name: tag.name, count: tag.count)
+                if viewStore.tags.isEmpty {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                } else {
+                    VFlow(alignment: .leading, horizontalSpacing: itemSpacing, verticalSpacing: itemSpacing) {
+                        ForEach(viewStore.tags, id: \.id) { tag in
+                            tagButton(name: tag.name, count: tag.count)
+                        }
                     }
+                    .padding(EdgeInsets(top: 0, leading: flowSpacing, bottom: flowSpacing, trailing: flowSpacing))
                 }
-                .padding(EdgeInsets(top: 0, leading: flowSpacing, bottom: flowSpacing, trailing: flowSpacing))
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {

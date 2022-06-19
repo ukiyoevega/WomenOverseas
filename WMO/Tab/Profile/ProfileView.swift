@@ -68,8 +68,8 @@ struct ProfileView: View {
     @ViewBuilder
     func entryView(_ entry: SettingEntry) -> some View {
         switch entry {
-//        case .notification:
-//            Text(entry.description)
+        case .notification:
+            NotificationListView(store: self.store.scope(state: \.notificationState, action: ProfileAction.notification))
 //        case .theme:
 //            Text(entry.description)
 //        case .settings:
@@ -113,7 +113,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     var id: String { self.rawValue }
     
 //    case account
-//    case notification
+    case notification
 //    case theme
 //    case settings
     case aboutUs
@@ -123,7 +123,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
         get {
             switch self {
 //            case .account: return "我的账号"
-//            case .notification: return "我的通知"
+            case .notification: return "我的通知"
 //            case .theme: return "切换到原生模式"
 //            case .settings: return "设置"
             case .aboutUs: return "关于我们"
@@ -136,7 +136,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
         get {
             switch self {
 //            case .account: return "person.crop.artframe"
-//            case .notification: return "envelope"
+            case .notification: return "envelope"
             case .donation: return "yensign.circle"
 //            case .settings: return "gearshape.2"
             case .aboutUs: return "info.circle"

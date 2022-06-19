@@ -38,7 +38,7 @@ struct APIService {
           .map { data, _ in data }
           .decode(type: ResponseType.self, decoder: JSONDecoder())
           .mapError { error in
-              print("error \(error)")
+              print("🥹 ERROR \(error)")
               return Failure(error: error)
           }
           .eraseToEffect()
@@ -63,6 +63,10 @@ struct APIService {
     lazy var getTags: (EndPoint.Tag) -> Effect<TagsResponse, Failure> = {
         return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
     }()
+
+    lazy var getNotifications: (EndPoint.Noti) -> Effect<NotificationResponse, Failure> = {
+        return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
+    }()
     
     lazy var getCategories: (EndPoint.Category) -> Effect<[CategoryList.Category], Failure> = {
         return { endpoint in
@@ -71,7 +75,7 @@ struct APIService {
               .decode(type: CategoriesResponse.self, decoder: JSONDecoder())
               .map({ response in response.categoryList.categories })
               .mapError { error in
-                  print("error \(error)")
+                  print("🥹 ERROR \(error)")
                   return Failure(error: error)
               }
               .eraseToEffect()

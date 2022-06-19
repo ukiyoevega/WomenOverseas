@@ -31,7 +31,7 @@
 		B2803831285C84AC004E10E9 /* VFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B280382D285C84AC004E10E9 /* VFlow.swift */; };
 		B2803833285C9BA7004E10E9 /* TopicTagCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2803832285C9BA7004E10E9 /* TopicTagCore.swift */; };
 		B2803835285C9C97004E10E9 /* TopicRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2803834285C9C97004E10E9 /* TopicRow.swift */; };
-		B2A481E5283DF1E50053B73A /* NotificationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A481E4283DF1E50053B73A /* NotificationList.swift */; };
+		B2A481E5283DF1E50053B73A /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A481E4283DF1E50053B73A /* Notification.swift */; };
 		B2A48371283E41380053B73A /* TopicList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A48370283E41380053B73A /* TopicList.swift */; };
 		B2AA08762814330D0065A30E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA08752814330D0065A30E /* SceneDelegate.swift */; };
 		B2AA0878281433F80065A30E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA0877281433F80065A30E /* AppDelegate.swift */; };
@@ -39,6 +39,7 @@
 		B2AA679F28448743006F50C0 /* ProfileHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA679E28448743006F50C0 /* ProfileHeaderView.swift */; };
 		B2AA67A128459D10006F50C0 /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA67A028459D10006F50C0 /* Color+Extension.swift */; };
 		B2AFEE9428486ECE0053DE32 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AFEE9328486ECE0053DE32 /* AboutView.swift */; };
+		B2D9F337285EB958008020B1 /* NotificationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D9F336285EB958008020B1 /* NotificationListView.swift */; };
 		B2EE551428119AE6008A8DD5 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EE551328119AE6008A8DD5 /* TabBarView.swift */; };
 		B2EE551828119AE9008A8DD5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2EE551728119AE9008A8DD5 /* Assets.xcassets */; };
 		B2EE551B28119AE9008A8DD5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2EE551A28119AE9008A8DD5 /* Preview Assets.xcassets */; };
@@ -82,7 +83,7 @@
 		B2803832285C9BA7004E10E9 /* TopicTagCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicTagCore.swift; sourceTree = "<group>"; };
 		B2803834285C9C97004E10E9 /* TopicRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicRow.swift; sourceTree = "<group>"; };
 		B29E33BE2828DA2D00F6F548 /* WMO.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WMO.entitlements; sourceTree = "<group>"; };
-		B2A481E4283DF1E50053B73A /* NotificationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationList.swift; sourceTree = "<group>"; };
+		B2A481E4283DF1E50053B73A /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		B2A48370283E41380053B73A /* TopicList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicList.swift; sourceTree = "<group>"; };
 		B2AA08752814330D0065A30E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		B2AA0877281433F80065A30E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -90,6 +91,7 @@
 		B2AA679E28448743006F50C0 /* ProfileHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHeaderView.swift; sourceTree = "<group>"; };
 		B2AA67A028459D10006F50C0 /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
 		B2AFEE9328486ECE0053DE32 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		B2D9F336285EB958008020B1 /* NotificationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationListView.swift; sourceTree = "<group>"; };
 		B2EE551028119AE6008A8DD5 /* WMO.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WMO.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2EE551328119AE6008A8DD5 /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
 		B2EE551728119AE9008A8DD5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -163,7 +165,7 @@
 				B2EFD55C283C57A200D7A6A0 /* CategoryList.swift */,
 				B2A48370283E41380053B73A /* TopicList.swift */,
 				B2EE552E28123451008A8DD5 /* UserSummary.swift */,
-				B2A481E4283DF1E50053B73A /* NotificationList.swift */,
+				B2A481E4283DF1E50053B73A /* Notification.swift */,
 				B2644283283F9DFF00FBEDCE /* Poster.swift */,
 				B264488528412B1F00FBEDCE /* Tag.swift */,
 			);
@@ -178,6 +180,7 @@
 				B2AA679E28448743006F50C0 /* ProfileHeaderView.swift */,
 				B2014BF82845D3430051E1B4 /* ProfileEditView.swift */,
 				B2AFEE9328486ECE0053DE32 /* AboutView.swift */,
+				B2D9F336285EB958008020B1 /* NotificationListView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -355,9 +358,10 @@
 				B2EFD55D283C57A200D7A6A0 /* CategoryList.swift in Sources */,
 				B2803831285C84AC004E10E9 /* VFlow.swift in Sources */,
 				B23230012843114F0048A717 /* DownloadTask.swift in Sources */,
+				B2D9F337285EB958008020B1 /* NotificationListView.swift in Sources */,
 				B2322FEF28420ACB0048A717 /* AppState.swift in Sources */,
 				B280382F285C84AC004E10E9 /* Flow.swift in Sources */,
-				B2A481E5283DF1E50053B73A /* NotificationList.swift in Sources */,
+				B2A481E5283DF1E50053B73A /* Notification.swift in Sources */,
 				B28035B0285C6F98004E10E9 /* TopicTagsView.swift in Sources */,
 				B2EE59852812B471008A8DD5 /* RSA+Header.swift in Sources */,
 				B2EE598B2812C5B6008A8DD5 /* URLEncoding.swift in Sources */,

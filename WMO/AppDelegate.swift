@@ -18,6 +18,9 @@
  case sameString = "sameString"
  find: case (.*) = \"[^_]*$
  replacing: case (.*) = \"([^_]*)"$
+
+ : \132
+ : \d
  */
 
 import UIKit

@@ -8,8 +8,21 @@
 import Foundation
 import UIKit
 
+extension String {
+    var lastPostedAt: String {
+        let iso8601 = self
+        let formatter = Date.dateFormatter
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        return formatter.date(from: iso8601)?.dateStringWithAgo ?? ""
+    }
+}
+
 extension Date {
     static let dateFormatter: DateFormatter = DateFormatter()
+
+    var dateString: String {
+        return ""
+    }
     
     var dateStringWithAgo: String {
         let calendar = Calendar.current
@@ -23,24 +36,24 @@ extension Date {
 
         if monthsDiff >= 1 || daysDiff >= 10 { // if longer than 10 days
             if calendar.isDate(self, equalTo: now, toGranularity: .year) {
-                return self.generateDateString(of: "MM/dd") + "更新"
+                return self.generateDateString(of: "MM/dd")
             } else {
-                return self.exactDateString + "更新"
+                return self.exactDateString
             }
         } else { // if within 10 days
             // 1. if daysDiff >= 1, aka >= 24 hours
             if daysDiff >= 1 {
-                return "\(daysDiff)天前更新"
+                return "\(daysDiff)天前"
                 
             // 2. if within 24 hours, and hoursDiff >= 1
             } else if hoursDiff >= 1 {
-                return "\(hoursDiff)小时前更新"
+                return "\(hoursDiff)小时前"
                 
             // 3. if within 1 hour, but minutes diff >= 1
             } else if minutesDiff >= 1 {
-                return "\(minutesDiff)分钟前更新"
+                return "\(minutesDiff)分钟前"
             } else {
-                return "刚刚更新"
+                return "刚刚"
             }
         }
     }

@@ -100,7 +100,7 @@ struct ProfileHeaderView: View {
                             .foregroundColor(Color.black)
                     }
                     Spacer()
-                    NavigationLink(destination: ProfileEditView(store: self.store, user: viewStore.userResponse.user)) {
+                    NavigationLink(destination: ProfileEditView(store: self.store)) {
                         RoundedRectangle(cornerRadius: editCornerRadius)
                             .foregroundColor(Color.mainIcon)
                             .frame(width: 80, height: 30)
