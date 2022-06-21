@@ -246,7 +246,6 @@ extension WebviewController: WKNavigationDelegate {
     }
 }
 
-
 struct NavigationBarModifier: ViewModifier {
     
     var backgroundColor: UIColor?
@@ -259,7 +258,7 @@ struct NavigationBarModifier: ViewModifier {
         // configure
         let coloredAppearance = UINavigationBarAppearance()
         coloredAppearance.configureWithTransparentBackground()
-        coloredAppearance.backgroundColor = .clear
+        coloredAppearance.backgroundColor = .white
         if let textColor = self.textColor {
             coloredAppearance.titleTextAttributes = [.foregroundColor: textColor]
             coloredAppearance.largeTitleTextAttributes = [.foregroundColor: textColor]
