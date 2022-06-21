@@ -95,7 +95,7 @@ enum User {
 
         let admin: Bool?
         let moderator: Bool?
-        let trustLevel: Int
+        let trustLevel: Int?
         let bioRaw: String?
         let flairURL: String?
         let title: String?

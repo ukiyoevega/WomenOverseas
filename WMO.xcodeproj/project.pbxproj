@@ -60,6 +60,9 @@
 		B2EE59A32813E594008A8DD5 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EE59A22813E594008A8DD5 /* WebView.swift */; };
 		B2EFD55D283C57A200D7A6A0 /* CategoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EFD55C283C57A200D7A6A0 /* CategoryList.swift */; };
 		B2EFD6D5283CD41900D7A6A0 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EFD6D4283CD41900D7A6A0 /* ProfileView.swift */; };
+		B2F75C8C2861EDDD0036E28A /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F75C8B2861EDDD0036E28A /* Bookmark.swift */; };
+		B2F75C8E2861F3BB0036E28A /* EndPoint.Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F75C8D2861F3BB0036E28A /* EndPoint.Bookmark.swift */; };
+		B2F75C912861F8460036E28A /* BookmarkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F75C902861F8460036E28A /* BookmarkListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -118,6 +121,9 @@
 		B2EE59A22813E594008A8DD5 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		B2EFD55C283C57A200D7A6A0 /* CategoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryList.swift; sourceTree = "<group>"; };
 		B2EFD6D4283CD41900D7A6A0 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		B2F75C8B2861EDDD0036E28A /* Bookmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bookmark.swift; sourceTree = "<group>"; };
+		B2F75C8D2861F3BB0036E28A /* EndPoint.Bookmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndPoint.Bookmark.swift; sourceTree = "<group>"; };
+		B2F75C902861F8460036E28A /* BookmarkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +184,7 @@
 				B2A481E4283DF1E50053B73A /* Notification.swift */,
 				B2D6DAD1285F552000DE94BE /* Search.swift */,
 				B2644283283F9DFF00FBEDCE /* Post.swift */,
+				B2F75C8B2861EDDD0036E28A /* Bookmark.swift */,
 				B2D6DAD3285F650200DE94BE /* InterestGroup.swift */,
 				B264488528412B1F00FBEDCE /* Tag.swift */,
 			);
@@ -191,8 +198,7 @@
 				B2EFD6D4283CD41900D7A6A0 /* ProfileView.swift */,
 				B2AA679E28448743006F50C0 /* ProfileHeaderView.swift */,
 				B2014BF82845D3430051E1B4 /* ProfileEditView.swift */,
-				B2AFEE9328486ECE0053DE32 /* AboutView.swift */,
-				B2D9F336285EB958008020B1 /* NotificationListView.swift */,
+				B2F75C8F2861F83A0036E28A /* Entries */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -259,6 +265,7 @@
 				B2EE5688281255C6008A8DD5 /* RESTful.swift */,
 				B2644285283FAD8A00FBEDCE /* EndPoint.Category.swift */,
 				B264428B283FB3F200FBEDCE /* EndPoint.Topics.swift */,
+				B2F75C8D2861F3BB0036E28A /* EndPoint.Bookmark.swift */,
 				B2644287283FB3E100FBEDCE /* EndPoint.User.swift */,
 				B2644289283FB3EA00FBEDCE /* EndPoint.Noti.swift */,
 				B2EE552628123363008A8DD5 /* APIService.swift */,
@@ -287,6 +294,16 @@
 				B2AA679D284486FD006F50C0 /* Profile */,
 			);
 			path = Tab;
+			sourceTree = "<group>";
+		};
+		B2F75C8F2861F83A0036E28A /* Entries */ = {
+			isa = PBXGroup;
+			children = (
+				B2F75C902861F8460036E28A /* BookmarkListView.swift */,
+				B2D9F336285EB958008020B1 /* NotificationListView.swift */,
+				B2AFEE9328486ECE0053DE32 /* AboutView.swift */,
+			);
+			path = Entries;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -370,10 +387,13 @@
 				B2EFD55D283C57A200D7A6A0 /* CategoryList.swift in Sources */,
 				B2803831285C84AC004E10E9 /* VFlow.swift in Sources */,
 				B23230012843114F0048A717 /* DownloadTask.swift in Sources */,
+				B2F75C8C2861EDDD0036E28A /* Bookmark.swift in Sources */,
 				B2D9F337285EB958008020B1 /* NotificationListView.swift in Sources */,
+				B2F75C8E2861F3BB0036E28A /* EndPoint.Bookmark.swift in Sources */,
 				B2322FEF28420ACB0048A717 /* AppState.swift in Sources */,
 				B280382F285C84AC004E10E9 /* Flow.swift in Sources */,
 				B2A481E5283DF1E50053B73A /* Notification.swift in Sources */,
+				B2F75C912861F8460036E28A /* BookmarkListView.swift in Sources */,
 				B28035B0285C6F98004E10E9 /* TopicTagsView.swift in Sources */,
 				B2EE59852812B471008A8DD5 /* RSA+Header.swift in Sources */,
 				B2EE598B2812C5B6008A8DD5 /* URLEncoding.swift in Sources */,

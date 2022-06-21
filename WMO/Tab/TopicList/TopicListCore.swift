@@ -8,6 +8,59 @@
 import ComposableArchitecture
 import Combine
 
+// MARK: - Bookmark
+
+struct BookmarkState: Equatable {
+    var bookmarks: [Bookmark] = []
+    var toastMessage: String?
+    var categories: [CategoryList.Category] = []
+    var currentPage: Int = 0
+}
+
+enum BookmarkAction {
+    case loadList
+    case dismissToast
+    case bookmarkResponse(Result<BookmarkResponse, Failure>)
+
+    case loadCategories
+    case categoriesResponse(Result<[CategoryList.Category], Failure>)
+}
+
+let bookmarkReducer = Reducer<BookmarkState, BookmarkAction, ProfileEnvironment> { state, action, environment in
+    switch action {
+    case .dismissToast:
+        state.toastMessage = nil
+
+    case .bookmarkResponse(.success(let resp)):
+        state.currentPage += 1
+        state.bookmarks.append(contentsOf: resp.bookmarkList.bookmarks)
+
+    case .bookmarkResponse(.failure(let failure)):
+        state.toastMessage = "\(failure.error)"
+
+    case .loadList:
+        break
+
+    case .loadCategories:
+        return APIService.shared.getCategories(.list(includeSubcategories: true))
+            .receive(on: environment.mainQueue)
+            .catchToEffect(BookmarkAction.categoriesResponse)
+
+    case .categoriesResponse(.success(let categories)):
+        state.categories = categories
+        let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username")?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        return APIService.shared.bookmark(.list(username: username, page: state.currentPage))
+            .receive(on: environment.mainQueue)
+            .catchToEffect(BookmarkAction.bookmarkResponse)
+
+    case .categoriesResponse(.failure(let failure)):
+        state.toastMessage = "\(failure.error)"
+    }
+    return .none
+}
+
+// MARK: - Topic
+
 struct TopicState: Equatable {
     var topicResponse: [TopicListResponse] = []
     var categories: [CategoryList.Category] = []
@@ -83,7 +136,7 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
 
     case .loadCategories:
         state.categories.removeAll()
-        return APIService.shared.getCategories(.list)
+        return APIService.shared.getCategories(.list(includeSubcategories: false))
             .receive(on: environment.mainQueue)
             .catchToEffect(TopicAction.categoriesResponse)
         

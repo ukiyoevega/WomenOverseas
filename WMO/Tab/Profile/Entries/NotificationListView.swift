@@ -74,7 +74,7 @@ private struct NotificationRow: View {
             }
             HStack {
                 Spacer()
-                Text(message.createdAt.lastPostedAt)
+                Text(message.createdAt.readableAgo)
                     .font(.system(size: receivedAtFontSize))
                     .foregroundColor(Color.systemLightGray)
             }

@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 extension String {
-    var lastPostedAt: String {
+    var readableAgo: String {
         let iso8601 = self
         let formatter = Date.dateFormatter
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"

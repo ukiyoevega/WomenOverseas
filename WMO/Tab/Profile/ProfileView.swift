@@ -78,6 +78,8 @@ struct ProfileView: View {
             AboutView()
         case .donation:
             Webview(type: .home, url: "https://womenoverseas.com/t/topic/11426")
+        case .bookmark:
+            BookmarkListView(store: Store(initialState: BookmarkState(), reducer: bookmarkReducer, environment: ProfileEnvironment()))
         }
     }
 }
@@ -113,6 +115,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     var id: String { self.rawValue }
     
 //    case account
+    case bookmark
     case notification
 //    case theme
 //    case settings
@@ -123,6 +126,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
         get {
             switch self {
 //            case .account: return "我的账号"
+            case .bookmark: return "我的书签"
             case .notification: return "我的通知"
 //            case .theme: return "切换到原生模式"
 //            case .settings: return "设置"
@@ -136,6 +140,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
         get {
             switch self {
 //            case .account: return "person.crop.artframe"
+            case .bookmark: return "bookmark"
             case .notification: return "envelope"
             case .donation: return "yensign.circle"
 //            case .settings: return "gearshape.2"

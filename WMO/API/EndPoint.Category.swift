@@ -9,7 +9,7 @@ import Foundation
 
 extension EndPoint {
     enum Category {
-        case list
+        case list(includeSubcategories: Bool = false)
         case sublist(parentId: Int)
     }
     
@@ -31,7 +31,11 @@ extension EndPoint.Category: RESTful {
     
     var params: [String : Any] {
         switch self {
-        case .list: return [:]
+        case .list(let includeSub):
+            if includeSub {
+                return ["include_subcategories": includeSub]
+            }
+            return [:]
         case .sublist(let parentId): return ["parent_category_id": parentId]
         }
     }

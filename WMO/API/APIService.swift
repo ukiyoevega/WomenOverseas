@@ -44,6 +44,10 @@ struct APIService {
           .eraseToEffect()
     }
 
+    lazy var bookmark: (EndPoint.Bookmarks) -> Effect<BookmarkResponse, Failure> = {
+        return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
+    }()
+
     lazy var updateUser: (EndPoint.User) -> Effect<UserResponse, Failure> = {
         return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
     }()

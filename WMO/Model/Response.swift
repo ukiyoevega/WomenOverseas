@@ -22,6 +22,14 @@ struct NotificationResponse: Decodable {
     }
 }
 
+struct BookmarkResponse: Decodable, Equatable {
+    let bookmarkList: BookmarkList
+
+    enum CodingKeys: String, CodingKey {
+        case bookmarkList = "user_bookmark_list"
+    }
+}
+
 struct TopicListResponse: Decodable, Equatable {
     let users: [User.User]?
     let topicList: TopicList?

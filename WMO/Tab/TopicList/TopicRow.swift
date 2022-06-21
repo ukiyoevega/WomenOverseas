@@ -21,45 +21,35 @@ private let titleFontSize: CGFloat = 15
 private let titleLineSpacing: CGFloat = 3
 private let bottomRightElementsFontSize: CGFloat = 11
 
-struct TopicRow: View {
-
-    let topic: Topic
-    let category: CategoryList.Category?
-    let user: User.User?
-
-    private func category(_ categoryItem: CategoryList.Category) -> some View {
-        let tint = Color(hex: categoryItem.color)
-        return Text(categoryItem.displayName)
+struct CategoryView: View {
+    let categoryItem: CategoryList.Category
+    var body: some View {
+        Text(categoryItem.displayName)
             .font(.system(size: categoryFontSize))
-            .foregroundColor(tint)
+            .foregroundColor(Color(hex: categoryItem.color))
             .padding(categoryTextPaddingInRow)
-            .background(tint.opacity(categoryBackgroundOpacity))
+            .background(Color(hex: categoryItem.color).opacity(categoryBackgroundOpacity))
             .cornerRadius(categoryCornerRadiusInRow)
-        /*
-        return Text(categoryItem.displayName)
-            .font(.system(size: categoryFontSize))
-            .foregroundColor(.white)
-            .padding(.init(top: 3, leading: 8, bottom: 3, trailing: 8))
-            .background(Color(hex: categoryItem.color))
-            .cornerRadius(topicCategoryCornerRadius)
-         */
     }
+}
 
-    private func label(_ text: String) -> some View {
-        return Text(text)
+struct TagView: View {
+    let tag: String
+    var body: some View {
+        Text(tag)
             .font(.system(size: tagFontSize))
             .foregroundColor(Color.tagText)
             .padding(.init(top: 2, leading: 5, bottom: 2, trailing: 5))
             .background(Color.tagBackground)
             .cornerRadius(tagCornerRadius)
     }
+}
 
-    private func lastPostedAt(_ iso8601: String?) -> String {
-        guard let iso8601 = iso8601 else { return "" }
-        let formatter = Date.dateFormatter
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        return formatter.date(from: iso8601)?.dateStringWithAgo ?? ""
-    }
+struct TopicRow: View {
+
+    let topic: Topic
+    let category: CategoryList.Category?
+    let user: User.User?
 
     private func titleText(_ topic: Topic) -> Text {
         if topic.pinned == true {
@@ -86,10 +76,10 @@ struct TopicRow: View {
                             .lineSpacing(titleLineSpacing)
                         HStack() { // category_tags
                             if let categoryItem = self.category {
-                                category(categoryItem)
+                                CategoryView(categoryItem: categoryItem)
                             }
                             ForEach(topic.tags ?? [], id: \.hashValue) { tag in
-                                label(tag)
+                                TagView(tag: tag)
                             }
                         }
                     } // title, tags
@@ -111,7 +101,9 @@ struct TopicRow: View {
                     }
                 } // title, tags, avatar
                 HStack(spacing: detailInfoSpacing) {
-                    Text(lastPostedAt(topic.lastPostedAt)).font(.system(size: bottomRightElementsFontSize))
+                    if let lastPosted = topic.lastPostedAt {
+                        Text(lastPosted.readableAgo).font(.system(size: bottomRightElementsFontSize))
+                    }
                     Spacer()
                     Image(systemName: "eye.fill").font(.system(size: bottomRightElementsFontSize))
                     Text("\(topic.views ?? 0)").font(.system(size: bottomRightElementsFontSize))
