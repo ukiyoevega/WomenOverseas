@@ -17,13 +17,14 @@ struct NotificationListView: View {
 
     var body: some View {
         WithViewStore(self.store) { viewStore in
-            List {
+            placeholderedList(isEmpty: viewStore.notifications.isEmpty, reachBottom: true, loadMoreAction: {
+                // TODO:
+            }) {
                 ForEach(viewStore.notifications) { noti in
                     NotificationRow(message: noti)
                         .padding(EdgeInsets(top: 10, leading: 0, bottom: 5, trailing: 0))
                 }
             }
-            .listStyle(PlainListStyle())
             .onAppear {
                 viewStore.send(.loadList)
             }

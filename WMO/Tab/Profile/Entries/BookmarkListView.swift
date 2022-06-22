@@ -24,26 +24,17 @@ struct BookmarkListView: View {
 
     var body: some View {
         WithViewStore(self.store) { viewStore in
-            List {
+            placeholderedList(isEmpty: viewStore.bookmarks.isEmpty, reachBottom: viewStore.reachEnd, loadMoreAction: {
+                viewStore.send(.loadList)
+            }) {
                 ForEach(Array(zip(viewStore.bookmarks, viewStore.bookmarkContent)), id: \.0.id) { bookmark, contentArray in
                     BookmarkRow(bookmark: bookmark, stringWithAttributes: contentArray, category: viewStore.categories.first(where: { $0.id == bookmark.categoryId }))
                 }
-                if viewStore.reachEnd {
-                    center {
-                        Text("已经到底啦")
-                            .font(.system(size: 11))
-                            .foregroundColor(Color(UIColor.lightGray))
-                            .padding()
-                    }
-
-                } else if !viewStore.bookmarks.isEmpty {
-                    center { ProgressView() }
-                        .onAppear { viewStore.send(.loadList) }
-                }
             }
-            .listStyle(PlainListStyle())
             .onAppear {
-                viewStore.send(.loadCategories)
+                if (viewStore.categories.isEmpty) {
+                    viewStore.send(.loadCategories)
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {

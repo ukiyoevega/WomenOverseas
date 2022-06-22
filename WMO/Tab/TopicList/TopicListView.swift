@@ -50,35 +50,17 @@ struct TopicListView: View {
         WithViewStore(self.store) { viewStore in
             Group {
                 categories(viewStore)
-                if (!viewStore.topicResponse.isEmpty) {
-                    List {
-                        ForEach(viewStore.topicResponse, id: \.uuid) { res in
-                            ForEach(res.topicList?.topics ?? []) { topic in
-                                TopicRow(topic: topic,
-                                         category: getTopicCategory(topic: topic, viewStore),
-                                         user: res.users?.first(where: { $0.id == topic.posters?.first?.uid })
-                                )
-                            }
-                        }
-                        if viewStore.reachEnd {
-                            center {
-                                Text("已经到底啦")
-                                    .font(.system(size: 11))
-                                    .foregroundColor(Color(UIColor.lightGray))
-                                    .padding()
-                            }
-
-                        } else if !viewStore.topicResponse.isEmpty {
-                            /// The pagination is done by appending a invisible rectancle at the bottom of the list, and trigerining the next page load as it appear... hacky way for now
-                            center { ProgressView() }
-                                .onAppear { viewStore.send(.loadTopics) }
+                placeholderedList(isEmpty: viewStore.topicResponse.isEmpty, reachBottom: viewStore.reachEnd, loadMoreAction: {
+                    viewStore.send(.loadTopics)
+                }) {
+                    ForEach(viewStore.topicResponse, id: \.uuid) { res in
+                        ForEach(res.topicList?.topics ?? []) { topic in
+                            TopicRow(topic: topic,
+                                     category: getTopicCategory(topic: topic, viewStore),
+                                     user: res.users?.first(where: { $0.id == topic.posters?.first?.uid })
+                            )
                         }
                     }
-                    .listStyle(PlainListStyle())
-                } else {
-                    Spacer()
-                    center { ProgressView() }
-                    Spacer()
                 }
             } // workaround for icon-style navigation bar title
             .navigationBarTitleDisplayMode(.inline)

@@ -17,6 +17,13 @@ struct BookmarkState: Equatable {
     var categories: [CategoryList.Category] = []
     var currentPage: Int = 0
     var reachEnd = false
+
+    mutating func reset() {
+        currentPage = 0
+        bookmarks = []
+        reachEnd = false
+        bookmarkContent = []
+    }
 }
 
 enum BookmarkAction {
@@ -60,10 +67,7 @@ let bookmarkReducer = Reducer<BookmarkState, BookmarkAction, ProfileEnvironment>
             .catchToEffect(BookmarkAction.bookmarkResponse)
 
     case .loadCategories:
-        state.currentPage = 0
-        state.bookmarks = []
-        state.reachEnd = false
-        state.bookmarkContent = []
+        state.reset()
         return APIService.shared.getCategories(.list(includeSubcategories: true))
             .receive(on: environment.mainQueue)
             .catchToEffect(BookmarkAction.categoriesResponse)

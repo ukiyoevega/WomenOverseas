@@ -17,35 +17,17 @@ struct TagTopicListView: View {
     var body: some View {
         WithViewStore(self.store) { viewStore in
             Group {
-                if (!viewStore.topicResponse.isEmpty) {
-                    List {
-                        ForEach(viewStore.topicResponse, id: \.uuid) { res in
-                            ForEach(res.topicList?.topics ?? []) { topic in
-                                TopicRow(topic: topic,
-                                         category: nil,
-                                         user: res.users?.first(where: { $0.id == topic.posters?.first?.uid })
-                                )
-                            }
-                        }
-                        if viewStore.reachEnd {
-                            center {
-                                Text("就这些啦")
-                                    .font(.system(size: 11))
-                                    .foregroundColor(Color(UIColor.lightGray))
-                                    .padding()
-                            }
-
-                        } else if !viewStore.topicResponse.isEmpty {
-                            /// The pagination is done by appending a invisible rectancle at the bottom of the list, and trigerining the next page load as it appear... hacky way for now
-                            center { ProgressView() }
-                                .onAppear { viewStore.send(.loadTopics(onStart: false, tag: self.tag)) }
+                placeholderedList(isEmpty: viewStore.topicResponse.isEmpty, reachBottom: viewStore.reachEnd, loadMoreAction: {
+                    viewStore.send(.loadTopics(onStart: false, tag: self.tag))
+                }) {
+                    ForEach(viewStore.topicResponse, id: \.uuid) { res in
+                        ForEach(res.topicList?.topics ?? []) { topic in
+                            TopicRow(topic: topic,
+                                     category: nil,
+                                     user: res.users?.first(where: { $0.id == topic.posters?.first?.uid })
+                            )
                         }
                     }
-                    .listStyle(PlainListStyle())
-                } else {
-                    Spacer()
-                    center { ProgressView() }
-                    Spacer()
                 }
             }
             .toolbar {
