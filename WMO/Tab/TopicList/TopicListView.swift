@@ -152,20 +152,6 @@ struct TopicListView: View {
         }
     }
 
-    @ViewBuilder
-    func center<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        let view = HStack(alignment: .center) {
-            Spacer()
-            content()
-            Spacer()
-        }
-        if #available(iOS 15.0, *) {
-            view.listRowSeparator(.hidden)
-        } else {
-            view
-        }
-    }
-
     private func category(_ title: String, color: String, selected: Bool, action: @escaping () -> Void) -> some View {
         let tint = Color(hex: color)
         let text = Text(title)

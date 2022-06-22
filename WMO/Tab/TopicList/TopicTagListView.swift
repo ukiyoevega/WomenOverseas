@@ -14,20 +14,6 @@ struct TagTopicListView: View {
     let tag: String
     let store: Store<TagState, TagAction>
 
-    @ViewBuilder
-    func center<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        let view = HStack(alignment: .center) {
-            Spacer()
-            content()
-            Spacer()
-        }
-        if #available(iOS 15.0, *) {
-            view.listRowSeparator(.hidden)
-        } else {
-            view
-        }
-    }
-
     var body: some View {
         WithViewStore(self.store) { viewStore in
             Group {

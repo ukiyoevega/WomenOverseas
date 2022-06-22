@@ -8,7 +8,13 @@
 import Foundation
 
 struct BookmarkList: Decodable, Equatable {
+    let loadMoreKey: String?
     let bookmarks: [Bookmark]
+
+    enum CodingKeys: String, CodingKey {
+        case loadMoreKey = "more_bookmarks_url"
+        case bookmarks
+    }
 }
 
 struct Bookmark: Decodable, Equatable, Identifiable {

@@ -28,6 +28,18 @@ struct BookmarkListView: View {
                 ForEach(Array(zip(viewStore.bookmarks, viewStore.bookmarkContent)), id: \.0.id) { bookmark, contentArray in
                     BookmarkRow(bookmark: bookmark, stringWithAttributes: contentArray, category: viewStore.categories.first(where: { $0.id == bookmark.categoryId }))
                 }
+                if viewStore.reachEnd {
+                    center {
+                        Text("已经到底啦")
+                            .font(.system(size: 11))
+                            .foregroundColor(Color(UIColor.lightGray))
+                            .padding()
+                    }
+
+                } else if !viewStore.bookmarks.isEmpty {
+                    center { ProgressView() }
+                        .onAppear { viewStore.send(.loadList) }
+                }
             }
             .listStyle(PlainListStyle())
             .onAppear {

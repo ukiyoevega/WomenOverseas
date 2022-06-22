@@ -63,6 +63,7 @@
 		B2F75C8C2861EDDD0036E28A /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F75C8B2861EDDD0036E28A /* Bookmark.swift */; };
 		B2F75C8E2861F3BB0036E28A /* EndPoint.Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F75C8D2861F3BB0036E28A /* EndPoint.Bookmark.swift */; };
 		B2F75C912861F8460036E28A /* BookmarkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F75C902861F8460036E28A /* BookmarkListView.swift */; };
+		B2F75FE128635E6C0036E28A /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F75FE028635E6C0036E28A /* View+Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -124,6 +125,7 @@
 		B2F75C8B2861EDDD0036E28A /* Bookmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bookmark.swift; sourceTree = "<group>"; };
 		B2F75C8D2861F3BB0036E28A /* EndPoint.Bookmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndPoint.Bookmark.swift; sourceTree = "<group>"; };
 		B2F75C902861F8460036E28A /* BookmarkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkListView.swift; sourceTree = "<group>"; };
+		B2F75FE028635E6C0036E28A /* View+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -279,6 +281,7 @@
 			isa = PBXGroup;
 			children = (
 				B2EE59A22813E594008A8DD5 /* WebView.swift */,
+				B2F75FE028635E6C0036E28A /* View+Extension.swift */,
 				B2322FF8284263130048A717 /* DropdownMenu.swift */,
 				B2803829285C849A004E10E9 /* Flowlayout */,
 				B232300A284312E60048A717 /* AsyncImage */,
@@ -398,6 +401,7 @@
 				B2EE59852812B471008A8DD5 /* RSA+Header.swift in Sources */,
 				B2EE598B2812C5B6008A8DD5 /* URLEncoding.swift in Sources */,
 				B264488628412B1F00FBEDCE /* Tag.swift in Sources */,
+				B2F75FE128635E6C0036E28A /* View+Extension.swift in Sources */,
 				B2EE553128124113008A8DD5 /* LoginView.swift in Sources */,
 				B2AA64A228445793006F50C0 /* ProfileCore.swift in Sources */,
 				B264428A283FB3EA00FBEDCE /* EndPoint.Noti.swift in Sources */,
