@@ -16,6 +16,7 @@ private let itemVerticalSpacing: CGFloat = 10
 private let rowPadding = EdgeInsets(top: 10, leading: 0, bottom: 5, trailing: 0)
 private let avatarWidth: CGFloat = 40
 private let titleFontSize: CGFloat = 15
+private let excerptFontSize: CGFloat = 13
 private let titleLineSpacing: CGFloat = 3
 
 struct BookmarkListView: View {
@@ -24,8 +25,8 @@ struct BookmarkListView: View {
     var body: some View {
         WithViewStore(self.store) { viewStore in
             List {
-                ForEach(viewStore.bookmarks) { bookmark in
-                    BookmarkRow(bookmark: bookmark, category: viewStore.categories.first(where: { $0.id == bookmark.categoryId }))
+                ForEach(Array(zip(viewStore.bookmarks, viewStore.bookmarkContent)), id: \.0.id) { bookmark, contentArray in
+                    BookmarkRow(bookmark: bookmark, stringWithAttributes: contentArray, category: viewStore.categories.first(where: { $0.id == bookmark.categoryId }))
                 }
             }
             .listStyle(PlainListStyle())
@@ -53,7 +54,9 @@ struct BookmarkListView: View {
 struct BookmarkRow: View {
 
     let bookmark: Bookmark
+    let stringWithAttributes: [StringWithAttributes]
     let category: CategoryList.Category?
+    @State private var showingAlert = false
 
     var body: some View {
         ZStack {
@@ -96,20 +99,52 @@ struct BookmarkRow: View {
                         }
                     }
                 } // title, tags, avatar
-                Text(bookmark.excerpt)
-                    .foregroundColor(.gray)
-                    .font(.system(size: titleFontSize))
-                    .fixedSize(horizontal: false, vertical: true)
+                stringWithAttributes
+                    .map(text(_:))
+                    .reduce(Text(""), +)
                     .lineSpacing(titleLineSpacing)
+                    .fixedSize(horizontal: false, vertical: true)
                 if let lastPosted = bookmark.updatedAt {
                     HStack {
-                        Spacer()
                         Text(lastPosted.readableAgo)
                             .font(.system(size: 11))
                             .foregroundColor(Color(UIColor.lightGray))
+                        Spacer()
+                        Image(systemName: "ellipsis")
+                            .font(.system(size: 11))
+                            .foregroundColor(Color(UIColor.lightGray))
+                            .onTapGesture {
+                                showingAlert = true
+                            }
                     }
                 } // lastUpdated
-            }.padding(rowPadding)
+            }
+            .padding(rowPadding)
+            .actionSheet(isPresented: $showingAlert) {
+                ActionSheet(
+                    title: Text("编辑书签"),
+                    buttons: [
+                        .default(Text("删除")) {
+
+                        },
+                        .cancel(Text("取消"))]
+                )
+            }
+        }
+    }
+
+    private func text(_ pair: StringWithAttributes) -> Text {
+        if #available(iOS 15, *), let link = pair.attrs[.link], let url = link as? URL {
+            var attributedString = AttributedString(pair.string)
+            attributedString.underlineStyle = .single
+            attributedString.link = url
+            return Text(attributedString)
+                .foregroundColor(Color.red)
+                .font(.system(size: excerptFontSize))
+        } else {
+            return Text(pair.string)
+                .foregroundColor(.gray)
+                .font(.system(size: excerptFontSize))
         }
     }
 }

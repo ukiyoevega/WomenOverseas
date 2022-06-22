@@ -16,6 +16,7 @@ extension Color {
     static let tagText = Color("tag_text", bundle: nil)
     static let systemGroup = Color(hex: "F2F2F6")
     static let systemLightGray = Color(hex: "AAAAAA")
+    static let hyperlink = Color(hex: "7D9FB1")
     static let avatarPlaceholder = Color.blue.opacity(0.3)
 
     init(hex: String) {

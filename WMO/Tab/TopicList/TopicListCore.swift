@@ -12,6 +12,7 @@ import Combine
 
 struct BookmarkState: Equatable {
     var bookmarks: [Bookmark] = []
+    var bookmarkContent: [[StringWithAttributes]] = []
     var toastMessage: String?
     var categories: [CategoryList.Category] = []
     var currentPage: Int = 0
@@ -34,6 +35,15 @@ let bookmarkReducer = Reducer<BookmarkState, BookmarkAction, ProfileEnvironment>
     case .bookmarkResponse(.success(let resp)):
         state.currentPage += 1
         state.bookmarks.append(contentsOf: resp.bookmarkList.bookmarks)
+        state.bookmarkContent.append(contentsOf: resp.bookmarkList.bookmarks.map({ bookmark in
+            if let data = bookmark.excerpt.data(using: .unicode),
+               let attributedString = try? NSAttributedString(data: data,
+                                                              options: [.documentType: NSAttributedString.DocumentType.html],
+                                                              documentAttributes: nil) {
+                return attributedString.stringsWithAttributes
+            }
+            return []
+        }))
 
     case .bookmarkResponse(.failure(let failure)):
         state.toastMessage = "\(failure.error)"
@@ -42,6 +52,7 @@ let bookmarkReducer = Reducer<BookmarkState, BookmarkAction, ProfileEnvironment>
         break
 
     case .loadCategories:
+        state.currentPage = 0
         return APIService.shared.getCategories(.list(includeSubcategories: true))
             .receive(on: environment.mainQueue)
             .catchToEffect(BookmarkAction.categoriesResponse)
@@ -183,4 +194,29 @@ let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, a
         state.toastMessage = "\(failure.error)"
     }
     return .none // Effect<TopicAction, Never>
+}
+
+struct StringWithAttributes: Hashable, Identifiable {
+    let id = UUID()
+    let string: String
+    let attrs: [NSAttributedString.Key: Any]
+
+    static func == (lhs: StringWithAttributes, rhs: StringWithAttributes) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
+
+extension NSAttributedString {
+    var stringsWithAttributes: [StringWithAttributes] {
+        var attributes = [StringWithAttributes]()
+         enumerateAttributes(in: NSRange(location: 0, length: length), options: []) { (attrs, range, _) in
+             let string = attributedSubstring(from: range).string
+            attributes.append(StringWithAttributes(string: string, attrs: attrs))
+         }
+        return attributes
+    }
 }
