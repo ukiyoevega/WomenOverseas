@@ -11,7 +11,7 @@ import ComposableArchitecture
 
 struct BookmarkState: Equatable {
     var bookmarks: [Bookmark] = []
-    var bookmarkContent: [[StringWithAttributes]] = []
+    var bookmarkContent: [Int: [StringWithAttributes]] = [:]
     var toastMessage: String?
     var categories: [CategoryList.Category] = []
     var currentPage: Int = 0
@@ -21,14 +21,26 @@ struct BookmarkState: Equatable {
         currentPage = 0
         bookmarks = []
         reachEnd = false
-        bookmarkContent = []
+        bookmarkContent = [:]
     }
+}
+
+struct RemoveBookmarkResponse: Decodable {
+    let success: String
+    let topic_bookmarked: Bool
+    var id: Int?
 }
 
 enum BookmarkAction {
     case loadList
     case dismissToast
     case bookmarkResponse(Result<BookmarkResponse, Failure>)
+
+    case remove(id: Int)
+    case removeRresponse(Result<RemoveBookmarkResponse, Failure>)
+
+    case togglePin(id: Int)
+    case toggleRresponse(Result<[String: String], Failure>)
 
     case loadCategories
     case categoriesResponse(Result<[CategoryList.Category], Failure>)
@@ -38,21 +50,63 @@ let bookmarkReducer = Reducer<BookmarkState, BookmarkAction, ProfileEnvironment>
     let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username")?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
 
     switch action {
+    case .remove(let id):
+        let effect: Effect<RemoveBookmarkResponse, Failure> = APIService.generateDataTaskPublisher(endpoint: EndPoint.Bookmarks.delete(id: id))
+        return effect
+            .receive(on: environment.mainQueue)
+            .map({ response in
+                var mapped = response
+                mapped.id = id
+                return mapped
+            })
+            .catchToEffect(BookmarkAction.removeRresponse)
+
+    case .togglePin(let id):
+        let effect: Effect<[String: String], Failure> = APIService.generateDataTaskPublisher(endpoint: EndPoint.Bookmarks.togglePin(id: id))
+        return effect
+            .receive(on: environment.mainQueue)
+            .map({ response in
+                var mapped = response
+                mapped["id"] = "\(id)"
+                return mapped
+            })
+            .catchToEffect(BookmarkAction.toggleRresponse)
+
+    case .removeRresponse(.success(let resp)):
+        if !resp.topic_bookmarked, let removedId = resp.id {
+            state.bookmarks = state.bookmarks.filter { $0.id != removedId }
+            state.bookmarkContent.removeValue(forKey: removedId)
+            state.toastMessage = "移除成功"
+        }
+
+    case .removeRresponse(.failure(let failure)):
+        state.toastMessage = "\(failure.error)"
+
+    case .toggleRresponse(.success(let resp)):
+        if let idString = resp["id"], let id = Int(idString), let index = state.bookmarks.firstIndex(where: { $0.id == id }) {
+            var bookmark = state.bookmarks[index]
+            bookmark.pinned = !bookmark.pinned
+            state.bookmarks[index] = bookmark
+        }
+        state.toastMessage = "操作成功"
+
+    case .toggleRresponse(.failure(let failure)):
+        state.toastMessage = "\(failure.error)"
+
     case .dismissToast:
         state.toastMessage = nil
 
     case .bookmarkResponse(.success(let resp)):
         state.currentPage += 1
         state.bookmarks.append(contentsOf: resp.bookmarkList.bookmarks)
-        state.bookmarkContent.append(contentsOf: resp.bookmarkList.bookmarks.map({ bookmark in
+        resp.bookmarkList.bookmarks.forEach { bookmark in
             if let data = bookmark.excerpt.data(using: .unicode),
                let attributedString = try? NSAttributedString(data: data,
                                                               options: [.documentType: NSAttributedString.DocumentType.html],
                                                               documentAttributes: nil) {
-                return attributedString.stringsWithAttributes
+                state.bookmarkContent[bookmark.id] = attributedString.stringsWithAttributes
             }
-            return []
-        }))
+        }
         if resp.bookmarkList.loadMoreKey == nil {
             state.reachEnd = true
         }

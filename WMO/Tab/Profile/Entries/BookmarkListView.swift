@@ -27,8 +27,12 @@ struct BookmarkListView: View {
             placeholderedList(isEmpty: viewStore.bookmarks.isEmpty, reachBottom: viewStore.reachEnd, loadMoreAction: {
                 viewStore.send(.loadList)
             }) {
-                ForEach(Array(zip(viewStore.bookmarks, viewStore.bookmarkContent)), id: \.0.id) { bookmark, contentArray in
-                    BookmarkRow(bookmark: bookmark, stringWithAttributes: contentArray, category: viewStore.categories.first(where: { $0.id == bookmark.categoryId }))
+                ForEach(viewStore.bookmarks, id: \.id) { bookmark in
+                    BookmarkRow(bookmark: bookmark, togglePinAction: {
+                        viewStore.send(.togglePin(id: bookmark.id))
+                    }, removeAction: {
+                        viewStore.send(.remove(id: bookmark.id))
+                    }, stringWithAttributes: viewStore.bookmarkContent[bookmark.id] ?? [], category: viewStore.categories.first(where: { $0.id == bookmark.categoryId }))
                 }
             }
             .onAppear {
@@ -57,9 +61,19 @@ struct BookmarkListView: View {
 struct BookmarkRow: View {
 
     let bookmark: Bookmark
+    let togglePinAction: () -> Void
+    let removeAction: () -> Void
     let stringWithAttributes: [StringWithAttributes]
     let category: CategoryList.Category?
     @State private var showingAlert = false
+
+    private func titleText(_ bookmark: Bookmark) -> Text {
+        if bookmark.pinned {
+            return Text(Image(systemName: "pin")) + Text(bookmark.title)
+        } else {
+            return Text(bookmark.title)
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -71,7 +85,7 @@ struct BookmarkRow: View {
             VStack(spacing: itemVerticalSpacing) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: itemVerticalSpacing) {
-                        Text(bookmark.title)
+                        titleText(bookmark)
                             .foregroundColor(.black)
                             .font(.system(size: titleFontSize))
                             .fixedSize(horizontal: false, vertical: true)
@@ -107,19 +121,19 @@ struct BookmarkRow: View {
                     .reduce(Text(""), +)
                     .lineSpacing(titleLineSpacing)
                     .fixedSize(horizontal: false, vertical: true)
-                if let lastPosted = bookmark.updatedAt {
-                    HStack {
-                        Text(lastPosted.readableAgo)
+                HStack {
+                    [(bookmark.createdAt, "收藏，"), (bookmark.bumpedAt, "更新")].map { dateString, suffix in
+                        Text(dateString.readableAgo + suffix)
                             .font(.system(size: 11))
                             .foregroundColor(Color(UIColor.lightGray))
-                        Spacer()
-                        Image(systemName: "ellipsis")
-                            .font(.system(size: 11))
-                            .foregroundColor(Color(UIColor.lightGray))
-                            .onTapGesture {
-                                showingAlert = true
-                            }
-                    }
+                    }.reduce(Text(""), +)
+                    Spacer()
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 11))
+                        .foregroundColor(Color(UIColor.lightGray))
+                        .onTapGesture {
+                            showingAlert = true
+                        }
                 } // lastUpdated
             }
             .padding(rowPadding)
@@ -127,8 +141,11 @@ struct BookmarkRow: View {
                 ActionSheet(
                     title: Text("编辑书签"),
                     buttons: [
+                        .default(Text(bookmark.pinned ? "取消置顶" : "置顶")) {
+                            self.togglePinAction()
+                        },
                         .default(Text("删除")) {
-
+                            self.removeAction()
                         },
                         .cancel(Text("取消"))]
                 )

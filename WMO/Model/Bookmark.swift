@@ -23,7 +23,7 @@ struct Bookmark: Decodable, Equatable, Identifiable {
     let updatedAt: String
     let name: String?
     let reminderAt: String?
-    let pinned: Bool
+    var pinned: Bool
     let title: String
     let fancyTitle: String
     let excerpt: String

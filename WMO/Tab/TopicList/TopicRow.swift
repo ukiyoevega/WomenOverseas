@@ -102,7 +102,7 @@ struct TopicRow: View {
                 } // title, tags, avatar
                 HStack(spacing: detailInfoSpacing) {
                     if let lastPosted = topic.lastPostedAt {
-                        Text(lastPosted.readableAgo).font(.system(size: bottomRightElementsFontSize))
+                        Text(lastPosted.readableAgo + "更新").font(.system(size: bottomRightElementsFontSize))
                     }
                     Spacer()
                     Image(systemName: "eye.fill").font(.system(size: bottomRightElementsFontSize))

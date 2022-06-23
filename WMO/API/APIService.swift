@@ -33,7 +33,7 @@ struct APIService {
         return urlRequest
     }
 
-    private static func generateDataTaskPublisher<ResponseType: Decodable>(endpoint: RESTful) -> Effect<ResponseType, Failure> {
+    static func generateDataTaskPublisher<ResponseType: Decodable>(endpoint: RESTful) -> Effect<ResponseType, Failure> {
         return URLSession.shared.dataTaskPublisher(for: generateRequest(endpoint: endpoint))
           .map { data, _ in data }
           .decode(type: ResponseType.self, decoder: JSONDecoder())
