@@ -41,6 +41,9 @@
 		B2AA679F28448743006F50C0 /* ProfileHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA679E28448743006F50C0 /* ProfileHeaderView.swift */; };
 		B2AA67A128459D10006F50C0 /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA67A028459D10006F50C0 /* Color+Extension.swift */; };
 		B2AFEE9428486ECE0053DE32 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AFEE9328486ECE0053DE32 /* AboutView.swift */; };
+		B2B8FB7D2865431600F34FEF /* LikeCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B8FB7C2865431600F34FEF /* LikeCore.swift */; };
+		B2B8FB7F2865431D00F34FEF /* LikeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B8FB7E2865431D00F34FEF /* LikeListView.swift */; };
+		B2B8FB8128654D0400F34FEF /* UserAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B8FB8028654D0400F34FEF /* UserAction.swift */; };
 		B2D6DAD2285F552000DE94BE /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D6DAD1285F552000DE94BE /* Search.swift */; };
 		B2D6DAD4285F650200DE94BE /* InterestGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D6DAD3285F650200DE94BE /* InterestGroup.swift */; };
 		B2D9F337285EB958008020B1 /* NotificationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D9F336285EB958008020B1 /* NotificationListView.swift */; };
@@ -105,6 +108,9 @@
 		B2AA679E28448743006F50C0 /* ProfileHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHeaderView.swift; sourceTree = "<group>"; };
 		B2AA67A028459D10006F50C0 /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
 		B2AFEE9328486ECE0053DE32 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		B2B8FB7C2865431600F34FEF /* LikeCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeCore.swift; sourceTree = "<group>"; };
+		B2B8FB7E2865431D00F34FEF /* LikeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeListView.swift; sourceTree = "<group>"; };
+		B2B8FB8028654D0400F34FEF /* UserAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAction.swift; sourceTree = "<group>"; };
 		B2D6DAD1285F552000DE94BE /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 		B2D6DAD3285F650200DE94BE /* InterestGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterestGroup.swift; sourceTree = "<group>"; };
 		B2D9F336285EB958008020B1 /* NotificationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationListView.swift; sourceTree = "<group>"; };
@@ -195,6 +201,7 @@
 				B2D6DAD1285F552000DE94BE /* Search.swift */,
 				B2644283283F9DFF00FBEDCE /* Post.swift */,
 				B2F75C8B2861EDDD0036E28A /* Bookmark.swift */,
+				B2B8FB8028654D0400F34FEF /* UserAction.swift */,
 				B2D6DAD3285F650200DE94BE /* InterestGroup.swift */,
 				B264488528412B1F00FBEDCE /* Tag.swift */,
 			);
@@ -316,6 +323,8 @@
 				B2D9F336285EB958008020B1 /* NotificationListView.swift */,
 				B2F75FE82863F9FB0036E28A /* HistoryCore.swift */,
 				B2F75FE22863F0FE0036E28A /* HistoryListView.swift */,
+				B2B8FB7C2865431600F34FEF /* LikeCore.swift */,
+				B2B8FB7E2865431D00F34FEF /* LikeListView.swift */,
 				B2AFEE9328486ECE0053DE32 /* AboutView.swift */,
 			);
 			path = Entries;
@@ -401,6 +410,7 @@
 				B2F75FE92863F9FB0036E28A /* HistoryCore.swift in Sources */,
 				B2EE59A32813E594008A8DD5 /* WebView.swift in Sources */,
 				B2EFD55D283C57A200D7A6A0 /* CategoryList.swift in Sources */,
+				B2B8FB7D2865431600F34FEF /* LikeCore.swift in Sources */,
 				B2803831285C84AC004E10E9 /* VFlow.swift in Sources */,
 				B23230012843114F0048A717 /* DownloadTask.swift in Sources */,
 				B2F75C8C2861EDDD0036E28A /* Bookmark.swift in Sources */,
@@ -418,6 +428,7 @@
 				B2F75FE128635E6C0036E28A /* View+Extension.swift in Sources */,
 				B2EE553128124113008A8DD5 /* LoginView.swift in Sources */,
 				B2AA64A228445793006F50C0 /* ProfileCore.swift in Sources */,
+				B2B8FB8128654D0400F34FEF /* UserAction.swift in Sources */,
 				B2F75FE52863F8800036E28A /* BookmarkCore.swift in Sources */,
 				B264428A283FB3EA00FBEDCE /* EndPoint.Noti.swift in Sources */,
 				B2AA08762814330D0065A30E /* SceneDelegate.swift in Sources */,
@@ -425,6 +436,7 @@
 				B2AA67A128459D10006F50C0 /* Color+Extension.swift in Sources */,
 				B23230052843124C0048A717 /* ImageService.swift in Sources */,
 				B210C2DD285F506400858097 /* SearchView.swift in Sources */,
+				B2B8FB7F2865431D00F34FEF /* LikeListView.swift in Sources */,
 				B2014BF92845D3430051E1B4 /* ProfileEditView.swift in Sources */,
 				B280382E285C84AC004E10E9 /* FlowLayout.swift in Sources */,
 				B2AFEE9428486ECE0053DE32 /* AboutView.swift in Sources */,

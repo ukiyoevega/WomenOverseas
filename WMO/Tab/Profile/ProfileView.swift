@@ -25,14 +25,24 @@ struct ProfileView: View {
                     ProfileHeaderView(store: self.store.scope(state: \.profileHeaderState, action: ProfileAction.header))
                     ProfileSummaryView(store: self.store.scope(state: \.profileSummaryState, action: ProfileAction.summary))
                         .padding([.top, .bottom])
-                    ForEach(SettingEntry.allCases) { entry in
-                        NavigationLink(destination: entryView(entry)) {
-                            entryRow(entry, toggle: viewStore
-                                        .binding(get: \.isNativeMode, send: ProfileAction.toggleNativeMode))
-                            .padding([.top, .bottom])
+                    Section(header: Text("")) {
+                        ForEach(SettingEntry.myEntries) { entry in
+                            entryRow(entry)
                         }
-                        .navigationBarTitle("") // remove back button title
                     }
+
+                    Section(header: Text("")) {
+                        ForEach(SettingEntry.otherEntries) { entry in
+                            entryRow(entry)
+                        }
+                    }
+                    #if DEBUG
+                    Section(header: Text("")) {
+                        ForEach(SettingEntry.ongoingEntries) { entry in
+                            entryRow(entry)
+                        }
+                    }
+                    #endif
                 }
             }
             .padding([.leading, .trailing, .top])
@@ -44,25 +54,32 @@ struct ProfileView: View {
     }
 
     @ViewBuilder
-    func entryRow(_ entry: SettingEntry, toggle: Binding<Bool>) -> some View {
-        HStack(spacing: settingEntryIconTitleSpacing) {
-            Image(systemName: entry.iconName)
-                .frame(width: settingEntrySize)
-                .foregroundColor(Color.gray)
-            Text(entry.description)
-                .font(.system(size: settingEntryFontSize, weight: .semibold))
-                .foregroundColor(Color.black)
-            Spacer()
-
-//            if entry == .theme {
-//                Toggle(isOn: toggle) { }
-//                        .toggleStyle(SmallToggleStyle())
-//            } else {
-                Image(systemName: "chevron.right")
-                    .font(.system(size: settingDetailSize))
+    func entryRow(_ entry: SettingEntry, toggle: Binding<Bool>? = nil) -> some View {
+        /* toggle be like
+         viewStore.binding(get: \.isNativeMode, send: ProfileAction.toggleNativeMode)
+         */
+        NavigationLink(destination: entryView(entry)) {
+            HStack(spacing: settingEntryIconTitleSpacing) {
+                Image(systemName: entry.iconName)
+                    .frame(width: settingEntrySize)
                     .foregroundColor(Color.gray)
-//            }
+                Text(entry.description)
+                    .font(.system(size: settingEntryFontSize, weight: .semibold))
+                    .foregroundColor(Color.black)
+                Spacer()
+
+                if let toggle = toggle {
+                    Toggle(isOn: toggle) { }
+                            .toggleStyle(SmallToggleStyle())
+                } else {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: settingDetailSize))
+                        .foregroundColor(Color.gray)
+                }
+            }
+            .padding([.top, .bottom])
         }
+        .navigationBarTitle("") // remove back button title
     }
     
     @ViewBuilder
@@ -70,10 +87,6 @@ struct ProfileView: View {
         switch entry {
         case .notification:
             NotificationListView(store: self.store.scope(state: \.notificationState, action: ProfileAction.notification))
-//        case .theme:
-//            Text(entry.description)
-//        case .settings:
-//            Text(entry.description)
         case .aboutUs:
             AboutView()
         case .donation:
@@ -82,6 +95,10 @@ struct ProfileView: View {
             BookmarkListView(store: Store(initialState: BookmarkState(), reducer: bookmarkReducer, environment: ProfileEnvironment()))
         case .history:
             HistoryListView(store: Store(initialState: HistoryState(), reducer: historyReducer, environment: TopicEnvironment()))
+        case .liked:
+            LikeListView(store: Store(initialState: LikeState(), reducer: likeReducer, environment: TopicEnvironment()))
+        default:
+            Text(entry.description)
         }
     }
 }
@@ -115,27 +132,49 @@ struct ListWithoutSepatorsAndMargins<Content: View>: View {
 
 enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     var id: String { self.rawValue }
-    
-//    case account
-    case bookmark
+
+    static var myEntries: [SettingEntry] {
+        return [.notification, .bookmark, .liked, .history]
+    }
+
+    static var otherEntries: [SettingEntry] {
+        return [.aboutUs, .donation]
+    }
+
+    static var ongoingEntries: [SettingEntry] {
+        return [.draft, .account, .theme, .settings, .createdTopic, .replied]
+    }
+
     case notification
+    case bookmark
+    case liked
     case history
-//    case theme
-//    case settings
+
     case aboutUs
     case donation
-    
+
+    case draft
+    case createdTopic
+    case replied
+    case account
+    case theme
+    case settings
+
     var description: String {
         get {
             switch self {
-//            case .account: return "我的账号"
-            case .bookmark: return "我的书签"
+            case .account: return "我的账号"
             case .notification: return "我的通知"
+            case .bookmark: return "我的书签"
+            case .liked: return "我赞过的"
             case .history: return "浏览历史"
-//            case .theme: return "切换到原生模式"
-//            case .settings: return "设置"
+            case .theme: return "切换到原生模式"
+            case .settings: return "设置"
             case .aboutUs: return "关于我们"
             case .donation: return "捐助"
+            case .createdTopic: return "我的话题"
+            case .replied: return "我的回复"
+            case .draft: return "我的草稿"
             }
         }
     }
@@ -143,14 +182,18 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     var iconName: String {
         get {
             switch self {
-//            case .account: return "person.crop.artframe"
-            case .bookmark: return "bookmark"
+            case .account: return "person.crop.artframe"
             case .notification: return "envelope"
+            case .bookmark: return "bookmark"
+            case .liked: return "heart"
             case .history: return "book"
             case .donation: return "yensign.circle"
-//            case .settings: return "gearshape.2"
+            case .settings: return "gearshape.2"
             case .aboutUs: return "info.circle"
-//            case .theme: return "switch.2"
+            case .theme: return "switch.2"
+            case .createdTopic: return "doc.text"
+            case .replied: return "arrowshape.turn.up.left"
+            case .draft: return "doc.append"
             }
         }
     }

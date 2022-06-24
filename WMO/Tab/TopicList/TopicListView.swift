@@ -99,31 +99,13 @@ struct TopicListView: View {
                     }
             )
             .onAppear {
+                // FIXME: scroll to top on re-entering tab
                 if viewStore.categories.isEmpty {
                     viewStore.send(.loadCategories)
                 }
             }
             .actionSheet(isPresented: $showingAlert) {
-                ActionSheet(
-                    title: Text("话题排序"),
-                    buttons: [
-                        .default(Text("按浏览量排序")) {
-                            viewStore.send(.tapOrder(.views))
-                        },
-                        .default(Text("按喜欢排序")) {
-                            viewStore.send(.tapOrder(.likes))
-                        },
-                        .default(Text("按回复量排序")) {
-                            viewStore.send(.tapOrder(.posts))
-                        },
-                        .default(Text("按热门排序")) {
-                            viewStore.send(.tapOrder(.default))
-                        },
-                        .default(Text("恢复默认")) {
-                            viewStore.send(.tapCategory(.all))
-                        },
-                        .cancel(Text("取消"))]
-                )
+                actionSheet(viewStore: viewStore)
             }
             .toast(message: viewStore.toastMessage ?? "",
                    isShowing:  viewStore.binding(get: { state in
@@ -151,6 +133,29 @@ struct TopicListView: View {
         }, label: {
             text
         })
+    }
+
+    private func actionSheet(viewStore: ViewStore<TopicState, TopicAction>) -> ActionSheet {
+        return ActionSheet(
+            title: Text("话题排序"),
+            buttons: [
+                .default(Text("按浏览量排序")) {
+                    viewStore.send(.tapOrder(.views))
+                },
+                .default(Text("按喜欢排序")) {
+                    viewStore.send(.tapOrder(.likes))
+                },
+                .default(Text("按回复量排序")) {
+                    viewStore.send(.tapOrder(.posts))
+                },
+                .default(Text("按热门排序")) {
+                    viewStore.send(.tapOrder(.default))
+                },
+                .default(Text("恢复默认")) {
+                    viewStore.send(.tapCategory(.all))
+                },
+                .cancel(Text("取消"))]
+        )
     }
 }
 

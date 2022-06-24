@@ -38,6 +38,7 @@ struct TagTopicListView: View {
                 }
             }
             .onAppear {
+                // FIXME: reload upon coming back from webview
                 viewStore.send(.loadTopics(onStart: true, tag: self.tag))
             }
         }

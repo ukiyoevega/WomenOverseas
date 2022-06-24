@@ -30,6 +30,14 @@ struct BookmarkResponse: Decodable, Equatable {
     }
 }
 
+struct LikesResponse: Decodable, Equatable {
+    let userActions: [UserAction]
+
+    enum CodingKeys: String, CodingKey {
+        case userActions = "user_actions"
+    }
+}
+
 struct TopicListResponse: Decodable, Equatable {
     let users: [User.User]?
     let topicList: TopicList?
