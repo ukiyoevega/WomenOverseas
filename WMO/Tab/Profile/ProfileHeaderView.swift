@@ -72,10 +72,10 @@ struct ProfileHeaderView: View {
             VStack(alignment: .leading, spacing: topContentSpacing) {
                 HStack {
                     ZStack(alignment: .bottomTrailing) {
-                        avatar(template: viewStore.userResponse.user.avatarTemplate, size: avatarWidth)
-                        avatar(template: viewStore.userResponse.user.flairURL, size: flairWidth)
+                        avatar(template: viewStore.userResponse.user?.avatarTemplate, size: avatarWidth)
+                        avatar(template: viewStore.userResponse.user?.flairURL, size: flairWidth)
                     }
-                    if let username = viewStore.userResponse.user.username {
+                    if let username = viewStore.userResponse.user?.username {
                         Text(username)
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(Color.black)
@@ -97,12 +97,12 @@ struct ProfileHeaderView: View {
                     }
                     .navigationBarTitle("") // remove back button title
                 } // avatar and edit
-                if let title = viewStore.userResponse.user.title {
+                if let title = viewStore.userResponse.user?.title {
                     Text(title)
                         .font(.system(size: roleFontSize))
                         .foregroundColor(Color.black)
                 }
-                if let bio = viewStore.userResponse.user.bioRaw {
+                if let bio = viewStore.userResponse.user?.bioRaw {
                     Text(bio).font(.system(size: bioFontSize))
                         .lineSpacing(bioLineSpacing)
                         .foregroundColor(Color.black)

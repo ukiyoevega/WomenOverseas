@@ -98,8 +98,8 @@ let bookmarkReducer = Reducer<BookmarkState, BookmarkAction, ProfileEnvironment>
 
     case .bookmarkResponse(.success(let resp)):
         state.currentPage += 1
-        state.bookmarks.append(contentsOf: resp.bookmarkList.bookmarks)
-        resp.bookmarkList.bookmarks.forEach { bookmark in
+        state.bookmarks.append(contentsOf: resp.bookmarkList?.bookmarks ?? [])
+        resp.bookmarkList?.bookmarks.forEach { bookmark in
             if let data = bookmark.excerpt.data(using: .unicode),
                let attributedString = try? NSAttributedString(data: data,
                                                               options: [.documentType: NSAttributedString.DocumentType.html],
@@ -107,7 +107,7 @@ let bookmarkReducer = Reducer<BookmarkState, BookmarkAction, ProfileEnvironment>
                 state.bookmarkContent[bookmark.id] = attributedString.stringsWithAttributes
             }
         }
-        if resp.bookmarkList.loadMoreKey == nil {
+        if resp.bookmarkList?.loadMoreKey == nil || resp.bookmarkList?.bookmarks.isEmpty == true || resp.bookmarkList == nil {
             state.reachEnd = true
         }
 

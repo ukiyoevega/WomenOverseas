@@ -151,7 +151,7 @@ enum User {
         let bookmarkCount: Int?
         let canSeeSummaryStats: Bool
         let solvedCount: Int
-        let badges: [UserBadge]
+        let badges: [UserBadge]?
 
         enum CodingKeys: String, CodingKey {
             case likesGivens = "likes_given"

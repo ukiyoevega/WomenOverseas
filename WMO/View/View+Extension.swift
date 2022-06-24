@@ -70,9 +70,18 @@ extension View {
             }
             .listStyle(PlainListStyle())
         } else {
-            Spacer()
-            center { ProgressView() }
-            Spacer()
+            if (reachBottom) {
+                center {
+                    Text("这里啥都没有")
+                        .font(.system(size: 14))
+                        .foregroundColor(Color(UIColor.lightGray))
+                        .padding()
+                }
+            } else {
+                Spacer()
+                center { ProgressView() }
+                Spacer()
+            }
         }
     }
 }

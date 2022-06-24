@@ -24,7 +24,7 @@ struct ProfileEditView: View {
     var body: some View {
         WithViewStore(self.store) { viewStore in
             ListWithoutSepatorsAndMargins {
-                ForEach(EditEntry.allCases) { entry in
+                ForEach(EditEntry.supportCases) { entry in
                     NavigationLink(destination: destination(viewStore: viewStore, entry: entry)) {
                         entryRow(viewStore: viewStore, entry)
                             .padding([.top, .bottom])
@@ -48,13 +48,13 @@ struct ProfileEditView: View {
         let resp = viewStore.userResponse
         switch entry {
         case .name, .bio_raw, .website:
-            ProfileEditingView(editingText: resp.user.getInfo(entry) ?? "", store: self.store, editEntry: entry)
+            ProfileEditingView(editingText: resp.user?.getInfo(entry) ?? "", store: self.store, editEntry: entry)
         case .title:
             ProfileSelectionView(selectedId: resp.selectedBadge.id, items: resp.badges ?? [], updateAction: { selectedId in
                 viewStore.send(.update(name: entry.rawValue, value: viewStore.userResponse.updatedBadgeName(id: selectedId)))
             })
         case .group:
-            ProfileSelectionView(selectedId: resp.user.flairGroupId ?? -1, items: resp.user.groups ?? [], updateAction: { selectedId in
+            ProfileSelectionView(selectedId: resp.user?.flairGroupId ?? -1, items: resp.user?.groups ?? [], updateAction: { selectedId in
                 viewStore.send(.update(name: "flair_group_id", value: selectedId == -1 ? "" : "\(selectedId)"))
             })
         case .date_of_birth:
@@ -73,13 +73,13 @@ struct ProfileEditView: View {
                 .font(.system(size: settingTitleFontSize, weight: .semibold))
                 .foregroundColor(Color.black)
             Spacer()
-            if let info = viewStore.userResponse.user.getInfo(entry) {
+            if let info = viewStore.userResponse.user?.getInfo(entry) {
                 Text(info)
                     .font(.system(size: settingDetailFontSize))
                     .foregroundColor(Color.black)
             }
             if entry == .avatar {
-                avatar(template: viewStore.userResponse.user.avatarTemplate)
+                avatar(template: viewStore.userResponse.user?.avatarTemplate)
             }
             Image(systemName: "chevron.right")
                 .font(.system(size: settingDetailIconSize))
@@ -251,6 +251,10 @@ enum EditEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     case group // 资历
     case website
     case date_of_birth
+
+    static var supportCases: [EditEntry] {
+        return [.name, .bio_raw, .title, .group, .website, .date_of_birth]
+    }
 
     var description: String {
         get {

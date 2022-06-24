@@ -33,9 +33,9 @@ let likeReducer = Reducer<LikeState, LikeAction, TopicEnvironment> { state, acti
             .catchToEffect(LikeAction.likedResponse)
 
     case .likedResponse(.success(let response)):
-        state.currentOffset += (response.userActions.count)
-        state.likesElement.append(contentsOf: response.userActions)
-        if response.userActions.isEmpty {
+        state.currentOffset += (response.userActions?.count ?? 0)
+        state.likesElement.append(contentsOf: response.userActions ?? [])
+        if response.userActions?.isEmpty == true || response.userActions == nil {
             state.reachEnd = true
         }
 

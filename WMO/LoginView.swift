@@ -44,6 +44,7 @@ struct LoginView: View {
                         Webview(type: .home, url: url.absoluteString, secKey: secKey)
                     }
                 }
+                /*
                 HStack(spacing: 2) {
                     Button {
                         isChecked.toggle()
@@ -53,6 +54,7 @@ struct LoginView: View {
                     }
                     AttributedText(ns_agreementAndPolicy)
                 }
+                 */
             }
         }
     }

@@ -21,8 +21,10 @@ struct NotificationListView: View {
                 // TODO:
             }) {
                 ForEach(viewStore.notifications) { noti in
-                    NotificationRow(message: noti)
-                        .padding(EdgeInsets(top: 10, leading: 0, bottom: 5, trailing: 0))
+                    if (noti.type != .group_message_summary) {
+                        NotificationRow(message: noti)
+                            .padding(EdgeInsets(top: 10, leading: 0, bottom: 5, trailing: 0))
+                    }
                 }
             }
             .onAppear {
@@ -47,39 +49,40 @@ struct NotificationListView: View {
 
 private struct NotificationRow: View {
     let message: NotificationMessage
+
+    private func content(type: NotificationMessage.`Type`) -> Text {
+        let midString: String
+        let endString: String
+        if type == .granted_badge {
+            midString = "获得了"
+            endString = message.payload.badgeName ?? "徽章"
+        } else {
+            midString = message.payload.displayUsername ?? "unknown"
+            endString = message.payload.topicTitle ?? message.fancyTitle ?? ""
+        }
+        let concated =
+        Text(Image(systemName: type.icon))
+            .font(.system(size: notiIconSize, weight: .semibold))
+            .foregroundColor(.orange)
+        +
+        Text(" " + midString)
+            .font(.system(size: notiIconSize))
+        +
+        Text(endString)
+            .font(.system(size: notiIconSize, weight: .semibold))
+        return concated
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            switch message.type {
-            case .granted_badge:
-                HStack(alignment: .center, spacing: 2) {
-                    Text(Image(systemName: "checkmark.seal"))
-                        .font(.system(size: notiIconSize, weight: .semibold))
-                        .foregroundColor(.orange)
-                    Text("获得了")
-                        .font(.system(size: notiIconSize))
-                    Text(message.payload.badgeName ?? "徽章")
-                        .font(.system(size: notiIconSize, weight: .semibold))
-                }
-            case .private_message:
-                HStack(alignment: .center, spacing: 5) {
-                    Text(Image(systemName: "envelope"))
-                        .font(.system(size: notiIconSize, weight: .semibold))
-                        .foregroundColor(.orange)
-                    Text(message.payload.displayUsername ?? "unknown")
-                        .font(.system(size: notiIconSize))
-                    Text(message.payload.topicTitle ?? "")
-                        .font(.system(size: notiIconSize, weight: .semibold))
-                }
-            default:
-                EmptyView()
-            }
+            content(type: message.type)
             HStack {
                 Spacer()
                 Text(message.createdAt.readableAgo)
                     .font(.system(size: receivedAtFontSize))
                     .foregroundColor(Color.systemLightGray)
             }
-        } // VStack
+        }
     }
 }
 
@@ -96,7 +99,7 @@ let fakeData =
                         topicId: nil,
                         fancyTitle: nil,
                         slug: nil,
-                        payload: .init(badgeId: 1, badgeName: "身份明确的好人", badgeSlug: nil, badgeTitle: false, username: "weijia", topicTitle: nil, originalPostId: nil, originalPostType: nil, originalUsername: nil, revisionNumber: nil, displayUsername: nil, title: nil, bookmarkName: nil, bookmarkableUrl: nil, count: 1),
+                        payload: .init(badgeId: 1, badgeName: "身份明确的好人", badgeSlug: nil, badgeTitle: false, username: "weijia", topicTitle: nil, originalPostId: nil, originalPostType: nil, originalUsername: nil, revisionNumber: nil, displayUsername: nil, title: nil, bookmarkName: nil, bookmarkableUrl: nil, count: 1, groupId: nil, groupName: "admins", inboxCount: 111),
                         isWarning: nil)
 struct NotificationListView_Previews : PreviewProvider {
     static var previews: some View {

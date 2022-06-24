@@ -61,6 +61,10 @@ extension NotificationMessage {
         let bookmarkableUrl: String?
         // MARK: liked_consolidated
         let count: Int?
+        // MARK: group_message_summary
+        let groupId: Int?
+        let groupName: String?
+        let inboxCount: Int?
 
         enum CodingKeys: String, CodingKey {
             case badgeId = "badge_id"
@@ -80,10 +84,31 @@ extension NotificationMessage {
             case bookmarkName = "bookmark_name"
             case bookmarkableUrl = "bookmarkable_url"
             case count
+
+            case groupId = "group_id"
+            case groupName = "group_name"
+            case inboxCount = "inbox_count"
+
         }
     }
 
     enum `Type`: Int, Decodable {
+
+        var icon: String {
+            switch self {
+            case .replied: return "arrowshape.turn.up.left"
+            case .mentioned: return "at"
+            case .liked: return "heart"
+            case .edited: return "pencil"
+            case .quoted: return "quote.opening"
+            case .posted: return "arrowshape.turn.up.left"
+            case .granted_badge: return "checkmark.seal"
+            case .private_message: return "envelope"
+            default:
+                return ""
+            }
+        }
+
         case mentioned = 1
         case replied
         case quoted

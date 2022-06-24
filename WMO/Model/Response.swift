@@ -23,7 +23,7 @@ struct NotificationResponse: Decodable {
 }
 
 struct BookmarkResponse: Decodable, Equatable {
-    let bookmarkList: BookmarkList
+    let bookmarkList: BookmarkList?
 
     enum CodingKeys: String, CodingKey {
         case bookmarkList = "user_bookmark_list"
@@ -31,7 +31,7 @@ struct BookmarkResponse: Decodable, Equatable {
 }
 
 struct LikesResponse: Decodable, Equatable {
-    let userActions: [UserAction]
+    let userActions: [UserAction]?
 
     enum CodingKeys: String, CodingKey {
         case userActions = "user_actions"
@@ -65,7 +65,7 @@ struct UserResponse: Decodable, Equatable {
     let badges: [User.Badge]?
     let userBadges: [User.UserBadge]? // UserBadge.badgeId -> Badge.id
     let users: [User.User]?
-    var user: User.User // udpate profile will set
+    var user: User.User? // udpate profile will set
     
     enum CodingKeys: String, CodingKey {
         case badges
@@ -78,7 +78,7 @@ struct UserResponse: Decodable, Equatable {
 }
 
 struct UserSummaryResponse: Decodable, Equatable {
-    let badges: [User.Badge]
+    let badges: [User.Badge]?
     let users: [User.User]?
     let topics: [Topic]?
     let summary: User.Summary
@@ -108,10 +108,10 @@ extension UserResponse {
         case .none:
             return emptyBadge
         case .some(let content):
-            if user.title?.isEmpty == true || user.title == nil {
+            if user?.title?.isEmpty == true || user?.title == nil {
                 return emptyBadge
             } else {
-                return content.first(where: { $0.name == self.user.title }) ?? emptyBadge
+                return content.first(where: { $0.name == self.user?.title }) ?? emptyBadge
             }
         }
     }
