@@ -32,7 +32,7 @@ struct RemoveBookmarkResponse: Decodable {
 }
 
 enum BookmarkAction {
-    case loadList
+    case loadList(onStart: Bool)
     case dismissToast
     case bookmarkResponse(Result<BookmarkResponse, Failure>)
 
@@ -114,7 +114,10 @@ let bookmarkReducer = Reducer<BookmarkState, BookmarkAction, ProfileEnvironment>
     case .bookmarkResponse(.failure(let failure)):
         state.toastMessage = "\(failure.error)"
 
-    case .loadList:
+    case .loadList(let onStart):
+        if onStart {
+            state.reset()
+        }
         return APIService.shared.bookmark(.list(username: username, page: state.currentPage))
             .receive(on: environment.mainQueue)
             .catchToEffect(BookmarkAction.bookmarkResponse)

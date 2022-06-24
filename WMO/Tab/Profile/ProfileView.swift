@@ -80,6 +80,8 @@ struct ProfileView: View {
             Webview(type: .home, url: "https://womenoverseas.com/t/topic/11426")
         case .bookmark:
             BookmarkListView(store: Store(initialState: BookmarkState(), reducer: bookmarkReducer, environment: ProfileEnvironment()))
+        case .history:
+            HistoryListView(store: Store(initialState: HistoryState(), reducer: historyReducer, environment: TopicEnvironment()))
         }
     }
 }
@@ -117,6 +119,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
 //    case account
     case bookmark
     case notification
+    case history
 //    case theme
 //    case settings
     case aboutUs
@@ -128,6 +131,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
 //            case .account: return "我的账号"
             case .bookmark: return "我的书签"
             case .notification: return "我的通知"
+            case .history: return "浏览历史"
 //            case .theme: return "切换到原生模式"
 //            case .settings: return "设置"
             case .aboutUs: return "关于我们"
@@ -142,6 +146,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
 //            case .account: return "person.crop.artframe"
             case .bookmark: return "bookmark"
             case .notification: return "envelope"
+            case .history: return "book"
             case .donation: return "yensign.circle"
 //            case .settings: return "gearshape.2"
             case .aboutUs: return "info.circle"

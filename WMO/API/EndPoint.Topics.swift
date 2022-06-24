@@ -13,6 +13,8 @@ extension EndPoint {
         case top(by: Order = .default, period: Period = .all, page: Int = 0)
         case category(slug: String, id: Int, page: Int = 0, order: Order? = nil)
         case tag(by: String, page: Int = 0)
+        // user activities
+        case history(page: Int)
 
         enum Order: String {
             // latest
@@ -58,6 +60,8 @@ extension EndPoint.Topics: RESTful {
         case .tag(let tag, _):
             let escapedTag = tag.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
             return "/tag/\(escapedTag).json"
+        case .history:
+            return "/read.json"
         }
     }
     
@@ -78,6 +82,8 @@ extension EndPoint.Topics: RESTful {
             }
             return params
         case .tag(_, let page):
+            return ["page": page]
+        case .history(let page):
             return ["page": page]
         }
     }

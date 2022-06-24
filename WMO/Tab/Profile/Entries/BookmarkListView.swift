@@ -25,7 +25,7 @@ struct BookmarkListView: View {
     var body: some View {
         WithViewStore(self.store) { viewStore in
             placeholderedList(isEmpty: viewStore.bookmarks.isEmpty, reachBottom: viewStore.reachEnd, loadMoreAction: {
-                viewStore.send(.loadList)
+                viewStore.send(.loadList(onStart: false))
             }) {
                 ForEach(viewStore.bookmarks, id: \.id) { bookmark in
                     BookmarkRow(bookmark: bookmark, togglePinAction: {
@@ -38,6 +38,9 @@ struct BookmarkListView: View {
             .onAppear {
                 if (viewStore.categories.isEmpty) {
                     viewStore.send(.loadCategories)
+                } else {
+                    // FIXME: reload upon coming back from webview
+                    viewStore.send(.loadList(onStart: true))
                 }
             }
             .toolbar {
