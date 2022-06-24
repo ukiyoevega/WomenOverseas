@@ -71,28 +71,9 @@ struct ProfileHeaderView: View {
         WithViewStore(self.store) { viewStore in
             VStack(alignment: .leading, spacing: topContentSpacing) {
                 HStack {
-                    if let escapedString = viewStore.userAvatar, let avatarURL = URL(string: escapedString) {
-                        ZStack(alignment: .bottomTrailing) {
-                            AsyncImage(url: avatarURL) { image in
-                                image.resizable()
-                            } placeholder: {
-                                Circle().fill(Color.avatarPlaceholder).frame(width: avatarWidth, height: avatarWidth)
-                            }
-                            .frame(width: avatarWidth, height: avatarWidth)
-                            .cornerRadius(avatarWidth / 2)
-                            if let flairPath = viewStore.userResponse.user.flairURL,
-                                let escapedString = String("https://womenoverseas.com" + flairPath)
-                                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-                                let flairURL = URL(string: escapedString) {
-                                AsyncImage(url: flairURL) { image in
-                                    image.resizable()
-                                } placeholder: {
-                                    Circle().fill(Color.avatarPlaceholder).frame(width: flairWidth, height: flairWidth)
-                                }
-                                .frame(width: flairWidth, height: flairWidth)
-                                .cornerRadius(flairWidth / 2)
-                            }
-                        }
+                    ZStack(alignment: .bottomTrailing) {
+                        avatar(template: viewStore.userResponse.user.avatarTemplate, size: avatarWidth)
+                        avatar(template: viewStore.userResponse.user.flairURL, size: flairWidth)
                     }
                     if let username = viewStore.userResponse.user.username {
                         Text(username)

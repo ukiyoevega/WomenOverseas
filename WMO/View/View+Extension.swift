@@ -7,7 +7,29 @@
 
 import SwiftUI
 
+private let avatarWidth: CGFloat = 40
+
 extension View {
+    @ViewBuilder
+    func avatar(template: String?, size: CGFloat = avatarWidth) -> some View {
+        if let template = template, !template.isEmpty, let escapedString = String("https://womenoverseas.com" + template)
+            .replacingOccurrences(of: "{size}", with: "400")
+            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+           let avatarURL = URL(string: escapedString) {
+            VStack(alignment: .trailing) {
+                AsyncImage(url: avatarURL) { image in
+                    image.resizable()
+                } placeholder: {
+                    Circle().fill(Color.avatarPlaceholder).frame(width: size)
+                }
+                .frame(width: size, height: size)
+                .cornerRadius(size / 2)
+            }
+        } else {
+            EmptyView()
+        }
+    }
+
     @ViewBuilder
     func center<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         let view = HStack(alignment: .center) {

@@ -15,7 +15,6 @@ struct ProfileEnvironment {
 
 struct ProfileHeaderState: Equatable {
     var userResponse: UserResponse = .empty
-    var userAvatar: String? = nil
     var toastMessage: String? = nil
 }
 
@@ -52,11 +51,6 @@ let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, Prof
             .catchToEffect(ProfileHeaderAction.userResponse)
     case .userResponse(.success(let userResponse)):
         state.userResponse = userResponse
-        if !userResponse.user.avatarTemplate.isEmpty {
-            state.userAvatar = String("https://womenoverseas.com" + userResponse.user.avatarTemplate)
-            .replacingOccurrences(of: "{size}", with: "400")
-            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
-        }
     case .userResponse(.failure(let failure)):
         state.toastMessage = "\(failure.error)"
     }

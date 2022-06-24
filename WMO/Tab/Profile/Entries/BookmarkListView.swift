@@ -14,7 +14,6 @@ private let receivedAtFontSize: CGFloat = 11
 
 private let itemVerticalSpacing: CGFloat = 10
 private let rowPadding = EdgeInsets(top: 10, leading: 0, bottom: 5, trailing: 0)
-private let avatarWidth: CGFloat = 40
 private let titleFontSize: CGFloat = 15
 private let excerptFontSize: CGFloat = 13
 private let titleLineSpacing: CGFloat = 3
@@ -103,21 +102,7 @@ struct BookmarkRow: View {
                         }
                     } // title, tags
                     Spacer()
-                    if let user = bookmark.user,
-                       let escapedString = String("https://womenoverseas.com" + user.avatarTemplate)
-                        .replacingOccurrences(of: "{size}", with: "400")
-                        .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-                       let avatarURL = URL(string: escapedString) {
-                        VStack(alignment: .trailing) {
-                            AsyncImage(url: avatarURL) { image in
-                                image.resizable()
-                            } placeholder: {
-                                Circle().fill(Color.avatarPlaceholder).frame(width: avatarWidth)
-                            }
-                            .frame(width: avatarWidth, height: avatarWidth)
-                            .cornerRadius(avatarWidth / 2)
-                        }
-                    }
+                    avatar(template: bookmark.user?.avatarTemplate)
                 } // title, tags, avatar
                 stringWithAttributes
                     .map(text(_:))

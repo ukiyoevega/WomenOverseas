@@ -14,7 +14,6 @@ private let settingTitleFontSize: CGFloat = 14
 private let settingEditingFontSize: CGFloat = 14
 private let textFieldTextInset: CGFloat = 12
 private let toolbarItemSize: CGFloat = 15
-private let avatarWidth: CGFloat = 40
 
 // MARK: - ProfileEditView
 
@@ -79,18 +78,8 @@ struct ProfileEditView: View {
                     .font(.system(size: settingDetailFontSize))
                     .foregroundColor(Color.black)
             }
-            if entry == .avatar, !viewStore.userResponse.user.avatarTemplate.isEmpty,
-               let escapedString = String("https://womenoverseas.com" + viewStore.userResponse.user.avatarTemplate)
-                .replacingOccurrences(of: "{size}", with: "400")
-                .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-               let avatarURL = URL(string: escapedString) {
-                AsyncImage(url: avatarURL) { image in
-                    image.resizable()
-                } placeholder: {
-                    Circle().fill(Color.avatarPlaceholder).frame(width: avatarWidth, height: avatarWidth)
-                }
-                .frame(width: avatarWidth, height: avatarWidth)
-                .cornerRadius(avatarWidth / 2)
+            if entry == .avatar {
+                avatar(template: viewStore.userResponse.user.avatarTemplate)
             }
             Image(systemName: "chevron.right")
                 .font(.system(size: settingDetailIconSize))
