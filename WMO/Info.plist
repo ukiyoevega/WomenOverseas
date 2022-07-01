@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>保存图片需要获取权限</string>
+	<key>NSCameraUsageDescription</key>
+	<string>拍照需要先开启相机权限</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>更新头像需要获取相册权限</string>
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

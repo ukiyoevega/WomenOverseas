@@ -151,7 +151,12 @@ extension WebviewController: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
         if let urlResponse = navigationResponse.response as? HTTPURLResponse, let username = urlResponse.allHeaderFields["x-discourse-username"] {
-            UserDefaults.standard.set(username, forKey: "com.womenoverseas.username")
+            if let utfData = (username as? String)?.data(using: .isoLatin1),
+                let utf = String(data: utfData, encoding: .utf8) {
+                UserDefaults.standard.set(utf, forKey: "com.womenoverseas.username")
+            } else {
+                UserDefaults.standard.set(username, forKey: "com.womenoverseas.username")
+            }
         }
         return .allow
     }
