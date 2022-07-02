@@ -26,9 +26,14 @@ public enum AsyncImageStatus {
 // MARK: - AsyncImage
 
 public struct AsyncImage<Content: View>: View {
+    enum LoadState {
+        case none
+        case loading
+        case loaded
+    }
     @ObservedObject var loader: ImageLoader
     var content: ((AsyncImageStatus) -> Content)?
-    @State var loaded: Bool = false
+    @State var loadState: LoadState = .none
     @ViewBuilder
     var contentOrImage: some View {
         if let content = content {
@@ -43,9 +48,11 @@ public struct AsyncImage<Content: View>: View {
     public var body: some View {
         contentOrImage
             .onAppear {
-                if !loaded {
-                    loader.loadImage()
-                    loaded = true
+                if loadState == .none {
+                    loader.loadImage { succeed in
+                        loadState = succeed ? .loaded : .none
+                    }
+                    loadState = .loading
                 }
             }
         // TODO: cancel logic
@@ -94,7 +101,7 @@ final class ImageLoader: ObservableObject {
         cancelDownload()
     }
     
-    func loadImage() {
+    func loadImage(completion: @escaping (Bool) -> Void) {
         guard let url = url, asyncImageStatus.image == nil else { return }
         downloadTask = ImageService.shared.fetchImage(url: url, scale: scale) {
             [weak self] result in
@@ -104,9 +111,11 @@ final class ImageLoader: ObservableObject {
                 switch result {
                 case .success(let image):
                     self.asyncImageStatus = .success(Image(uiImage: image))
+                    completion(true)
                 case .failure(let error):
                     if error.isCanceled { return }
                     self.asyncImageStatus = .failure(error)
+                    completion(false)
                 }
                 
                 self.downloadTask = nil

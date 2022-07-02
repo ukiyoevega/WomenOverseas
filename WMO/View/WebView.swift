@@ -223,12 +223,14 @@ extension WebviewController: WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        print("test error \(error.localizedDescription)")
+        print("🥹 ERROR \(error.localizedDescription)")
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         removeElement(.tabbar)
-        removeElement(.header)
+        if self.type == .home || self.type == .events {
+            removeElement(.header)
+        }
     }
     
     private func removeElement(_ type: RemoveElement) {

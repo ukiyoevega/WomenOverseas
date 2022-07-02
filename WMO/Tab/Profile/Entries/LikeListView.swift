@@ -24,7 +24,7 @@ struct LikeListView: View {
                     viewStore.send(.loadLike(onStart: false))
                 }) {
                     ForEach(viewStore.likesElement, id: \.id) { like in
-                        LikeRow(like: like)
+                        LikeRow(like: like, stringWithAttributes: viewStore.likeContent[like.id] ?? [])
                     }
                 }
             }
@@ -46,6 +46,7 @@ struct LikeListView: View {
 struct LikeRow: View {
 
     let like: UserAction
+    let stringWithAttributes: [StringWithAttributes]
 
     var body: some View {
         ZStack {
@@ -60,9 +61,9 @@ struct LikeRow: View {
                     EmptyView()
                     avatar(template: like.avatarTemplate)
                 } // title, avatar
-                Text(like.excerpt)
-                    .foregroundColor(.gray)
-                    .font(.system(size: excerptFontSize))
+                attributedText(stringWithAttributes,
+                               fontSize: excerptFontSize)
+                .fixedSize(horizontal: false, vertical: true)
             }
             .padding(rowPadding)
         }

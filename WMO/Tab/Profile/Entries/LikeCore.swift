@@ -10,6 +10,7 @@ import ComposableArchitecture
 struct LikeState: Equatable {
     var toastMessage: String?
     var likesElement: [UserAction] = []
+    var likeContent: [String: [StringWithAttributes]] = [:]
     var currentOffset: Int = 0
     var reachEnd = false
 }
@@ -25,6 +26,7 @@ let likeReducer = Reducer<LikeState, LikeAction, TopicEnvironment> { state, acti
     case .loadLike(let onStart):
         if onStart {
             state.likesElement = []
+            state.likeContent = [:]
             state.currentOffset = 0
         }
         let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username")
@@ -35,6 +37,14 @@ let likeReducer = Reducer<LikeState, LikeAction, TopicEnvironment> { state, acti
     case .likedResponse(.success(let response)):
         state.currentOffset += (response.userActions?.count ?? 0)
         state.likesElement.append(contentsOf: response.userActions ?? [])
+        state.likesElement.forEach { userAction in
+            if let data = userAction.excerpt.data(using: .unicode),
+               let attributedString = try? NSAttributedString(data: data,
+                                                              options: [.documentType: NSAttributedString.DocumentType.html],
+                                                              documentAttributes: nil) {
+                state.likeContent[userAction.id] = attributedString.stringsWithAttributes
+            }
+        }
         if response.userActions?.isEmpty == true || response.userActions == nil {
             state.reachEnd = true
         }

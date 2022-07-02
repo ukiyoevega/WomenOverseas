@@ -13,8 +13,7 @@ private let settingEntryFontSize: CGFloat = 14
 private let settingEntryIconTitleSpacing: CGFloat = 8
 private let settingDetailSize: CGFloat = 15
 
-// 关注者 8 - 正在关注 1 - 加入日期： 20 年 0 月 4 日 - 最后一个帖子 23 小时 - 最后活动 4 分钟 - 浏览量 627
-// https://womenoverseas.com/u/merry_go_round/summary
+// TODO: View profile: 关注者, 正在关注, 加入日期, 最后一个帖子, 最后活动, 浏览量
 struct ProfileView: View {
     let store: Store<ProfileState, ProfileAction>
 

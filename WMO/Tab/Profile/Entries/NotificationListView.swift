@@ -21,7 +21,7 @@ struct NotificationListView: View {
                 // TODO:
             }) {
                 ForEach(viewStore.notifications) { noti in
-                    if (noti.type != .group_message_summary) {
+                    if let type = noti.type, type != .group_message_summary {
                         NotificationRow(message: noti)
                             .padding(EdgeInsets(top: 10, leading: 0, bottom: 5, trailing: 0))
                     }
@@ -50,7 +50,7 @@ struct NotificationListView: View {
 private struct NotificationRow: View {
     let message: NotificationMessage
 
-    private func content(type: NotificationMessage.`Type`) -> Text {
+    private func content(type: NotificationMessage.`Type`?) -> Text {
         let midString: String
         let endString: String
         if type == .granted_badge {
@@ -61,7 +61,7 @@ private struct NotificationRow: View {
             endString = message.payload.topicTitle ?? message.fancyTitle ?? ""
         }
         let concated =
-        Text(Image(systemName: type.icon))
+        Text(Image(systemName: type?.icon ?? "questionmark"))
             .font(.system(size: notiIconSize, weight: .semibold))
             .foregroundColor(.orange)
         +

@@ -11,7 +11,7 @@ struct NotificationMessage: Decodable, Equatable, Identifiable {
     let id: Int
     let userId: Int
     let externalId: Int?
-    let type: `Type`
+    let type: `Type`?
     let read: Bool
     let highPriority: Bool
     let createdAt: String // server-side as ISO8601 format

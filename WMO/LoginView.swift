@@ -21,6 +21,8 @@ struct LoginView: View {
             }
             VStack(alignment: .center, spacing: 6) {
                 Image("login_background", bundle: nil)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
                 Text("探索广阔的世界，成为更好的自己")
                     .font(.system(size: 30, weight: .regular))
                     .padding(EdgeInsets(top: 0, leading: 14, bottom: 0, trailing: 14))
@@ -68,8 +70,8 @@ struct LoginView: View {
         let agreementRange = text.range(of: "用户协议")
         let policyRange = text.range(of: "隐私政策")
         if agreementRange.length > 0, policyRange.length > 0,
-            let agreementURL = URL(string: "www.google.com"),
-            let policyURL = URL(string: "www.google.com") {
+            let agreementURL = URL(string: "https://womenoverseas.com/tos"),
+            let policyURL = URL(string: "https://womenoverseas.com/privacy") {
             mutableText.addAttributes([
                 NSAttributedString.Key.link : agreementURL,
                 NSAttributedString.Key.foregroundColor: UIColor.black,

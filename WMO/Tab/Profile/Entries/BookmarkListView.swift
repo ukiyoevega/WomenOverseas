@@ -104,10 +104,8 @@ struct BookmarkRow: View {
                     Spacer()
                     avatar(template: bookmark.user?.avatarTemplate)
                 } // title, tags, avatar
-                stringWithAttributes
-                    .map(text(_:))
-                    .reduce(Text(""), +)
-                    .lineSpacing(titleLineSpacing)
+                attributedText(stringWithAttributes,
+                               fontSize: excerptFontSize)
                     .fixedSize(horizontal: false, vertical: true)
                 HStack {
                     [(bookmark.createdAt, "收藏，"), (bookmark.bumpedAt, "更新")].map { dateString, suffix in
@@ -138,21 +136,6 @@ struct BookmarkRow: View {
                         .cancel(Text("取消"))]
                 )
             }
-        }
-    }
-
-    private func text(_ pair: StringWithAttributes) -> Text {
-        if #available(iOS 15, *), let link = pair.attrs[.link], let url = link as? URL {
-            var attributedString = AttributedString(pair.string)
-            attributedString.underlineStyle = .single
-            attributedString.link = url
-            return Text(attributedString)
-                .foregroundColor(Color.red)
-                .font(.system(size: excerptFontSize))
-        } else {
-            return Text(pair.string)
-                .foregroundColor(.gray)
-                .font(.system(size: excerptFontSize))
         }
     }
 }

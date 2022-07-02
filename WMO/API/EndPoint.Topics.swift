@@ -89,8 +89,8 @@ extension EndPoint.Topics: RESTful {
         case .history(let page):
             return ["page": page]
         case .liked(let username, let offset):
-            if let username = username, let escaped = username.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) {
-                return ["offset": offset, "username": escaped, "filter": 1]
+            if let username = username {
+                return ["offset": offset, "username": username, "filter": 1]
             }
             return ["offset": offset, "filter": 1]
         }

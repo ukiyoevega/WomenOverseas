@@ -11,6 +11,27 @@ private let avatarWidth: CGFloat = 40
 
 extension View {
     @ViewBuilder
+    func attributedText(_ stringWithAttributes: [StringWithAttributes], fontSize: CGFloat) -> some View {
+        stringWithAttributes
+            .map { pair in
+                if #available(iOS 15, *), let link = pair.attrs[.link], let url = link as? URL {
+                    var attributedString = AttributedString(pair.string)
+                    attributedString.underlineStyle = .single
+                    attributedString.link = url
+                    return Text(attributedString)
+                        .foregroundColor(Color.red)
+                        .font(.system(size: fontSize))
+                } else {
+                    return Text(pair.string)
+                        .foregroundColor(.gray)
+                        .font(.system(size: fontSize))
+                }
+            }
+            .reduce(Text(""), +)
+            .lineSpacing(3)
+    }
+
+    @ViewBuilder
     func avatar(template: String?, size: CGFloat = avatarWidth) -> some View {
         if let template = template, !template.isEmpty, let escapedString = String("https://womenoverseas.com" + template)
             .replacingOccurrences(of: "{size}", with: "400")
