@@ -137,7 +137,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     }
 
     static var otherEntries: [SettingEntry] {
-        return [.aboutUs, .donation]
+        return [.aboutUs]
     }
 
     static var ongoingEntries: [SettingEntry] {

@@ -21,6 +21,7 @@ private let categoryBorderWidth: CGFloat = 1.5
 struct TopicListView: View {
     let store: Store<TopicState, TopicAction>
     @State private var showingAlert = false
+    @State private var searchText: String = ""
 
     @ViewBuilder
     func categories(_ viewStore: ViewStore<TopicState, TopicAction>) -> some View {
@@ -46,21 +47,33 @@ struct TopicListView: View {
         }
     }
 
+    @ViewBuilder
+    private func topList(viewStore: ViewStore<TopicState, TopicAction>) -> some View {
+        placeholderedList(isEmpty: viewStore.topicResponse.isEmpty, reachBottom: viewStore.reachEnd, loadMoreAction: {
+            viewStore.send(.loadTopics)
+        }) {
+            ForEach(viewStore.topicResponse, id: \.uuid) { res in
+                ForEach(res.topicList?.topics ?? []) { topic in
+                    TopicRow(topic: topic,
+                             category: getTopicCategory(topic: topic, viewStore),
+                             user: res.users?.first(where: { $0.id == topic.posters?.first?.uid })
+                    )
+                }
+            }
+        }
+    }
+
     var body: some View {
         WithViewStore(self.store) { viewStore in
             Group {
                 categories(viewStore)
-                placeholderedList(isEmpty: viewStore.topicResponse.isEmpty, reachBottom: viewStore.reachEnd, loadMoreAction: {
-                    viewStore.send(.loadTopics)
-                }) {
-                    ForEach(viewStore.topicResponse, id: \.uuid) { res in
-                        ForEach(res.topicList?.topics ?? []) { topic in
-                            TopicRow(topic: topic,
-                                     category: getTopicCategory(topic: topic, viewStore),
-                                     user: res.users?.first(where: { $0.id == topic.posters?.first?.uid })
-                            )
+                if #available(iOS 15.0, *) {
+                    topList(viewStore: viewStore)
+                        .refreshable {
+                            viewStore.send(.tapCategory(viewStore.currentCategory))
                         }
-                    }
+                } else {
+                    topList(viewStore: viewStore)
                 }
             } // workaround for icon-style navigation bar title
             .navigationBarTitleDisplayMode(.inline)
