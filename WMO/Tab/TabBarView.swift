@@ -80,7 +80,7 @@ struct TabBarView : View {
     }
 
     private func setupAppearance() {
-        UINavigationBar.appearance().tintColor = UIColor(hex: "D8805E")
+        UINavigationBar.appearance().tintColor = UIColor(hex: "D8805E") // mainIcon
     }
 }
 

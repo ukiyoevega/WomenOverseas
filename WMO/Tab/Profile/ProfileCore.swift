@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import UIKit
 
 // MARK: - Header
 
@@ -95,6 +96,7 @@ let profileSummaryReducer = Reducer<ProfileSummaryState, ProfileSummaryAction, P
 
 struct ProfileState: Equatable {
     var isNativeMode: Bool = true
+    var showLogoutAlert: Bool = false
     var profileSummaryState = ProfileSummaryState()
     var profileHeaderState = ProfileHeaderState()
     var notificationState = NotificationState()
@@ -105,6 +107,9 @@ enum ProfileAction {
     case header(ProfileHeaderAction)
     case notification(NotificationAction)
     case toggleNativeMode(Bool)
+    case toggleLogoutAlert
+    case logout
+    case logoutResponse(Result<[String: String], Failure>)
 }
 
 // TODO: reducer should not be global instance
@@ -127,9 +132,22 @@ let profileReducer = Reducer<ProfileState, ProfileAction, Void>.combine(
     Reducer { state, action, _ in
         switch action {
         case .summary, .header, .notification:
-            return .none
+            break
         case .toggleNativeMode(let isNative):
-            return .none // TODO: 
+            break // TODO: dark mode
+        case .toggleLogoutAlert:
+            state.showLogoutAlert = !state.showLogoutAlert
+        case .logout:
+            return APIService.generateDataTaskPublisher(endpoint: EndPoint.User.logout)
+                .catchToEffect(ProfileAction.logoutResponse)
+        case .logoutResponse(.success(let data)):
+            DispatchQueue.main.async {
+                APIService.shared.apiKey = ""
+                Router.showMain()
+            }
+        case .logoutResponse(.failure(let failure)):
+            print("logout failed: \(failure.error)")
         }
+        return .none
     }
 )

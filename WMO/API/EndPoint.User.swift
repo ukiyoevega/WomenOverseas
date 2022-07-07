@@ -22,6 +22,7 @@ enum UploadType: String {
 
 extension EndPoint {
     enum User {
+        case logout
         case getUser(name: String)
         case summary(username: String)
         case activity(username: String) // N/A
@@ -41,6 +42,7 @@ extension EndPoint.User: RESTful {
     
     var path: String {
         switch self {
+        case .logout: return "/user-api-key/revoke"
         case .getUser(let name): return "/u/\(name).json"
         case .summary(let name): return "/u/\(name)/summary.json"
         case .activity(let name): return "/u/\(name)/activity.json"
@@ -55,7 +57,7 @@ extension EndPoint.User: RESTful {
     
     var method: HTTPMethod {
         switch self {
-        case .upload: return .POST
+        case .upload, .logout: return .POST
         case .preference, .update: return .PUT
         default: return .GET
         }

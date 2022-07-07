@@ -31,9 +31,15 @@ struct ProfileView: View {
                     }
 
                     Section(header: Text("")) {
-                        ForEach(SettingEntry.otherEntries) { entry in
-                            entryRow(entry)
-                        }
+                        entryRow(SettingEntry.aboutUs)
+                        entryRowView(SettingEntry.logout)
+                            .onTapGesture {
+                                viewStore.send(.toggleLogoutAlert)
+                            }
+                        #if DEBUG
+                        entryRow(SettingEntry.theme,
+                                 toggle: viewStore.binding(get: \.isNativeMode, send: ProfileAction.toggleNativeMode))
+                        #endif
                     }
                     #if DEBUG
                     Section(header: Text("")) {
@@ -49,34 +55,46 @@ struct ProfileView: View {
                 viewStore.send(.summary(.refresh))
                 viewStore.send(.header(.refresh))
             }
+            .actionSheet(isPresented: viewStore.binding(get: \.showLogoutAlert, send: ProfileAction.toggleLogoutAlert)) {
+                ActionSheet(
+                    title: Text("确定要退出登录吗"),
+                    buttons: [
+                        .destructive(Text("退出登录")) {
+                            viewStore.send(.logout)
+                        },
+                        .cancel(Text("取消"))]
+                )
+            }
         }
     }
 
     @ViewBuilder
-    func entryRow(_ entry: SettingEntry, toggle: Binding<Bool>? = nil) -> some View {
-        /* toggle be like
-         viewStore.binding(get: \.isNativeMode, send: ProfileAction.toggleNativeMode)
-         */
-        NavigationLink(destination: entryView(entry)) {
-            HStack(spacing: settingEntryIconTitleSpacing) {
-                Image(systemName: entry.iconName)
-                    .frame(width: settingEntrySize)
-                    .foregroundColor(Color.gray)
-                Text(entry.description)
-                    .font(.system(size: settingEntryFontSize, weight: .semibold))
-                    .foregroundColor(Color.black)
-                Spacer()
+    func entryRowView(_ entry: SettingEntry, toggle: Binding<Bool>? = nil) -> some View {
+        HStack(spacing: settingEntryIconTitleSpacing) {
+            Image(systemName: entry.iconName)
+                .frame(width: settingEntrySize)
+                .foregroundColor(Color.gray)
+            Text(entry.description)
+                .font(.system(size: settingEntryFontSize, weight: .semibold))
+                .foregroundColor(Color.black)
+            Spacer()
 
-                if let toggle = toggle {
-                    Toggle(isOn: toggle) { }
-                            .toggleStyle(SmallToggleStyle())
-                } else {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: settingDetailSize))
-                        .foregroundColor(Color.gray)
-                }
+            if let toggle = toggle {
+                Toggle(isOn: toggle) { }
+                .toggleStyle(SmallToggleStyle())
+            } else {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: settingDetailSize))
+                    .foregroundColor(Color.gray)
             }
-            .padding([.top, .bottom])
+        }
+        .padding([.top, .bottom])
+    }
+
+    @ViewBuilder
+    func entryRow(_ entry: SettingEntry, toggle: Binding<Bool>? = nil) -> some View {
+        NavigationLink(destination: entryView(entry)) {
+            entryRowView(entry)
         }
         .navigationBarTitle("") // remove back button title
     }
@@ -137,11 +155,11 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     }
 
     static var otherEntries: [SettingEntry] {
-        return [.aboutUs]
+        return [.aboutUs, .logout]
     }
 
     static var ongoingEntries: [SettingEntry] {
-        return [.draft, .account, .theme, .settings, .createdTopic, .replied]
+        return [.draft, .account, .settings, .createdTopic, .replied]
     }
 
     case notification
@@ -151,6 +169,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
 
     case aboutUs
     case donation
+    case logout
 
     case draft
     case createdTopic
@@ -170,6 +189,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
             case .theme: return "切换到原生模式"
             case .settings: return "设置"
             case .aboutUs: return "关于我们"
+            case .logout: return "退出登录"
             case .donation: return "捐助"
             case .createdTopic: return "我的话题"
             case .replied: return "我的回复"
@@ -189,6 +209,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
             case .donation: return "yensign.circle"
             case .settings: return "gearshape.2"
             case .aboutUs: return "info.circle"
+            case .logout: return "ipad.and.arrow.forward"
             case .theme: return "switch.2"
             case .createdTopic: return "doc.text"
             case .replied: return "arrowshape.turn.up.left"

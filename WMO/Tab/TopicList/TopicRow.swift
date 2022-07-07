@@ -19,6 +19,7 @@ private let detailInfoSpacing: CGFloat = 4
 private let titleFontSize: CGFloat = 15
 private let titleLineSpacing: CGFloat = 3
 private let bottomRightElementsFontSize: CGFloat = 11
+private let toolbarItemSize: CGFloat = 15
 
 struct CategoryView: View {
     let categoryItem: CategoryList.Category
@@ -60,7 +61,15 @@ struct TopicRow: View {
 
     var body: some View {
         ZStack {
-            NavigationLink(destination: Webview(type: .home, url: "https://womenoverseas.com/t/topic/\(topic.id)")) {
+            NavigationLink(destination: Webview(type: .home, url: "https://womenoverseas.com/t/topic/\(topic.id)")
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text(topic.title)
+                            .font(.system(size: toolbarItemSize, weight: .semibold))
+                            .fixedSize(horizontal: false, vertical: true)
+                            .foregroundColor(Color.black)
+                    }
+                }) {
                 EmptyView()
             }
             .opacity(0)
