@@ -60,7 +60,7 @@ let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, Prof
         state.toastMessage = "\(failure.error)"
     }
     return .none // Effect<ProfileAction, Never>
-}.debug()
+}
 
 // MARK: - Summary
 

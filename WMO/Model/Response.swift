@@ -30,7 +30,7 @@ struct BookmarkResponse: Decodable, Equatable {
     }
 }
 
-struct LikesResponse: Decodable, Equatable {
+struct UserActionResponse: Decodable, Equatable {
     let userActions: [UserAction]?
 
     enum CodingKeys: String, CodingKey {

@@ -44,7 +44,7 @@ struct APIService {
           .eraseToEffect()
     }
 
-    lazy var getLiked: (EndPoint.Topics) -> Effect<LikesResponse, Failure> = {
+    lazy var getUserActions: (EndPoint.Topics) -> Effect<UserActionResponse, Failure> = {
         return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
     }()
 

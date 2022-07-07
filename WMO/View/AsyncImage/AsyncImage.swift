@@ -25,7 +25,7 @@ public enum AsyncImageStatus {
 
 // MARK: - AsyncImage
 
-public struct AsyncImage<Content: View>: View {
+public struct CustomAsyncImage<Content: View>: View {
     enum LoadState {
         case none
         case loading

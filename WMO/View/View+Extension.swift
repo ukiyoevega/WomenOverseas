@@ -37,8 +37,16 @@ extension View {
             .replacingOccurrences(of: "{size}", with: "400")
             .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
            let avatarURL = URL(string: escapedString) {
-            VStack(alignment: .trailing) {
+            if #available(iOS 15.0, *) {
                 AsyncImage(url: avatarURL) { image in
+                    image.resizable()
+                } placeholder: {
+                    Circle().fill(Color.avatarPlaceholder).frame(width: size)
+                }
+                .frame(width: size, height: size)
+                .cornerRadius(size / 2)
+            } else {
+                CustomAsyncImage(url: avatarURL) { image in
                     image.resizable()
                 } placeholder: {
                     Circle().fill(Color.avatarPlaceholder).frame(width: size)

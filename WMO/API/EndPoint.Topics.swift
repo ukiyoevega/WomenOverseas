@@ -14,8 +14,9 @@ extension EndPoint {
         case category(slug: String, id: Int, page: Int = 0, order: Order? = nil)
         case tag(by: String, page: Int = 0)
         // user activities
+        case created(by: String, page: Int)
         case history(page: Int)
-        case liked(username: String?, offset: Int)
+        case userAction(username: String?, offset: Int, type: UserActionState.`Type`)
 
         enum Order: String {
             // latest
@@ -63,8 +64,11 @@ extension EndPoint.Topics: RESTful {
             return "/tag/\(escapedTag).json"
         case .history:
             return "/read.json"
-        case .liked:
+        case .userAction:
             return "/user_actions.json"
+        case .created(let user, _):
+            let escapedUser = user.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+            return "/topics/created-by/\(escapedUser).json"
         }
     }
     
@@ -88,11 +92,13 @@ extension EndPoint.Topics: RESTful {
             return ["page": page]
         case .history(let page):
             return ["page": page]
-        case .liked(let username, let offset):
+        case .userAction(let username, let offset, let type):
             if let username = username {
-                return ["offset": offset, "username": username, "filter": 1]
+                return ["offset": offset, "username": username, "filter": type.rawValue]
             }
-            return ["offset": offset, "filter": 1]
+            return ["offset": offset, "filter": type.rawValue]
+        case .created(_, let page):
+            return ["page": page]
         }
     }
 }

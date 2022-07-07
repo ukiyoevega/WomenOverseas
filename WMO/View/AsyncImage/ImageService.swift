@@ -48,7 +48,7 @@ public final class ImageService: NSObject {
     private let ioQueue: DispatchQueue
     
     private override init() {
-        ioQueue = DispatchQueue(label: "com.zeu.AsyncImage.ioQueue")
+        ioQueue = DispatchQueue(label: "com.womenoverseas.CustomAsyncImage.ioQueue")
         session = URLSession(configuration: .ephemeral, delegate: sessionDelegat, delegateQueue: nil)
         super.init()
         sessionDelegat.onTaskFinished = { [weak self] url, cache in

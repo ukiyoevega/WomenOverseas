@@ -17,7 +17,7 @@ extension Color {
     static let systemGroup = Color(hex: "F2F2F6")
     static let systemLightGray = Color(hex: "AAAAAA")
     static let hyperlink = Color(hex: "7D9FB1")
-    static let avatarPlaceholder = Color.blue.opacity(0.3)
+    static let avatarPlaceholder = Color(hex: "ECEAEF")
 
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)

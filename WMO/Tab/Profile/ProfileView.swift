@@ -110,10 +110,14 @@ struct ProfileView: View {
             Webview(type: .home, url: "https://womenoverseas.com/t/topic/11426")
         case .bookmark:
             BookmarkListView(store: Store(initialState: BookmarkState(), reducer: bookmarkReducer, environment: ProfileEnvironment()))
-        case .history:
-            HistoryListView(store: Store(initialState: HistoryState(), reducer: historyReducer, environment: TopicEnvironment()))
+        case .replied:
+            UserActionListView(store: Store(initialState: UserActionState(type: .replied), reducer: userActionReducer, environment: TopicEnvironment()))
         case .liked:
-            LikeListView(store: Store(initialState: LikeState(), reducer: likeReducer, environment: TopicEnvironment()))
+            UserActionListView(store: Store(initialState: UserActionState(type: .liked), reducer: userActionReducer, environment: TopicEnvironment()))
+        case .history:
+            PlainTopicListView(store: Store(initialState: PlainTopicListState(type: .viewed), reducer: historyReducer, environment: TopicEnvironment()))
+        case .createdTopic:
+            PlainTopicListView(store: Store(initialState: PlainTopicListState(type: .created), reducer: historyReducer, environment: TopicEnvironment()))
         default:
             Text(entry.description)
         }
@@ -151,7 +155,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     var id: String { self.rawValue }
 
     static var myEntries: [SettingEntry] {
-        return [.notification, .bookmark, .liked, .history]
+        return [.notification, .bookmark, .createdTopic, .replied, .liked, .history]
     }
 
     static var otherEntries: [SettingEntry] {
@@ -159,7 +163,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     }
 
     static var ongoingEntries: [SettingEntry] {
-        return [.draft, .account, .settings, .createdTopic, .replied]
+        return [.draft, .account, .settings]
     }
 
     case notification
