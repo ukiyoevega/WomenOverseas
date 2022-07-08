@@ -18,6 +18,8 @@ extension Color {
     static let systemLightGray = Color(hex: "AAAAAA")
     static let hyperlink = Color(hex: "7D9FB1")
     static let avatarPlaceholder = Color(hex: "ECEAEF")
+    static let globeBlue = Color(hex: "63C5DA")
+    static let primaryText = Color(hex: "222222")
 
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)

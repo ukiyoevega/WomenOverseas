@@ -20,7 +20,6 @@ private let categoryBorderWidth: CGFloat = 1.5
 
 struct TopicListView: View {
     let store: Store<TopicState, TopicAction>
-    @State private var showingAlert = false
     @State private var searchText: String = ""
 
     @ViewBuilder
@@ -89,7 +88,7 @@ struct TopicListView: View {
                 trailing:
                     HStack(spacing: 0) {
                         Button(action: {
-                            showingAlert = true
+                            viewStore.send(.toggleSortSheet)
                         }) {
                             ZStack(alignment: .bottomTrailing) {
                                 Image(systemName: "arrow.up.arrow.down")
@@ -117,7 +116,7 @@ struct TopicListView: View {
                     viewStore.send(.loadCategories)
                 }
             }
-            .actionSheet(isPresented: $showingAlert) {
+            .actionSheet(isPresented: viewStore.binding(get: \.showSortSheet, send: TopicAction.toggleSortSheet)) {
                 actionSheet(viewStore: viewStore)
             }
             .toast(message: viewStore.toastMessage ?? "",

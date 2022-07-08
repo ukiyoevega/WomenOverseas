@@ -22,7 +22,6 @@ enum TagOrder {
 
 struct TopicTagsView: View {
     let store: Store<TagState, TagAction>
-    @State private var showingAlert = false
 
     var body: some View {
         WithViewStore(self.store) { viewStore in
@@ -48,7 +47,7 @@ struct TopicTagsView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        showingAlert = true
+                        viewStore.send(.toggleSortSheet)
                     } label: {
                         Image(systemName: "arrow.up.arrow.down")
                             .font(.system(size: 14, weight: .medium))
@@ -56,7 +55,7 @@ struct TopicTagsView: View {
                     }
                 }
             }
-            .actionSheet(isPresented: $showingAlert) {
+            .actionSheet(isPresented: viewStore.binding(get: \.showSortSheet, send: TagAction.toggleSortSheet)) {
                 ActionSheet(
                     title: Text("话题排序"),
                     buttons: [

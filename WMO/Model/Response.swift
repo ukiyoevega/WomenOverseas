@@ -74,7 +74,7 @@ struct UserResponse: Decodable, Equatable {
         case user
     }
 
-    static let empty = UserResponse(badges: [], userBadges: [], users: [], user: User.User(id: 1, username: "", name: nil, avatarTemplate: "", flairName: nil, flairGroupId: nil, groups: nil, email: nil, lastPostedAt: nil, lastSeenAt: nil, createdAt: nil, timezone: nil, canUploadProfileHeader: false, canUploadUserCardBackground: false, canChangeBio: false, canChangeLocation: false, canChangeWebsite: false, canChangeTrackingPreference: false, birthday: "", website: nil, websiteName: nil, admin: nil, moderator: nil, trustLevel: 1, bioRaw: nil, flairURL: nil, title: nil, customAvatarTemplate: nil, systemAvatarTemplate: nil))
+    static let empty = UserResponse(badges: [], userBadges: [], users: [], user: User.User(id: 1, username: "", name: nil, avatarTemplate: "", flairName: nil, flairGroupId: nil, groups: nil, email: nil, lastPostedAt: nil, lastSeenAt: nil, createdAt: nil, viewCount: 111, timezone: nil, canUploadProfileHeader: false, canUploadUserCardBackground: false, canChangeBio: false, canChangeLocation: false, canChangeWebsite: false, canChangeTrackingPreference: false, birthday: "", website: nil, websiteName: nil, admin: nil, moderator: nil, trustLevel: 1, bioRaw: nil, flairURL: nil, title: nil, customAvatarTemplate: nil, systemAvatarTemplate: nil))
 }
 
 struct UserSummaryResponse: Decodable, Equatable {

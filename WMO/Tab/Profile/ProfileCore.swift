@@ -18,12 +18,14 @@ struct ProfileHeaderState: Equatable {
     var userResponse: UserResponse = .empty
     var toastMessage: String? = nil
     var isLoading = false
+    var showInfo = false
 }
 
 enum ProfileHeaderAction {
     case refresh
     case dismissToast
     case userResponse(Result<UserResponse, Failure>)
+    case togglshowInfo
 
     case update(name: String, value: String)
     case updateResponse(Result<UserResponse, Failure>)
@@ -32,6 +34,9 @@ enum ProfileHeaderAction {
 let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, ProfileEnvironment> { state, action, environment in
     let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username")?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
     switch action {
+    case .togglshowInfo:
+        state.showInfo = !state.showInfo
+
     case .update(let name, let value):
         state.isLoading = true
         return APIService.shared.updateUser(.update(username: username, name: name, value: value))

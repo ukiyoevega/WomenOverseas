@@ -19,6 +19,7 @@ struct TopicState: Equatable {
     var currentOrder: EndPoint.Topics.Order?
     var toastMessage: String?
     var reachEnd = false
+    var showSortSheet = false
 
     mutating func resetResponse() {
         self.currentPage = 0
@@ -36,6 +37,7 @@ enum TopicAction {
     case topicsResponse(Result<TopicListResponse, Failure>)
     case topicsCategriesResponse(Result<([CategoryList.Category], TopicListResponse), Failure>)
     case dismissToast
+    case toggleSortSheet
 }
 
 struct TopicEnvironment {
@@ -44,6 +46,9 @@ struct TopicEnvironment {
 
 let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, action, environment in
     switch action {
+    case .toggleSortSheet:
+        state.showSortSheet = !state.showSortSheet
+
     case .dismissToast:
         state.toastMessage = nil
 

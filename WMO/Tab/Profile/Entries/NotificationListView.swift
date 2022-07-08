@@ -21,8 +21,8 @@ struct NotificationListView: View {
                 // TODO:
             }) {
                 ForEach(viewStore.notifications) { noti in
-                    if let type = noti.type, type != .group_message_summary, let topicId = noti.topicId {
-                        webviewLink("https://womenoverseas.com/t/topic/\(topicId)",
+                    if let type = noti.type, type != .group_message_summary, let topicId = noti.topicId, let postNumber = noti.postNumber {
+                        webviewLink("https://womenoverseas.com/t/topic/\(topicId)/\(postNumber)",
                                     title: noti.payload.topicTitle ?? "")  {
                             NotificationRow(message: noti)
                                 .padding(EdgeInsets(top: 10, leading: 0, bottom: 5, trailing: 0))

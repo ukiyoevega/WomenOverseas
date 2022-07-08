@@ -13,7 +13,6 @@ private let settingEntryFontSize: CGFloat = 14
 private let settingEntryIconTitleSpacing: CGFloat = 8
 private let settingDetailSize: CGFloat = 15
 
-// TODO: View profile: 关注者, 正在关注, 加入日期, 最后一个帖子, 最后活动, 浏览量
 struct ProfileView: View {
     let store: Store<ProfileState, ProfileAction>
 
@@ -23,7 +22,7 @@ struct ProfileView: View {
                 Group {
                     ProfileHeaderView(store: self.store.scope(state: \.profileHeaderState, action: ProfileAction.header))
                     ProfileSummaryView(store: self.store.scope(state: \.profileSummaryState, action: ProfileAction.summary))
-                        .padding([.top, .bottom])
+                        .padding([.top])
                     Section(header: Text("")) {
                         ForEach(SettingEntry.myEntries) { entry in
                             entryRow(entry)

@@ -8,13 +8,14 @@
 import SwiftUI
 import ComposableArchitecture
 // Header
-private let topContentSpacing: CGFloat = 15
+private let topContentSpacing: CGFloat = 10
 private let bioFontSize: CGFloat = 14
 private let editFontSize: CGFloat = 12
 private let bioLineSpacing: CGFloat = 3
 private let badgeIconSize: CGFloat = 16
 private let tagFontSize: CGFloat = 12
 private let tagCornerRadius: CGFloat = 2
+private let websiteCornerRadius: CGFloat = 8
 private let editCornerRadius: CGFloat = 15
 private let roleFontSize: CGFloat = 13
 private let badgeSpacing: CGFloat = 5
@@ -60,16 +61,7 @@ struct ProfileSummaryView: View {
 
 struct ProfileHeaderView: View {
     let store: Store<ProfileHeaderState, ProfileHeaderAction>
-    
-    private func label(_ text: String) -> some View {
-        return Text(text)
-            .font(.system(size: tagFontSize))
-            .foregroundColor(Color.tagText)
-            .padding(.init(top: 2, leading: 5, bottom: 2, trailing: 5))
-            .background(Color.tagBackground)
-            .cornerRadius(tagCornerRadius)
-    }
-    
+
     var body: some View {
         WithViewStore(self.store) { viewStore in
             VStack(alignment: .leading, spacing: topContentSpacing) {
@@ -80,9 +72,16 @@ struct ProfileHeaderView: View {
                     }
                     VStack(alignment: .leading, spacing: badgeSpacing) {
                         Text(viewStore.userResponse.user?.name ?? "")
-                            .font(.system(size: displaynameSize, weight: .semibold))
-                        Text(viewStore.userResponse.user?.username ?? "")
-                            .font(.system(size: usernameSize))
+                            .font(.system(size: displaynameSize, weight: .semibold)) // displayname
+                        HStack(spacing: 3) {
+                            Text(viewStore.userResponse.user?.username ?? "")
+                                .font(.system(size: usernameSize)) // username
+                            if let title = viewStore.userResponse.user?.title, !title.isEmpty {
+                                Text(title)
+                                    .font(.system(size: tagFontSize))
+                                    .foregroundColor(Color.gray)
+                            } // title badge
+                        }
                     }
                     .foregroundColor(Color.black)
                     Spacer()
@@ -102,11 +101,11 @@ struct ProfileHeaderView: View {
                     }
                     .navigationBarTitle("") // remove back button title
                 } // 1.avatar names edit
-                if let title = viewStore.userResponse.user?.title {
-                    Text(title)
-                        .font(.system(size: roleFontSize))
-                        .foregroundColor(Color.black)
-                } // 2.title badge
+                if #available(iOS 15, *),
+                   let websiteName = viewStore.userResponse.user?.websiteName,
+                   let website = URL(string: viewStore.userResponse.user?.website ?? "") {
+                    websiteLabel(name: websiteName, url: website)
+                } // 2. website
                 if let bio = viewStore.userResponse.user?.bioRaw {
                     Text(bio).font(.system(size: bioFontSize))
                         .lineSpacing(bioLineSpacing)
@@ -121,7 +120,19 @@ struct ProfileHeaderView: View {
                             label(badge.name)
                         }
                     }
-                }
+                    Spacer()
+                    Button(action: {
+                        viewStore.send(.togglshowInfo, animation: .default)
+                    }) {
+                        Image(systemName: viewStore.showInfo ? "arrowtriangle.up.circle" : "arrowtriangle.down.circle")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(Color.gray)
+                    }
+                } // 4.badges
+                if viewStore.showInfo {
+                    accountStatistics(viewStore.userResponse.user,
+                                      badges: viewStore.userResponse.badges)
+                } // 5.account info
             }
             .toast(message: viewStore.toastMessage ?? "",
                    isShowing:  viewStore.binding(get: { state in
@@ -129,6 +140,68 @@ struct ProfileHeaderView: View {
 
             }, send: .dismissToast),
                    duration: Toast.short)
+        }
+    }
+
+    private func label(_ text: String) -> some View {
+        return Text(text)
+            .font(.system(size: tagFontSize))
+            .foregroundColor(Color.tagText)
+            .padding(.init(top: 2, leading: 5, bottom: 2, trailing: 5))
+            .background(Color.tagBackground)
+            .cornerRadius(tagCornerRadius)
+    }
+
+    @available(iOS 15, *)
+    private func websiteLabel(name: String, url: URL) -> some View {
+        let globeText = Text(Image(systemName: "globe")).foregroundColor(Color.globeBlue)
+        var astr = AttributedString(" \(name)")
+        astr.underlineStyle = .none
+        astr.setAttributes(AttributeContainer.foregroundColor(.gray))
+        astr.link = url
+        return (globeText + Text(astr))
+            .font(.system(size: tagFontSize))
+            .padding(.init(top: 3, leading: 6, bottom: 3, trailing: 6))
+            .background(Color.globeBlue.opacity(0.3))
+            .cornerRadius(websiteCornerRadius)
+    }
+
+    private func accountStatistics(_ user: User.User?, badges: [User.Badge]?) -> some View {
+        let result: [(String, String?)] = [
+            ("加入日期", user?.createdAt?.readableAgo),
+            ("最后一个帖子", user?.lastPostedAt?.readableAgo),
+            ("最后活动", user?.lastSeenAt?.readableAgo),
+            ("浏览量", {
+                if let count = user?.viewCount {
+                    return "\(count)"
+                } else {
+                    return nil
+                }
+            }()),
+            ("信任级别", {
+                if let level = user?.trustLevel {
+                    return badges?.first(where: { $0.id == level })?.name
+                } else {
+                    return nil
+                }
+            }()),
+        ]
+        let statistic: [(String, String)] = result.compactMap { title, info in
+            if let info = info { return (title, info) }
+            return nil
+        }
+        return VStack {
+            Divider()
+            statistic.map { title, info in
+                Text("\(title) ")
+                    .font(.system(size: statisticTitleSize))
+                    .foregroundColor(Color.black)
+                +
+                Text("\(info)   ")
+                    .font(.system(size: statisticTitleSize))
+                    .foregroundColor(Color.gray)
+            }.reduce(Text(""), +)
+            Divider()
         }
     }
 }

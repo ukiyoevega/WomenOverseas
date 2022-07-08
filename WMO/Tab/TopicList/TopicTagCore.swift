@@ -15,6 +15,7 @@ struct TagState: Equatable {
     var currentPage: Int = 0
     var currentTag: String?
     var reachEnd = false
+    var showSortSheet = false
 }
 
 enum TagAction {
@@ -25,10 +26,14 @@ enum TagAction {
     case loadTopics(onStart: Bool, tag: String)
     case tagTopicResponse(Result<TopicListResponse, Failure>)
     case dismissToast
+    case toggleSortSheet
 }
 
 let tagReducer = Reducer<TagState, TagAction, TopicEnvironment> { state, action, environment in
     switch action {
+    case .toggleSortSheet:
+        state.showSortSheet = !state.showSortSheet
+
     case .loadTopics(let onStart, let tag):
         state.currentTag = tag
         if onStart {

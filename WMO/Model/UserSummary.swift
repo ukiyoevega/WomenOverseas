@@ -82,6 +82,7 @@ enum User {
         let lastPostedAt: String?
         let lastSeenAt: String?
         let createdAt: String?
+        let viewCount: Int?
         let timezone: String?
         let canUploadProfileHeader: Bool?
         let canUploadUserCardBackground: Bool?
@@ -124,6 +125,7 @@ enum User {
             case lastPostedAt = "last_posted_at"
             case lastSeenAt = "last_seen_at"
             case createdAt = "created_at"
+            case viewCount = "profile_view_count"
             case timezone
             
             case canUploadProfileHeader = "can_upload_profile_header"
