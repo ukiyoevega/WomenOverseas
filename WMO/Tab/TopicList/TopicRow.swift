@@ -60,20 +60,8 @@ struct TopicRow: View {
     }
 
     var body: some View {
-        ZStack {
-            NavigationLink(destination: Webview(type: .home, url: "https://womenoverseas.com/t/topic/\(topic.id)")
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Text(topic.title)
-                            .font(.system(size: toolbarItemSize, weight: .semibold))
-                            .fixedSize(horizontal: false, vertical: true)
-                            .foregroundColor(Color.black)
-                    }
-                }) {
-                EmptyView()
-            }
-            .opacity(0)
-            .navigationBarTitle("") // workaround: remove back button title
+        webviewLink("https://womenoverseas.com/t/topic/\(topic.id)",
+                    title: topic.title) {
             VStack(spacing: itemVerticalSpacing) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: itemVerticalSpacing) {

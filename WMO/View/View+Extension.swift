@@ -8,8 +8,29 @@
 import SwiftUI
 
 private let avatarWidth: CGFloat = 40
+private let toolbarItemSize: CGFloat = 15
 
 extension View {
+    @ViewBuilder
+    func webviewLink<Content: View>(_ urlString: String, title: String, @ViewBuilder content: () -> Content) -> some View {
+        ZStack {
+            NavigationLink(destination: Webview(type: .home, url: urlString)
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text(title)
+                            .font(.system(size: toolbarItemSize, weight: .semibold))
+                            .fixedSize(horizontal: false, vertical: true)
+                            .foregroundColor(Color.black)
+                    }
+                }) {
+                    EmptyView()
+                }
+                .opacity(0)
+                .navigationBarTitle("") // workaround: remove back button title
+            content()
+        }
+    }
+
     @ViewBuilder
     func attributedText(_ stringWithAttributes: [StringWithAttributes], fontSize: CGFloat) -> some View {
         stringWithAttributes

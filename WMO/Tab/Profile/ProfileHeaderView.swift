@@ -20,6 +20,9 @@ private let roleFontSize: CGFloat = 13
 private let badgeSpacing: CGFloat = 5
 private let avatarWidth: CGFloat = 55
 private let flairWidth: CGFloat = 20
+private let displaynameSize: CGFloat = 20
+private let usernameSize: CGFloat = 15
+
 // Summary
 private let statisticNumberSize: CGFloat = 14
 private let statisticTitleSize: CGFloat = 12
@@ -75,11 +78,13 @@ struct ProfileHeaderView: View {
                         avatar(template: viewStore.userResponse.user?.avatarTemplate, size: avatarWidth)
                         avatar(template: viewStore.userResponse.user?.flairURL, size: flairWidth)
                     }
-                    if let username = viewStore.userResponse.user?.username {
-                        Text(username)
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(Color.black)
+                    VStack(alignment: .leading, spacing: badgeSpacing) {
+                        Text(viewStore.userResponse.user?.name ?? "")
+                            .font(.system(size: displaynameSize, weight: .semibold))
+                        Text(viewStore.userResponse.user?.username ?? "")
+                            .font(.system(size: usernameSize))
                     }
+                    .foregroundColor(Color.black)
                     Spacer()
                     NavigationLink(destination: ProfileEditView(store: self.store)) {
                         RoundedRectangle(cornerRadius: editCornerRadius)
@@ -88,7 +93,7 @@ struct ProfileHeaderView: View {
                             .overlay(
                                 HStack(spacing: 3) {
                                     Image(systemName: "square.and.pencil")
-                                        .font(.system(size: 12))
+                                        .font(.system(size: editFontSize))
                                         .foregroundColor(.white)
                                     Text("编辑资料")
                                         .font(.system(size: editFontSize, weight: .medium))
@@ -96,18 +101,18 @@ struct ProfileHeaderView: View {
                                 })
                     }
                     .navigationBarTitle("") // remove back button title
-                } // avatar and edit
+                } // 1.avatar names edit
                 if let title = viewStore.userResponse.user?.title {
                     Text(title)
                         .font(.system(size: roleFontSize))
                         .foregroundColor(Color.black)
-                }
+                } // 2.title badge
                 if let bio = viewStore.userResponse.user?.bioRaw {
                     Text(bio).font(.system(size: bioFontSize))
                         .lineSpacing(bioLineSpacing)
                         .foregroundColor(Color.black)
-                }
-                HStack(alignment: .center, spacing: badgeSpacing) { // myLabel
+                } // 3.bio
+                HStack(alignment: .center, spacing: badgeSpacing) {
                     Image(systemName: "checkmark.seal")
                         .font(.system(size: badgeIconSize, weight: .semibold))
                         .foregroundColor(.orange)

@@ -78,12 +78,7 @@ struct BookmarkRow: View {
     }
 
     var body: some View {
-        ZStack {
-            NavigationLink(destination: Webview(type: .home, url: bookmark.bookmarkableUrl)) {
-                EmptyView()
-            }
-            .opacity(0)
-            .navigationBarTitle("") // workaround: remove back button title
+        webviewLink(bookmark.bookmarkableUrl, title: bookmark.title) {
             VStack(spacing: itemVerticalSpacing) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: itemVerticalSpacing) {

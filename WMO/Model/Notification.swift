@@ -104,6 +104,7 @@ extension NotificationMessage {
             case .posted: return "arrowshape.turn.up.left"
             case .granted_badge: return "checkmark.seal"
             case .private_message: return "envelope"
+            case .linked: return "link"
             default:
                 return ""
             }
