@@ -101,7 +101,6 @@ let profileSummaryReducer = Reducer<ProfileSummaryState, ProfileSummaryAction, P
 
 struct ProfileState: Equatable {
     var isNativeMode: Bool = true
-    var showLogoutAlert: Bool = false
     var profileSummaryState = ProfileSummaryState()
     var profileHeaderState = ProfileHeaderState()
     var notificationState = NotificationState()
@@ -112,7 +111,6 @@ enum ProfileAction {
     case header(ProfileHeaderAction)
     case notification(NotificationAction)
     case toggleNativeMode(Bool)
-    case toggleLogoutAlert
     case logout
     case logoutResponse(Result<[String: String], Failure>)
 }
@@ -140,8 +138,6 @@ let profileReducer = Reducer<ProfileState, ProfileAction, Void>.combine(
             break
         case .toggleNativeMode(let isNative):
             break // TODO: dark mode
-        case .toggleLogoutAlert:
-            state.showLogoutAlert = !state.showLogoutAlert
         case .logout:
             return APIService.generateDataTaskPublisher(endpoint: EndPoint.User.logout)
                 .catchToEffect(ProfileAction.logoutResponse)

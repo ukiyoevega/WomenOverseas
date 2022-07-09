@@ -15,6 +15,7 @@ private let settingDetailSize: CGFloat = 15
 
 struct ProfileView: View {
     let store: Store<ProfileState, ProfileAction>
+    @State var showLogoutAlert = false // use viewStore.binding will cause bug
 
     var body: some View {
         WithViewStore(self.store) { viewStore in
@@ -33,12 +34,14 @@ struct ProfileView: View {
                         entryRow(SettingEntry.aboutUs)
                         entryRowView(SettingEntry.logout)
                             .onTapGesture {
-                                viewStore.send(.toggleLogoutAlert)
+                                self.showLogoutAlert = true
                             }
+                        /*
                         #if DEBUG
                         entryRow(SettingEntry.theme,
                                  toggle: viewStore.binding(get: \.isNativeMode, send: ProfileAction.toggleNativeMode))
                         #endif
+                        */
                     }
                     #if DEBUG
                     Section(header: Text("")) {
@@ -54,7 +57,7 @@ struct ProfileView: View {
                 viewStore.send(.summary(.refresh))
                 viewStore.send(.header(.refresh))
             }
-            .actionSheet(isPresented: viewStore.binding(get: \.showLogoutAlert, send: ProfileAction.toggleLogoutAlert)) {
+            .actionSheet(isPresented: $showLogoutAlert) {
                 ActionSheet(
                     title: Text("确定要退出登录吗"),
                     buttons: [
