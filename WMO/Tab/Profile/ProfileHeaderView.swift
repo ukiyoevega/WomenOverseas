@@ -61,7 +61,7 @@ struct ProfileSummaryView: View {
 
 struct ProfileHeaderView: View {
     let store: Store<ProfileHeaderState, ProfileHeaderAction>
-
+    @State var enterEdit = false
     var body: some View {
         WithViewStore(self.store) { viewStore in
             VStack(alignment: .leading, spacing: topContentSpacing) {
@@ -69,6 +69,9 @@ struct ProfileHeaderView: View {
                     ZStack(alignment: .bottomTrailing) {
                         avatar(template: viewStore.userResponse.user?.avatarTemplate, size: avatarWidth)
                         avatar(template: viewStore.userResponse.user?.flairURL, size: flairWidth)
+                    }
+                    .onTapGesture {
+                        self.enterEdit = true
                     }
                     VStack(alignment: .leading, spacing: badgeSpacing) {
                         Text(viewStore.userResponse.user?.name ?? "")
@@ -85,7 +88,7 @@ struct ProfileHeaderView: View {
                     }
                     .foregroundColor(Color.black)
                     Spacer()
-                    NavigationLink(destination: ProfileEditView(store: self.store)) {
+                    NavigationLink(destination: ProfileEditView(store: self.store), isActive: $enterEdit) {
                         RoundedRectangle(cornerRadius: editCornerRadius)
                             .foregroundColor(Color.mainIcon)
                             .frame(width: 80, height: 30)
