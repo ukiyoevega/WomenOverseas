@@ -16,6 +16,7 @@ private let settingDetailSize: CGFloat = 15
 struct ProfileView: View {
     let store: Store<ProfileState, ProfileAction>
     @State var showLogoutAlert = false // use viewStore.binding will cause bug
+    @State var showDeleteAlert = false
 
     var body: some View {
         WithViewStore(self.store) { viewStore in
@@ -35,6 +36,10 @@ struct ProfileView: View {
                         entryRowView(SettingEntry.logout)
                             .onTapGesture {
                                 self.showLogoutAlert = true
+                            }
+                        entryRowView(SettingEntry.deleteAccount)
+                            .onTapGesture {
+                                self.showDeleteAlert = true
                             }
                         /*
                         #if DEBUG
@@ -63,6 +68,16 @@ struct ProfileView: View {
                     buttons: [
                         .destructive(Text("退出登录")) {
                             viewStore.send(.logout)
+                        },
+                        .cancel(Text("取消"))]
+                )
+            }
+            .actionSheet(isPresented: $showDeleteAlert) {
+                ActionSheet(
+                    title: Text("确定要注销账号吗，注销后将不能登录"),
+                    buttons: [
+                        .destructive(Text("确定注销")) {
+                            viewStore.send(.deleteAccount)
                         },
                         .cancel(Text("取消"))]
                 )
@@ -161,7 +176,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     }
 
     static var otherEntries: [SettingEntry] {
-        return [.aboutUs, .logout]
+        return [.aboutUs, .logout, .deleteAccount]
     }
 
     static var ongoingEntries: [SettingEntry] {
@@ -176,6 +191,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
     case aboutUs
     case donation
     case logout
+    case deleteAccount
 
     case draft
     case createdTopic
@@ -196,6 +212,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
             case .settings: return "设置"
             case .aboutUs: return "关于我们"
             case .logout: return "退出登录"
+            case .deleteAccount: return "注销账号"
             case .donation: return "捐助"
             case .createdTopic: return "我的话题"
             case .replied: return "我的回复"
@@ -216,6 +233,7 @@ enum SettingEntry: String, CustomStringConvertible, CaseIterable, Identifiable {
             case .settings: return "gearshape.2"
             case .aboutUs: return "info.circle"
             case .logout: return "ipad.and.arrow.forward"
+            case .deleteAccount: return "trash"
             case .theme: return "switch.2"
             case .createdTopic: return "doc.text"
             case .replied: return "arrowshape.turn.up.left"

@@ -154,11 +154,28 @@ extension WebviewController: WKNavigationDelegate {
             if let utfData = (username as? String)?.data(using: .isoLatin1),
                 let utf = String(data: utfData, encoding: .utf8) {
                 UserDefaults.standard.set(utf, forKey: "com.womenoverseas.username")
+                if utf == UserDefaults.standard.string(forKey: "com.womenoverseas.deletedAccount") {
+                    showRemovalAlert()
+                    return .cancel
+                }
             } else {
                 UserDefaults.standard.set(username, forKey: "com.womenoverseas.username")
             }
         }
         return .allow
+    }
+
+    private func showRemovalAlert() {
+        let alertVC = UIAlertController(title: "注销提醒", message: "当前帐号申请了注销，无法继续登录。", preferredStyle: .alert)
+        alertVC.addAction(UIAlertAction(title: "退出", style: .default) { action in
+            self.dismiss(animated: true)
+            WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+                WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), for: records, completionHandler: {
+                    print("Deleted: \(records.map(\.displayName))")
+                })
+            }
+        })
+        present(alertVC, animated: true)
     }
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {

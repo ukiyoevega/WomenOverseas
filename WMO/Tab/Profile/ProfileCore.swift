@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import UIKit
+import WebKit
 
 // MARK: - Header
 
@@ -112,6 +113,7 @@ enum ProfileAction {
     case notification(NotificationAction)
     case toggleNativeMode(Bool)
     case logout
+    case deleteAccount
     case logoutResponse(Result<[String: String], Failure>)
 }
 
@@ -138,12 +140,22 @@ let profileReducer = Reducer<ProfileState, ProfileAction, Void>.combine(
             break
         case .toggleNativeMode(let isNative):
             break // TODO: dark mode
+        case .deleteAccount:
+            let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username")
+            UserDefaults.standard.set(username, forKey: "com.womenoverseas.deletedAccount")
+            return APIService.generateDataTaskPublisher(endpoint: EndPoint.User.logout)
+                .catchToEffect(ProfileAction.logoutResponse)
         case .logout:
             return APIService.generateDataTaskPublisher(endpoint: EndPoint.User.logout)
                 .catchToEffect(ProfileAction.logoutResponse)
         case .logoutResponse(.success(let data)):
             DispatchQueue.main.async {
                 APIService.shared.apiKey = ""
+                WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+                    WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), for: records, completionHandler: {
+                        print("Deleted: \(records.map(\.displayName))")
+                    })
+                }
                 Router.showMain()
             }
         case .logoutResponse(.failure(let failure)):
