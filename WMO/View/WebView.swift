@@ -45,6 +45,7 @@ class WebviewController: UIViewController {
     enum RemoveElement: String {
         case header = "d-header-wrap"
         case tabbar = "d-tab-bar"
+        case button = "btn-primary sign-up-button btn btn-text ember-view"
     }
     
     private let secKey: SecKey?
@@ -76,6 +77,13 @@ class WebviewController: UIViewController {
         view.backgroundColor = .white
         setupSubviews()
         setupObservers()
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if let path = webview.url?.path, path == "/login" {
+            APIService.removeCache()
+        }
     }
     
     private func setupSubviews() {
@@ -169,11 +177,7 @@ extension WebviewController: WKNavigationDelegate {
         let alertVC = UIAlertController(title: "注销提醒", message: "当前帐号申请了注销，无法继续登录。", preferredStyle: .alert)
         alertVC.addAction(UIAlertAction(title: "退出", style: .default) { action in
             self.dismiss(animated: true)
-            WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
-                WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), for: records, completionHandler: {
-                    print("Deleted: \(records.map(\.displayName))")
-                })
-            }
+            APIService.removeCache()
         })
         present(alertVC, animated: true)
     }
@@ -248,11 +252,17 @@ extension WebviewController: WKNavigationDelegate {
         if self.type == .home || self.type == .events {
             removeElement(.header)
         }
+        removeElement(.button)
     }
     
     private func removeElement(_ type: RemoveElement) {
-        let removeElementScript = "document.querySelector('.\(type.rawValue)').style.display='none';"
-        webview.evaluateJavaScript(removeElementScript, completionHandler: nil) // TODO: error handling
+        let removeElementScript = "document.getElementsByClassName('\(type.rawValue)')[0].style.display='none';"
+        // alternative: "document.querySelector('.\(type.rawValue)').style.display='none';"
+        webview.evaluateJavaScript(removeElementScript) { (response, error) in
+            if let error = error {
+                print("🥹 ERROR \(error)")
+            }
+        }
     }
     
     private func decrypted(rawData: String, with key: SecKey, algorithm: SecKeyAlgorithm) throws -> [String: Any] {

@@ -7,6 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
+import WebKit
 
 enum APIError: Error {
     case noResponse
@@ -21,6 +22,14 @@ struct Failure: Error {
 
 struct APIService {
     // TODO: test code. decoder reuse issue
+
+    public static func removeCache() {
+        WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+            WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), for: records, completionHandler: {
+                print("Deleted: \(records.map(\.displayName))")
+            })
+        }
+    }
 
     private static func generateRequest(endpoint: RESTful) -> URLRequest {
         var components = URLComponents(string: "https://womenoverseas.com" + endpoint.path)!

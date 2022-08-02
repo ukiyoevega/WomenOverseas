@@ -7,7 +7,6 @@
 
 import ComposableArchitecture
 import UIKit
-import WebKit
 
 // MARK: - Header
 
@@ -151,11 +150,7 @@ let profileReducer = Reducer<ProfileState, ProfileAction, Void>.combine(
         case .logoutResponse(.success(let data)):
             DispatchQueue.main.async {
                 APIService.shared.apiKey = ""
-                WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
-                    WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), for: records, completionHandler: {
-                        print("Deleted: \(records.map(\.displayName))")
-                    })
-                }
+                APIService.removeCache()
                 Router.showMain()
             }
         case .logoutResponse(.failure(let failure)):
