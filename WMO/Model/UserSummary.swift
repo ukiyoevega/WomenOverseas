@@ -171,12 +171,22 @@ enum User {
             case badges
         }
         
-        var statisticEntries: [(title: String, count: Int)] {
-            return [("访问天数", daysVisited),
-                    ("阅读时间", timeRead), ("最近阅读时间", recentTimeRead),
-                    ("浏览的话题", topicsEntered), ("已读帖子", postsReadCount),
-                    ("已送出", likesGivens), ("已收到", likesReceived),
-                    ("话题数", topicCount), ("发帖量", postCount)] // bookmarkCount
+        var statisticEntries: [(title: String, count: String)] {
+            let roundedTimeRead = (Double(timeRead) / 3600).roundToPlaces(places: 1)
+            let roundedRecentTimeRead = (Double(recentTimeRead) / 3600).roundToPlaces(places: 1)
+            return [("访问天数", "\(daysVisited)"),
+                    ("阅读时间", "\(roundedTimeRead)h"), ("最近阅读时间", "\(roundedRecentTimeRead)h"),
+                    ("浏览的话题", "\(topicsEntered)"), ("已读帖子", "\(postsReadCount)"),
+                    ("已送出", "\(likesGivens)"), ("已收到", "\(likesReceived)"),
+                    ("话题数", "\(topicCount)"), ("发帖量", "\(postCount)")] // bookmarkCount
         }
+    }
+}
+
+private extension Double {
+    /// Rounds the double to decimal places value
+    func roundToPlaces(places: Int) -> Double {
+        let divisor = pow(10.0, Double(places))
+        return roundl(self * divisor) / divisor
     }
 }

@@ -14,9 +14,13 @@ private let settingEntryIconTitleSpacing: CGFloat = 8
 private let settingDetailSize: CGFloat = 15
 
 struct ProfileView: View {
+    enum AlertType: Equatable {
+        case logout
+        case delete
+        case none
+    }
     let store: Store<ProfileState, ProfileAction>
-    @State var showLogoutAlert = false // use viewStore.binding will cause bug
-    @State var showDeleteAlert = false
+    @State var alertType: AlertType = .none // use viewStore.binding will cause bug
 
     var body: some View {
         WithViewStore(self.store) { viewStore in
@@ -35,11 +39,11 @@ struct ProfileView: View {
                         entryRow(SettingEntry.aboutUs)
                         entryRowView(SettingEntry.logout)
                             .onTapGesture {
-                                self.showLogoutAlert = true
+                                self.alertType = .logout
                             }
                         entryRowView(SettingEntry.deleteAccount)
                             .onTapGesture {
-                                self.showDeleteAlert = true
+                                self.alertType = .delete
                             }
                         /*
                         #if DEBUG
@@ -62,25 +66,33 @@ struct ProfileView: View {
                 viewStore.send(.summary(.refresh))
                 viewStore.send(.header(.refresh))
             }
-            .actionSheet(isPresented: $showLogoutAlert) {
-                ActionSheet(
-                    title: Text("确定要退出登录吗"),
-                    buttons: [
-                        .destructive(Text("退出登录")) {
-                            viewStore.send(.logout)
-                        },
-                        .cancel(Text("取消"))]
-                )
-            }
-            .actionSheet(isPresented: $showDeleteAlert) {
-                ActionSheet(
-                    title: Text("确定要注销账号吗，注销后将不能登录"),
-                    buttons: [
-                        .destructive(Text("确定注销")) {
-                            viewStore.send(.deleteAccount)
-                        },
-                        .cancel(Text("取消"))]
-                )
+            .actionSheet(isPresented: Binding<Bool>(
+                get: { self.alertType != .none },
+                set: { _ in
+                    self.alertType = .none
+                })) {
+                    switch alertType {
+                    case .logout:
+                        return ActionSheet(
+                            title: Text("确定要退出登录吗"),
+                            buttons: [
+                                .destructive(Text("退出登录")) {
+                                    viewStore.send(.logout)
+                                },
+                                .cancel(Text("取消"))]
+                        )
+                    case .delete:
+                        return ActionSheet(
+                            title: Text("确定要注销账号吗，注销后将不能登录"),
+                            buttons: [
+                                .destructive(Text("确定注销")) {
+                                    viewStore.send(.deleteAccount)
+                                },
+                                .cancel(Text("取消"))]
+                        )
+                    case .none:
+                        return ActionSheet(title: Text("error"))
+                    }
             }
         }
     }
