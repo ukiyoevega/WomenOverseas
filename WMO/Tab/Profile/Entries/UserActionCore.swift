@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import Foundation
 
 struct UserActionState: Equatable {
     enum `Type`: Int {
