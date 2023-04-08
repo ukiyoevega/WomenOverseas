@@ -30,9 +30,9 @@ struct TabBarView : View {
                                                    reducer: topicReducer,
                                                    environment: TopicEnvironment()))
     let latestWeb = Webview(type: .latest,
-                     url: "https://womenoverseas.com/latest")
+                            url: "https://womenoverseas.com/latest", secKey: nil)
     let eventsWeb = Webview(type: .events,
-                            url: "https://womenoverseas.com/upcoming-events")
+                            url: "https://womenoverseas.com/upcoming-events", secKey: nil)
     let profile = ProfileView(store: Store(initialState: ProfileState(),
                                                reducer: profileReducer, environment: ()))
     let statusBarModifier = NavigationBarModifier(backgroundColor: UIColor(named: "header_pink"), textColor: .white)
@@ -72,7 +72,7 @@ struct TabBarView : View {
             .sheet(isPresented: $shouldPresentLink) {
             } content: {
                 if let link = link {
-                    Webview(type: .events, url: link)
+                    Webview(type: .events, url: link, secKey: nil)
                 }
             }
         }
@@ -162,3 +162,43 @@ struct TabbarView_Previews : PreviewProvider {
     }
 }
 #endif
+
+struct NavigationBarModifier: ViewModifier {
+
+    var backgroundColor: UIColor?
+    var textColor: UIColor?
+
+    init(backgroundColor: UIColor?, textColor: UIColor?) {
+        // assign
+        self.backgroundColor = backgroundColor
+        self.textColor = textColor
+        // configure
+        let coloredAppearance = UINavigationBarAppearance()
+        coloredAppearance.configureWithTransparentBackground()
+        coloredAppearance.backgroundColor = .white
+        if let textColor = self.textColor {
+            coloredAppearance.titleTextAttributes = [.foregroundColor: textColor]
+            coloredAppearance.largeTitleTextAttributes = [.foregroundColor: textColor]
+        }
+        // change appearance
+        UINavigationBar.appearance().standardAppearance = coloredAppearance
+        UINavigationBar.appearance().compactAppearance = coloredAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = coloredAppearance
+        UINavigationBar.appearance().tintColor = textColor
+    }
+
+    func body(content: Content) -> some View {
+        ZStack{
+            content
+            VStack {
+                GeometryReader { geometry in
+                    Color(backgroundColor ?? .white) // This is Color so we can reference frame
+                        .frame(height: geometry.safeAreaInsets.top)
+                        .edgesIgnoringSafeArea(.top)
+                    Spacer()
+                }
+            }
+        }
+    }
+
+}

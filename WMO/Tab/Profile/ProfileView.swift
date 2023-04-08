@@ -136,7 +136,7 @@ struct ProfileView: View {
         case .aboutUs:
             AboutView()
         case .donation:
-            Webview(type: .home, url: "https://womenoverseas.com/t/topic/11426")
+            Webview(type: .home, url: "https://womenoverseas.com/t/topic/11426", secKey: nil)
         case .bookmark:
             BookmarkListView(store: Store(initialState: BookmarkState(), reducer: bookmarkReducer, environment: ProfileEnvironment()))
         case .replied:

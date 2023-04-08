@@ -14,7 +14,7 @@ extension View {
     @ViewBuilder
     func webviewLink<Content: View>(_ urlString: String, title: String, @ViewBuilder content: () -> Content) -> some View {
         ZStack {
-            NavigationLink(destination: Webview(type: .home, url: urlString)
+            NavigationLink(destination: Webview(type: .home, url: urlString, secKey: nil)
                 .toolbar {
                     ToolbarItem(placement: .principal) {
                         Text(title)
