@@ -12,18 +12,18 @@ struct Toast: ViewModifier {
   // or DURATION_SHORT and DURATION_LONG
   static let short: TimeInterval = 2
   static let long: TimeInterval = 3.5
-
+  
   let message: String
   @Binding var isShowing: Bool
   let config: Config
-
+  
   func body(content: Content) -> some View {
     ZStack {
       content
       toastView
     }
   }
-
+  
   private var toastView: some View {
     VStack {
       Spacer()
@@ -52,7 +52,7 @@ struct Toast: ViewModifier {
     .animation(config.animation, value: isShowing)
     .transition(config.transition)
   }
-
+  
   struct Config {
     let textColor: Color
     let font: Font
@@ -60,7 +60,7 @@ struct Toast: ViewModifier {
     let duration: TimeInterval
     let transition: AnyTransition
     let animation: Animation
-
+    
     init(textColor: Color = .white,
          font: Font = .system(size: 14),
          backgroundColor: Color = .black.opacity(0.588),
@@ -85,7 +85,7 @@ extension View {
                         isShowing: isShowing,
                         config: config))
   }
-    // https://www.fivestars.blog/articles/swiftui-windows/
+  // https://www.fivestars.blog/articles/swiftui-windows/
   func toast(message: String,
              isShowing: Binding<Bool>,
              duration: TimeInterval) -> some View {

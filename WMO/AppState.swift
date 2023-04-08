@@ -8,5 +8,5 @@
 import Foundation
 
 struct AppState {
-    let topicState = TopicState()
+  let topicState = TopicState()
 }

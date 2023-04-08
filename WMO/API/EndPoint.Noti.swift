@@ -8,25 +8,25 @@
 import Foundation
 
 extension EndPoint {
-    enum Noti {
-        case list
-    }
+  enum Noti {
+    case list
+  }
 }
 
 extension EndPoint.Noti: RESTful {
-    var path: String {
-        switch self {
-        case .list: return "/notifications.json"
-        }
+  var path: String {
+    switch self {
+    case .list: return "/notifications.json"
     }
-    
-    var method: HTTPMethod {
-        return .GET
+  }
+  
+  var method: HTTPMethod {
+    return .GET
+  }
+  
+  var params: [String : Any] {
+    switch self {
+    case .list: return [:]
     }
-    
-    var params: [String : Any] {
-        switch self {
-        case .list: return [:]
-        }
-    }
+  }
 }

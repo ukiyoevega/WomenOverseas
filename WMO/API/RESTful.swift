@@ -10,20 +10,20 @@ import Foundation
 enum EndPoint {}
 
 enum HTTPMethod: String {
-    case GET
-    case HEAD
-    
-    case POST
-    case PUT
-    case PATCH
-    
-    case DELETE
-    case TRACE
-    case OPTIONS
+  case GET
+  case HEAD
+  
+  case POST
+  case PUT
+  case PATCH
+  
+  case DELETE
+  case TRACE
+  case OPTIONS
 }
 
 protocol RESTful {
-    var path: String { get }
-    var method: HTTPMethod { get }
-    var params: [String: Any] { get }
+  var path: String { get }
+  var method: HTTPMethod { get }
+  var params: [String: Any] { get }
 }

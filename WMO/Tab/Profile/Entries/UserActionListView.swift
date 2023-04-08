@@ -17,61 +17,61 @@ import ComposableArchitecture
 import SwiftUI
 
 struct UserActionListView: View {
-    let store: Store<UserActionState, UserActionAction>
-
-    var body: some View {
-        WithViewStore(self.store) { viewStore in
-            Group {
-                placeholderedList(isEmpty: viewStore.userActions.isEmpty, reachBottom: viewStore.reachEnd, loadMoreAction: {
-                    viewStore.send(.loadUserAction(onStart: false))
-                }) {
-                    ForEach(viewStore.userActions, id: \.id) { userAction in
-                        UserActionRow(userAction: userAction, stringWithAttributes: viewStore.userActionAttributes[userAction.id] ?? [])
-                    }
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text(viewStore.type.title)
-                        .font(.system(size: toolbarItemSize, weight: .semibold))
-                        .foregroundColor(Color.black)
-                }
-            }
-            .onAppear {
-                // FIXME: reload upon coming back from webview
-                viewStore.send(.loadUserAction(onStart: true))
-            }
+  let store: Store<UserActionState, UserActionAction>
+  
+  var body: some View {
+    WithViewStore(self.store) { viewStore in
+      Group {
+        placeholderedList(isEmpty: viewStore.userActions.isEmpty, reachBottom: viewStore.reachEnd, loadMoreAction: {
+          viewStore.send(.loadUserAction(onStart: false))
+        }) {
+          ForEach(viewStore.userActions, id: \.id) { userAction in
+            UserActionRow(userAction: userAction, stringWithAttributes: viewStore.userActionAttributes[userAction.id] ?? [])
+          }
         }
+      }
+      .toolbar {
+        ToolbarItem(placement: .principal) {
+          Text(viewStore.type.title)
+            .font(.system(size: toolbarItemSize, weight: .semibold))
+            .foregroundColor(Color.black)
+        }
+      }
+      .onAppear {
+        // FIXME: reload upon coming back from webview
+        viewStore.send(.loadUserAction(onStart: true))
+      }
     }
+  }
 }
 
 struct UserActionRow: View {
-
-    let userAction: UserAction
-    let stringWithAttributes: [StringWithAttributes]
-
-    var body: some View {
-        ZStack {
-            VStack(spacing: itemVerticalSpacing) {
-                HStack(alignment: .top) {
-                    Text(userAction.title)
-                        .foregroundColor(.black)
-                        .font(.system(size: titleFontSize))
-                        .fixedSize(horizontal: false, vertical: true)
-                        .lineSpacing(titleLineSpacing)
-                    Spacer()
-                    EmptyView()
-                    avatar(template: userAction.avatarTemplate)
-                } // title, avatar
-                attributedText(stringWithAttributes,
-                               fontSize: excerptFontSize)
-                .fixedSize(horizontal: false, vertical: true)
-                HStack {
-                    Text(userAction.createdAt.readableAgo).font(.system(size: bottomRightElementsFontSize))
-                    Spacer()
-                }
-            }
-            .padding(rowPadding)
+  
+  let userAction: UserAction
+  let stringWithAttributes: [StringWithAttributes]
+  
+  var body: some View {
+    ZStack {
+      VStack(spacing: itemVerticalSpacing) {
+        HStack(alignment: .top) {
+          Text(userAction.title)
+            .foregroundColor(.black)
+            .font(.system(size: titleFontSize))
+            .fixedSize(horizontal: false, vertical: true)
+            .lineSpacing(titleLineSpacing)
+          Spacer()
+          EmptyView()
+          avatar(template: userAction.avatarTemplate)
+        } // title, avatar
+        attributedText(stringWithAttributes,
+                       fontSize: excerptFontSize)
+        .fixedSize(horizontal: false, vertical: true)
+        HStack {
+          Text(userAction.createdAt.readableAgo).font(.system(size: bottomRightElementsFontSize))
+          Spacer()
         }
+      }
+      .padding(rowPadding)
     }
+  }
 }
