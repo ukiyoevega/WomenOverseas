@@ -29,9 +29,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
   
   func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-    if let url = userActivity.webpageURL, url.path.contains("topic") {
-      let tabview = TabBarView(selectedTab: .latest, link: url.absoluteString)
-      self.window?.rootViewController = UIHostingController(rootView: tabview)
+    if let url = userActivity.webpageURL {
+      if url.path.contains("topic") {
+        let tabview = TabBarView(selectedTab: .latest, link: url.absoluteString)
+        self.window?.rootViewController = UIHostingController(rootView: tabview)
+      } else if url.path.contains("activate-account") {
+        let webviewController = WebviewController(seckKey: .none, type: .home)
+        webviewController.webview.load(URLRequest(url: url))
+        self.window?.rootViewController?.present(webviewController, animated: true)
+      }
     }
   }
 }

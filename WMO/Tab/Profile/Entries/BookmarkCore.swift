@@ -86,7 +86,7 @@ let bookmarkReducer = Reducer<BookmarkState, BookmarkAction, ProfileEnvironment>
   case .toggleRresponse(.success(let resp)):
     if let idString = resp["id"], let id = Int(idString), let index = state.bookmarks.firstIndex(where: { $0.id == id }) {
       var bookmark = state.bookmarks[index]
-      bookmark.pinned = !bookmark.pinned
+      bookmark.pinned = !(bookmark.pinned ?? false)
       state.bookmarks[index] = bookmark
     }
     state.toastMessage = "操作成功"

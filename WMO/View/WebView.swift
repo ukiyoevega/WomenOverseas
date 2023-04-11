@@ -19,13 +19,21 @@ enum NavigationDirection {
 }
 
 struct Webview: View {
-  let type: Tab
-  let url: String
-  let secKey: SecKey?
-  @State var navigationDirection: NavigationDirection = .none
-  
+  private let type: Tab
+  private let url: String
+  private let secKey: SecKey?
+  private let estimatedHeight: CGFloat?
+  @State private var navigationDirection: NavigationDirection = .none
+
+  init(type: Tab, url: String, secKey: SecKey? = nil, estimatedHeight: CGFloat? = nil) {
+    self.type = type
+    self.url = url
+    self.secKey = secKey
+    self.estimatedHeight = estimatedHeight
+  }
+
   var body: some View {
-    WebViewControllerRepresentable(type: type, url: url, secKey: secKey, navDirection: $navigationDirection)
+    WebViewControllerRepresentable(type: type, url: url, secKey: secKey, navDirection: $navigationDirection, height: estimatedHeight)
       .navigationBarBackButtonHidden()
       .toolbar {
         ToolbarItem(placement: .navigationBarLeading) {
@@ -56,10 +64,11 @@ struct WebViewControllerRepresentable: UIViewControllerRepresentable {
   let url: String
   let secKey: SecKey?
   @Binding var navDirection: NavigationDirection
+  let height: CGFloat?
   @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
   
   func makeUIViewController(context: Context) -> WebviewController {
-    let webviewController = WebviewController(seckKey: self.secKey, type: type, preloadLatest: false)
+    let webviewController = WebviewController(seckKey: self.secKey, type: type, preloadLatest: false, height: height)
     let URL = URL(string: self.url) ?? URL(string: "https://womenoverseas.com")!
     var urlRequest = URLRequest(url: URL)
     if !APIService.shared.apiKey.isEmpty {
@@ -97,13 +106,15 @@ class WebviewController: UIViewController {
   private let type: Tab
   private let refreshControl = UIRefreshControl()
   private var webViewTopConstraint: NSLayoutConstraint?
+  private let estimatedHeight: CGFloat?
   
   lazy public var webview: WKWebView = WKWebView()
   lazy private var progressbar: UIProgressView = UIProgressView()
   
-  init(seckKey: SecKey?, type: Tab, preloadLatest: Bool = false) {
+  init(seckKey: SecKey?, type: Tab, preloadLatest: Bool = false, height: CGFloat? = nil) {
     self.secKey = seckKey
     self.type = type
+    self.estimatedHeight = height
     super.init(nibName: nil, bundle: nil)
     if preloadLatest, let url = URL(string: "https://womenoverseas.com/latest") {
       self.webview.load(URLRequest(url: url))
@@ -138,11 +149,16 @@ class WebviewController: UIViewController {
   private func setupSubviews() {
     view.addSubview(webview)
     webview.backgroundColor = .white
-    webview.frame = view.frame
     webview.navigationDelegate = self
     webview.allowsBackForwardNavigationGestures = true
     webview.scrollView.showsHorizontalScrollIndicator = false
-    webview.scrollView.contentSize = view.bounds.size
+    if let height = estimatedHeight, height > 0 {
+      webview.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: height)
+      webview.scrollView.contentSize = CGSize(width: view.frame.width, height: height)
+    } else {
+      webview.frame = view.bounds
+      webview.scrollView.contentSize = view.bounds.size
+    }
     webview.scrollView.delegate = self
     webview.addSubview(self.progressbar)
     progressbar.progress = 0.1
@@ -201,6 +217,10 @@ extension WebviewController: UIScrollViewDelegate {
 extension WebviewController: WKNavigationDelegate {
   
   func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+    if let urlResponse = navigationResponse.response as? HTTPURLResponse, let route = urlResponse.allHeaderFields["x-discourse-route"] as? String, route.contains("perform_account_activation") {
+      dismiss(animated: true)
+      return .allow
+    }
     if let urlResponse = navigationResponse.response as? HTTPURLResponse, let username = urlResponse.allHeaderFields["x-discourse-username"] {
       if let utfData = (username as? String)?.data(using: .isoLatin1),
          let utf = String(data: utfData, encoding: .utf8) {
@@ -218,6 +238,11 @@ extension WebviewController: WKNavigationDelegate {
   
   private func showRemovalAlert() {
     let alertVC = UIAlertController(title: "注销提醒", message: "当前帐号申请了注销，无法继续登录。", preferredStyle: .alert)
+    alertVC.addAction(UIAlertAction(title: "取消注销并继续登录", style: .default) { action in
+      UserDefaults.standard.removeObject(forKey: "com.womenoverseas.deletedAccount")
+      self.dismiss(animated: true) // TODO: better ux
+      APIService.removeCache()
+    })
     alertVC.addAction(UIAlertAction(title: "退出", style: .default) { action in
       self.dismiss(animated: true)
       APIService.removeCache()

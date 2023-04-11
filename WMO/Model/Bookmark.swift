@@ -23,7 +23,7 @@ struct Bookmark: Decodable, Equatable, Identifiable {
   let updatedAt: String
   let name: String?
   let reminderAt: String?
-  var pinned: Bool
+  var pinned: Bool?
   let title: String
   let fancyTitle: String
   let excerpt: String
@@ -42,7 +42,6 @@ struct Bookmark: Decodable, Equatable, Identifiable {
   let archived: Bool
   let archetype: String
   let highestPostNumber: Int
-  let lastReadPostNumber: Int
   let bumpedAt: String
   let slug: String
   let user: User.User?
@@ -72,7 +71,6 @@ struct Bookmark: Decodable, Equatable, Identifiable {
     case archived
     case archetype
     case highestPostNumber = "highest_post_number"
-    case lastReadPostNumber = "last_read_post_number"
     case bumpedAt = "bumped_at"
     case slug
     case user

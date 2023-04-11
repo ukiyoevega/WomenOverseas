@@ -70,7 +70,7 @@ struct BookmarkRow: View {
   @State private var showingAlert = false
   
   private func titleText(_ bookmark: Bookmark) -> Text {
-    if bookmark.pinned {
+    if bookmark.pinned == true {
       return Text(Image(systemName: "pin")) + Text(bookmark.title)
     } else {
       return Text(bookmark.title)
@@ -122,7 +122,7 @@ struct BookmarkRow: View {
         ActionSheet(
           title: Text("编辑书签"),
           buttons: [
-            .default(Text(bookmark.pinned ? "取消置顶" : "置顶")) {
+            .default(Text(bookmark.pinned == true ? "取消置顶" : "置顶")) {
               self.togglePinAction()
             },
             .default(Text("删除")) {

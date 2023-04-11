@@ -15,10 +15,10 @@ extension Notification.Name {
 
 /// refactor done here: replace navigationView-style tabs with plainView-style tabs inside a container navigation view
 struct TabBarView : View {
-  @State var selectedTab: Tab = .home
-  @State var shouldPresentLink: Bool = false
+  @State private var selectedTab: Tab = .home
+  @State private var shouldPresentLink: Bool = false
 
-  let link: String?
+  private let link: String?
 
   init(selectedTab: Tab, link: String? = nil) {
     self.selectedTab = selectedTab
@@ -26,27 +26,41 @@ struct TabBarView : View {
     self.setupAppearance()
   }
 
-  let topicList = TopicListView(store: Store(initialState: TopicState(),
+  private let topicList = TopicListView(store: Store(initialState: TopicState(),
                                              reducer: topicReducer,
                                              environment: TopicEnvironment()))
-  let latestWeb = Webview(type: .latest,
-                          url: "https://womenoverseas.com/latest", secKey: nil)
-  let eventsWeb = Webview(type: .events,
-                          url: "https://womenoverseas.com/upcoming-events", secKey: nil)
-  let profile = ProfileView(store: Store(initialState: ProfileState(),
+  private let eventsWeb = Webview(type: .events,
+                                  url: "https://womenoverseas.com/upcoming-events")
+  private let profile = ProfileView(store: Store(initialState: ProfileState(),
                                          reducer: profileReducer, environment: ()))
-  let statusBarModifier = NavigationBarModifier(backgroundColor: UIColor(named: "header_pink"), textColor: .white)
+  private let statusBarModifier = NavigationBarModifier(backgroundColor: UIColor(named: "header_pink"), textColor: .white)
+
+  @ViewBuilder
+  private func latestTabView() -> some View {
+    let tabView = GeometryReader(content: { proxy in
+      NavigationView(content: {
+        Webview(type: .latest,
+                url: "https://womenoverseas.com/latest", estimatedHeight: proxy.size.height)
+      })
+      .foregroundColor(Color.green)
+      .modifier(statusBarModifier)
+      .navigationBarHidden(true)
+    })
+    if #available(iOS 16.0, *) {
+      tabView
+      .toolbarBackground(Color("header_pink", bundle: nil), for: .navigationBar)
+    } else {
+      tabView
+    }
+  }
 
   var body: some View {
-
     NavigationView {
       VStack(spacing: 0) {
         ZStack {
           switch selectedTab {
           case .home: topicList
-          case .latest: latestWeb
-              .modifier(statusBarModifier)
-              .navigationBarHidden(true)
+          case .latest: latestTabView()
           case .events: eventsWeb
               .modifier(statusBarModifier)
               .navigationBarHidden(true)
@@ -72,7 +86,7 @@ struct TabBarView : View {
       .sheet(isPresented: $shouldPresentLink) {
       } content: {
         if let link = link {
-          Webview(type: .events, url: link, secKey: nil)
+          Webview(type: .events, url: link)
         }
       }
     }

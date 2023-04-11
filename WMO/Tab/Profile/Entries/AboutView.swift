@@ -59,7 +59,7 @@ struct AboutView: View {
       }
       Section(header: Text(aboutSections[1].title)) {
         ForEach(aboutSections[1].rows, id: \.title) { row in
-          NavigationLink(destination: Webview(type: .home, url: row.link, secKey: nil)) {
+          NavigationLink(destination: Webview(type: .home, url: row.link)) {
             self.row(row, noIndicator: true)
           }
         }
