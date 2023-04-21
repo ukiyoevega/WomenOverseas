@@ -23,6 +23,11 @@ struct TopicList: Decodable, Equatable {
   }
 }
 
+protocol Engageable {
+  var eventStartDate: Date? { get }
+  var eventEndDate: Date? { get }
+}
+
 struct Topic: Decodable, Equatable, Identifiable {
   static func == (lhs: Topic, rhs: Topic) -> Bool {
     return lhs.id == rhs.id
@@ -64,7 +69,10 @@ struct Topic: Decodable, Equatable, Identifiable {
   let featuredLink: String?
   let hasAcceptedAnswer: Bool?
   let posters: [Poster]?
-  
+  // events
+  let eventStartsAt: String? // "2021-02-13 17:00:00"
+  let eventEndsAt: String? // "2021-02-13 19:30:00"
+
   enum CodingKeys: String, CodingKey {
     case id
     case title
@@ -102,5 +110,27 @@ struct Topic: Decodable, Equatable, Identifiable {
     case featuredLink = "featured_link"
     case hasAcceptedAnswer = "has_accepted_answer"
     case posters
+    case eventStartsAt = "event_starts_at"
+    case eventEndsAt = "event_ends_at"
+  }
+}
+
+extension Topic: Engageable {
+  var eventStartDate: Date? {
+    if let start = eventStartsAt {
+      let formatter = Date.dateFormatter
+      formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+      return formatter.date(from: start)
+    }
+    return nil
+  }
+
+  var eventEndDate: Date? {
+    if let end = eventEndsAt {
+      let formatter = Date.dateFormatter
+      formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+      return formatter.date(from: end)
+    }
+    return nil
   }
 }

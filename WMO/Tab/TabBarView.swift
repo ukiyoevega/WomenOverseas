@@ -18,21 +18,23 @@ struct TabBarView : View {
   @State private var selectedTab: Tab = .home
   @State private var shouldPresentLink: Bool = false
 
-  private let link: String?
+  private var link: String?
 
   init(selectedTab: Tab, link: String? = nil) {
-    self.selectedTab = selectedTab
     self.link = link
-    self.setupAppearance()
+    let topicStore = Store(initialState: TopicState(),
+                           reducer: topicReducer,
+                           environment: TopicEnvironment())
+    self.topicList = TopicListView(store: topicStore)
+    self.profile = ProfileView(store: Store(initialState: ProfileState(),
+                                            reducer: profileReducer, environment: ()))
+    self.eventList = EventList(store: topicStore.scope(state: \.categories))
+    self.selectedTab = selectedTab
   }
 
-  private let topicList = TopicListView(store: Store(initialState: TopicState(),
-                                             reducer: topicReducer,
-                                             environment: TopicEnvironment()))
-  private let eventsWeb = Webview(type: .events,
-                                  url: "https://womenoverseas.com/upcoming-events")
-  private let profile = ProfileView(store: Store(initialState: ProfileState(),
-                                         reducer: profileReducer, environment: ()))
+  private let topicList: TopicListView
+  private let profile: ProfileView
+  private let eventList: EventList
   private let statusBarModifier = NavigationBarModifier(backgroundColor: UIColor(named: "header_pink"), textColor: .white)
 
   @ViewBuilder
@@ -61,9 +63,7 @@ struct TabBarView : View {
           switch selectedTab {
           case .home: topicList
           case .latest: latestTabView()
-          case .events: eventsWeb
-              .modifier(statusBarModifier)
-              .navigationBarHidden(true)
+          case .events: eventList
           case .profile: profile
           }
         }

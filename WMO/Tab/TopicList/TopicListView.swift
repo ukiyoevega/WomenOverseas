@@ -192,7 +192,9 @@ let fakeTopic = Topic(id: 1,
                       pinnedGlobally: false,
                       featuredLink: nil,
                       hasAcceptedAnswer: false,
-                      posters: []
+                      posters: [],
+                      eventStartsAt: nil,
+                      eventEndsAt: nil
 )
 
 struct HomeView_Previews : PreviewProvider {

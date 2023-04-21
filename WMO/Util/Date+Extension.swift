@@ -23,7 +23,23 @@ extension Date {
   var dateString: String {
     return ""
   }
-  
+
+  var calendarTitle: String {
+    let components = Calendar.current.dateComponents([.month, .year], from: self)
+    let month = Calendar.current.monthSymbols[(components.month ?? 1) - 1]
+    return "\(month) \(components.year ?? 0)"
+  }
+
+  var daysInMonth: [Date] {
+    let cal = Calendar.current
+    guard let startDate = cal.date(from: cal.dateComponents([.year, .month], from: self)), let range = cal.range(of: .day, in: .month, for: startDate) else {
+      return []
+    }
+    return range.compactMap {
+      cal.date(byAdding: .day, value: $0 - 1 , to: startDate)
+    }
+  }
+
   var dateStringWithAgo: String {
     let calendar = Calendar.current
     let now = Date()

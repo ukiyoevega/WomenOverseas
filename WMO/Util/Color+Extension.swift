@@ -16,10 +16,11 @@ extension Color {
   static let tagText = Color("tag_text", bundle: nil)
   static let systemGroup = Color(hex: "F2F2F6")
   static let systemLightGray = Color(hex: "AAAAAA")
-  static let hyperlink = Color(hex: "7D9FB1")
   static let avatarPlaceholder = Color(hex: "ECEAEF")
   static let globeBlue = Color(hex: "63C5DA")
   static let primaryText = Color(hex: "222222")
+  static let eventHighlight = Color(hex: "89BED4")
+  static let eventTint = Color(hex: "D57A58")
   
   init(hex: String) {
     let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
