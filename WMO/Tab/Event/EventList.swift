@@ -46,6 +46,24 @@ struct EventList: View {
           }
         }
       }
+      .onAppear {
+        if !events.isEmpty { return }
+        guard let eventCategory = viewStore.state.first(where: { $0.slug == "events" }) else {
+          return
+        }
+        Task {
+          let topics = try await APIService.shared.getAllTopics(of: eventCategory)
+          events = topics.compactMap { response in
+            response.topicList?.topics?.filter { $0.eventStartsAt != nil }
+          }.reduce([], +)
+          .sorted(by: {
+            if let end0 = $0.eventEndDate, let end1 = $1.eventEndDate {
+              return end0 > end1
+            }
+            return $0.postsCount > $1.postsCount
+          })
+        }
+      }
       .toolbar {
         ToolbarItem(placement: .navigationBarLeading) {
           Text("活动日历")

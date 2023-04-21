@@ -8,29 +8,59 @@
 import Foundation
 import ComposableArchitecture
 import WebKit
+import Combine
 
 enum APIError: Error {
   case noResponse
   case jsonDecodingError(error: Error)
   case networkError(error: Error)
+  case invalidParams(params: [String : Any])
 }
 
 struct Failure: Error {
   let error: Error
 }
 
-
 struct APIService {
-  // TODO: test code. decoder reuse issue
-  
-  public static func removeCache() {
-    WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
-      WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), for: records, completionHandler: {
-        print("Deleted: \(records.map(\.displayName))")
-      })
+
+  init() {
+    self.jsonDecoder = JSONDecoder()
+    self.jsonDecoder.dateDecodingStrategy = .iso8601
+  }
+
+  func getAllTopics(of category: CategoryList.Category) async throws -> [TopicListResponse] {
+    let pages = Int(ceil(Double(category.topicCount ?? 0) / 30))
+    var res: [TopicListResponse] = Array(repeating: TopicListResponse(users: nil, topicList: nil),
+                                         count: pages)
+    try await withThrowingTaskGroup(of: (Int, TopicListResponse).self, body: { group in
+      for page in 0..<pages {
+        group.addTask {
+          let topic = try await self.getTopics(endpoint: EndPoint.Topics.category(slug: category.slug, id: category.id, page: page))
+          return (page, topic)
+        }
+        while let result = await group.nextResult() {
+          switch result {
+          case .failure(let error):
+            throw error
+          case .success(let (index, listResponse)):
+            res[index] = listResponse
+          }
+        }
+      }
+    })
+    return res
+  }
+
+  private func getTopics(endpoint: RESTful) async throws -> TopicListResponse {
+    do {
+      let (data, _) = try await URLSession.shared.data(for: APIService.generateRequest(endpoint: endpoint))
+      let topicResponse = try jsonDecoder.decode(TopicListResponse.self, from: data)
+      return topicResponse
+    } catch(let error) {
+      throw APIError.networkError(error: error)
     }
   }
-  
+
   private static func generateRequest(endpoint: RESTful) -> URLRequest {
     var components = URLComponents(string: "https://womenoverseas.com" + endpoint.path)!
     components.queryItems = endpoint.params.map { param in
@@ -41,7 +71,17 @@ struct APIService {
     urlRequest.setValue(APIService.shared.apiKey, forHTTPHeaderField: "user-api-key")
     return urlRequest
   }
+
+  // TODO: test code. decoder reuse issue
   
+  public static func removeCache() {
+    WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+      WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), for: records, completionHandler: {
+        print("Deleted: \(records.map(\.displayName))")
+      })
+    }
+  }
+
   static func generateDataTaskPublisher<ResponseType: Decodable>(endpoint: RESTful) -> Effect<ResponseType, Failure> {
     return URLSession.shared.dataTaskPublisher(for: generateRequest(endpoint: endpoint))
       .map { data, _ in data }
@@ -110,52 +150,5 @@ struct APIService {
     }
   }
   static var shared = APIService()
-  let decoder = JSONDecoder()
-  
-  func GET<T: Codable>(endpoint: RESTful,
-                       params: [String: String]?,
-                       completionHandler: @escaping (Result<T, APIError>) -> Void) {
-    let queryURL = baseURL.appendingPathComponent(endpoint.path)
-    var components = URLComponents(url: queryURL, resolvingAgainstBaseURL: true)!
-    components.queryItems = [
-      URLQueryItem(name: "api_key", value: apiKey),
-      URLQueryItem(name: "language", value: Locale.preferredLanguages[0])
-    ]
-    if let params = params {
-      for (_, value) in params.enumerated() {
-        components.queryItems?.append(URLQueryItem(name: value.key, value: value.value))
-      }
-    }
-    var request = URLRequest(url: components.url!)
-    request.httpMethod = "GET"
-    let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-      guard let data = data else {
-        DispatchQueue.main.async {
-          completionHandler(.failure(.noResponse))
-        }
-        return
-      }
-      guard error == nil else {
-        DispatchQueue.main.async {
-          completionHandler(.failure(.networkError(error: error!)))
-        }
-        return
-      }
-      do {
-        let object = try self.decoder.decode(T.self, from: data)
-        DispatchQueue.main.async {
-          completionHandler(.success(object))
-        }
-      } catch let error {
-        DispatchQueue.main.async {
-#if DEBUG
-          print("JSON Decoding Error: \(error)")
-#endif
-          completionHandler(.failure(.jsonDecodingError(error: error)))
-        }
-      }
-    }
-    task.resume()
-  }
-  
+  private let jsonDecoder: JSONDecoder
 }
