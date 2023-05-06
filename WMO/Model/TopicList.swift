@@ -28,11 +28,15 @@ protocol Engageable {
   var eventEndDate: Date? { get }
 }
 
-struct Topic: Decodable, Equatable, Identifiable {
+struct Topic: Decodable, Equatable, Identifiable, Hashable {
   static func == (lhs: Topic, rhs: Topic) -> Bool {
     return lhs.id == rhs.id
   }
-  
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+  }
+
   let id: Int
   let title: String
   let fancyTitle: String

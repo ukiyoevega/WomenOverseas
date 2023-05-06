@@ -33,7 +33,8 @@ struct CustomDatePicker: View {
   @State private var selectedMonth: Int = 0
 
   @Binding var selectedDate: Date
-  @Binding var events: [Topic]
+  @Binding var events: [(String, [Topic])]
+  let didSelectDate: () -> Void
 
   private var currentMonthDate: Date {
     let current = Calendar.current.date(byAdding: .month, value: selectedMonth, to: Date())
@@ -62,6 +63,7 @@ struct CustomDatePicker: View {
             .onTapGesture {
               if let date = numberedDate.date {
                 selectedDate = date
+                didSelectDate()
               }
             }
         }
@@ -80,7 +82,9 @@ struct CustomDatePicker: View {
     let isToday = Calendar.current.isDate(cube.date ?? selectedDate, inSameDayAs: Date())
     var isEarlierDate = cube.date == nil ? true : (cube.date! < Date() && !isToday)
     VStack(spacing: dotTextSpacing) {
-      let cubeEvents = events.filter { topic in
+      let cubeEvents = events.reduce([], { partialResult, next in
+        partialResult + next.1
+      }).filter { topic in
         if let startDate = topic.eventStartDate {
           return Calendar.current.isDate(startDate, inSameDayAs: cube.date ?? Date())
         }
@@ -148,7 +152,7 @@ struct CustomDatePicker: View {
 #if DEBUG
 struct calendarView_Previews: PreviewProvider {
   static var previews: some View {
-    CustomDatePicker(selectedDate: .constant(Date()), events: .constant([]))
+    CustomDatePicker(selectedDate: .constant(Date()), events: .constant([]), didSelectDate: { })
   }
 }
 #endif

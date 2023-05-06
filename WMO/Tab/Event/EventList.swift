@@ -11,58 +11,80 @@ import Combine
 
 private let eventListBackground = Color(hex: "FBFBFB")
 private let navigationTitleSize: CGFloat = 18
-private let eventRowPadding: CGFloat = 4
 
 struct EventList: View {
   let store: Store<[CategoryList.Category], TopicAction>
-  @State private var events: [Topic] = []
+  @State private var events: [(String, [Topic])] = []
   @State private var selectedDate = Date()
   @State private var isListMode = false
 
-  private var currentDateEvents: [Topic] {
-    return events.filter({ topic in
-      guard let startDate = topic.eventStartDate else {
-        return false
-      }
-      return Calendar.current.isDate(startDate, inSameDayAs: selectedDate)
+  private var flatEvents: [Topic] {
+    events.reduce([], { partialResult, next in
+      partialResult + next.1
     })
   }
 
   var body: some View {
     WithViewStore(self.store) { viewStore in
-      ScrollView {
-        if isListMode {
-          ForEach(events) { event in
-            EventRow(event: event)
-          }.padding([.top], eventRowPadding)
-        } else {
-          CustomDatePicker(selectedDate: $selectedDate, events: $events)
-          if events.isEmpty {
-            center { ProgressView() }
-          } else {
-            ForEach(currentDateEvents) { event in
-              EventRow(event: event)
-            }.padding([.top], eventRowPadding)
-          }
-        }
-      }
-      .onAppear {
-        if !events.isEmpty { return }
-        guard let eventCategory = viewStore.state.first(where: { $0.slug == "events" }) else {
-          return
-        }
-        Task {
-          let topics = try await APIService.shared.getAllTopics(of: eventCategory)
-          events = topics.compactMap { response in
-            response.topicList?.topics?.filter { $0.eventStartsAt != nil }
-          }.reduce([], +)
-          .sorted(by: {
-            if let end0 = $0.eventEndDate, let end1 = $1.eventEndDate {
-              return end0 > end1
+      VStack(spacing: 0) {
+        ScrollViewReader { proxy in
+          if !isListMode {
+            CustomDatePicker(selectedDate: $selectedDate, events: $events, didSelectDate: {
+              proxy.scrollTo(selectedDate.generateDateString(of: "yyyy-MM-dd"), anchor: .top)
+            })
+            .onAppear {
+              if !events.isEmpty { return }
+              guard let eventCategory = viewStore.state.first(where: { $0.slug == "events" }) else {
+                return
+              }
+              Task {
+                let topics = try await APIService.shared.getAllTopics(of: eventCategory)
+                let flatEvents = topics.compactMap { response in
+                  response.topicList?.topics?.filter { $0.eventStartsAt != nil }
+                }.reduce([], +)
+                .sorted(by: {
+                  if let end0 = $0.eventEndDate, let end1 = $1.eventEndDate {
+                    return end0 < end1
+                  }
+                  return $0.postsCount > $1.postsCount
+                })
+                let groupedEvents = Dictionary(grouping: flatEvents, by: { $0.eventStartsAt?.components(separatedBy: " ").first ?? "" })
+                events = groupedEvents.sorted(by: { $0.key < $1.key })
+                if let nextAvailable = events.last?.0 {
+                  selectedDate = Date(string: nextAvailable)
+                }
+              }
             }
-            return $0.postsCount > $1.postsCount
-          })
-        }
+          }
+          if events.isEmpty {
+            Spacer()
+            ProgressView()
+            Spacer()
+          } else {
+            ScrollView {
+              ForEach(events, id: \.0) { section in
+                Section {
+                  ForEach(section.1) { event in
+                    EventRow(event: event)
+                  }
+                } header: {
+                  HStack {
+                    Text(section.0)
+                      .foregroundColor(.black)
+                      .font(.system(size: 12, weight: .regular))
+                    Spacer()
+                  }.padding(.leading, 12)
+                }
+                .id(section.0)
+              }
+            }
+            .onAppear {
+              if let nextAvailable = events.last?.0 {
+                proxy.scrollTo(nextAvailable, anchor: .top)
+              }
+            }
+          }
+        } // ScrollViewReader
       }
       .toolbar {
         ToolbarItem(placement: .navigationBarLeading) {
@@ -95,9 +117,18 @@ struct EventList: View {
 #if DEBUG
 struct EventList_Previews: PreviewProvider {
   static var previews: some View {
-    ScrollView {
+    VStack {
       CustomDatePicker(selectedDate: .constant(Date()),
-                       events: .constant([]))
+                       events: .constant([]),
+                       didSelectDate: { })
+      ScrollView {
+        List((1...20), id: \.self) { count in
+          HStack {
+            Text("\(count)")
+            EventRow(event: fakeTopic)
+          }
+        }
+      }
     }
   }
 }

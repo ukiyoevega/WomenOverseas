@@ -19,9 +19,11 @@ extension String {
 
 extension Date {
   static let dateFormatter: DateFormatter = DateFormatter()
-  
-  var dateString: String {
-    return ""
+
+  init(string: String, format: String = "yyyy-MM-dd")  {
+    let formatter = Date.dateFormatter
+    formatter.dateFormat = format
+    self = formatter.date(from: string) ?? Date()
   }
 
   var calendarTitle: String {
