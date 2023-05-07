@@ -28,5 +28,9 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSCalendarsUsageDescription</key>
+	<string>她乡需要日历权限</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>她乡需要提醒权限</string>
 </dict>
 </plist>

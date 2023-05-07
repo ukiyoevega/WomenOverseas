@@ -73,6 +73,7 @@
 		B2F75FE52863F8800036E28A /* BookmarkCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F75FE42863F8800036E28A /* BookmarkCore.swift */; };
 		B2F75FE72863F94E0036E28A /* NotificationCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F75FE62863F94E0036E28A /* NotificationCore.swift */; };
 		B2F75FE92863F9FB0036E28A /* PlainTopicListCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F75FE82863F9FB0036E28A /* PlainTopicListCore.swift */; };
+		B616F26F2A074B190013F52D /* EventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B616F26E2A074B190013F52D /* EventHandler.swift */; };
 		B6E398A729E18C7A00658A09 /* EventList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E398A629E18C7A00658A09 /* EventList.swift */; };
 		B6E3997E29F114A300658A09 /* CustomDatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E3997D29F114A300658A09 /* CustomDatePicker.swift */; };
 		B6E3998229F2466900658A09 /* EventRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E3998129F2466900658A09 /* EventRow.swift */; };
@@ -147,6 +148,7 @@
 		B2F75FE42863F8800036E28A /* BookmarkCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkCore.swift; sourceTree = "<group>"; };
 		B2F75FE62863F94E0036E28A /* NotificationCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCore.swift; sourceTree = "<group>"; };
 		B2F75FE82863F9FB0036E28A /* PlainTopicListCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainTopicListCore.swift; sourceTree = "<group>"; };
+		B616F26E2A074B190013F52D /* EventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventHandler.swift; sourceTree = "<group>"; };
 		B6E398A629E18C7A00658A09 /* EventList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventList.swift; sourceTree = "<group>"; };
 		B6E3997D29F114A300658A09 /* CustomDatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDatePicker.swift; sourceTree = "<group>"; };
 		B6E3998129F2466900658A09 /* EventRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventRow.swift; sourceTree = "<group>"; };
@@ -349,6 +351,7 @@
 				B6E398A629E18C7A00658A09 /* EventList.swift */,
 				B6E3998129F2466900658A09 /* EventRow.swift */,
 				B6E3997D29F114A300658A09 /* CustomDatePicker.swift */,
+				B616F26E2A074B190013F52D /* EventHandler.swift */,
 			);
 			path = Event;
 			sourceTree = "<group>";
@@ -456,6 +459,7 @@
 				B2B8FB8128654D0400F34FEF /* UserAction.swift in Sources */,
 				B2F75FE52863F8800036E28A /* BookmarkCore.swift in Sources */,
 				B264428A283FB3EA00FBEDCE /* EndPoint.Noti.swift in Sources */,
+				B616F26F2A074B190013F52D /* EventHandler.swift in Sources */,
 				B2AA08762814330D0065A30E /* SceneDelegate.swift in Sources */,
 				B2F75FE72863F94E0036E28A /* NotificationCore.swift in Sources */,
 				B2AA67A128459D10006F50C0 /* Color+Extension.swift in Sources */,

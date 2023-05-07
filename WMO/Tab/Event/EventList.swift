@@ -17,6 +17,7 @@ struct EventList: View {
   @State private var events: [(String, [Topic])] = []
   @State private var selectedDate = Date()
   @State private var isListMode = false
+  @State private var eventStates = EventHandler.shared.eventStates
 
   private var flatEvents: [Topic] {
     events.reduce([], { partialResult, next in
@@ -65,7 +66,7 @@ struct EventList: View {
               ForEach(events, id: \.0) { section in
                 Section {
                   ForEach(section.1) { event in
-                    EventRow(event: event)
+                    EventRow(event: event, isAdded: EventHandler.shared.containEvent(id: "\(event.id)"))
                   }
                 } header: {
                   HStack {
@@ -103,7 +104,7 @@ struct EventList: View {
               Image(systemName: isListMode ? "calendar" : "list.bullet.rectangle")
                 .font(.system(size: 14, weight: .medium))
             }.foregroundColor(Color.mainIcon)
-            NavigationLink(destination: Text("add event")) {
+            NavigationLink(destination: Webview(type: .home, url: "https://womenoverseas.com/t/topic")) {
               Image(systemName: "plus.circle")
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(Color.mainIcon)
@@ -125,7 +126,7 @@ struct EventList_Previews: PreviewProvider {
         List((1...20), id: \.self) { count in
           HStack {
             Text("\(count)")
-            EventRow(event: fakeTopic)
+            EventRow(event: fakeTopic, isAdded: true)
           }
         }
       }
