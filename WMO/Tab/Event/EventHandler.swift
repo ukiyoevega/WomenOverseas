@@ -15,9 +15,9 @@ class EventHandler {
   static let shared = EventHandler()
   private var store = EKEventStore()
   
-  public var eventStates: [String: Bool] {
+  public var eventStates: [String: String] {
     get {
-      UserDefaults.standard.value(forKey: eventStateUserDefaultKey) as? [String: Bool] ?? [:]
+      UserDefaults.standard.value(forKey: eventStateUserDefaultKey) as? [String: String] ?? [:]
     }
     set {
       UserDefaults.standard.set(newValue, forKey: eventStateUserDefaultKey)
@@ -31,6 +31,24 @@ class EventHandler {
       } else if granted {
         onFinish(nil)
       }
+    }
+  }
+
+  public func removeEvent(_ event: Topic,
+                          onFinish: @escaping (Error?) -> Void) {
+    guard let eventIdentifier = self.eventStates["\(event.id)"],
+    let ekevent = self.store.event(withIdentifier: eventIdentifier) else {
+      return
+    }
+    ekevent.alarms?.forEach { alarm in
+      ekevent.removeAlarm(alarm)
+    }
+    do {
+      try self.store.remove(ekevent, span: .thisEvent)
+      self.eventStates.removeValue(forKey: "\(event.id)")
+      onFinish(nil)
+    } catch {
+      onFinish(error)
     }
   }
 
@@ -52,7 +70,7 @@ class EventHandler {
       ekEvent.addAlarm(EKAlarm(relativeOffset: -86400)) // a day before
       do {
         try store.save(ekEvent, span: .thisEvent, commit: true)
-        self?.eventStates["\(event.id)"] = true
+        self?.eventStates["\(event.id)"] = ekEvent.eventIdentifier
         onFinish(nil)
       } catch {
         onFinish(error)
@@ -61,6 +79,6 @@ class EventHandler {
   }
 
   public func containEvent(id: String) -> Bool {
-    return eventStates[id] ?? false
+    return eventStates[id] != nil
   }
 }

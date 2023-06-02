@@ -29,8 +29,8 @@
 		</dict>
 	</dict>
 	<key>NSCalendarsUsageDescription</key>
-	<string>她乡需要日历权限</string>
+	<string>她乡需要访问你的日历和提醒权限，以便为你发送Event提醒</string>
 	<key>NSRemindersUsageDescription</key>
-	<string>她乡需要提醒权限</string>
+	<string>她乡需要访问你的日历和提醒权限，以便为你发送Event提醒</string>
 </dict>
 </plist>

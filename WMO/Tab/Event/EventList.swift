@@ -104,11 +104,13 @@ struct EventList: View {
               Image(systemName: isListMode ? "calendar" : "list.bullet.rectangle")
                 .font(.system(size: 14, weight: .medium))
             }.foregroundColor(Color.mainIcon)
+            /*
             NavigationLink(destination: Webview(type: .home, url: "https://womenoverseas.com/t/topic")) {
               Image(systemName: "plus.circle")
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(Color.mainIcon)
             }
+             */
           }
       )
     }

@@ -64,13 +64,19 @@ struct EventRow: View {
               Spacer()
               if !invalid {
                 Button {
-                  if !isAdded {
+                  if isAdded {
+                    EventHandler.shared.removeEvent(event) { error in
+                      if error == nil {
+                        isAdded = false
+                      }
+                    }
+                  } else {
                     EventHandler.shared.addEvent(event) { error in
                       isAdded = error == nil // TODO: toast error
                     }
                   }
                 } label: {
-                  (Text(Image(systemName: "checkmark")) + (isAdded ? Text("已添加") : Text("添加提醒")))
+                  (Text(Image(systemName: "checkmark")) + (isAdded ? Text("取消提醒") : Text("添加提醒")))
                     .font(.system(size: titleFontSize))
                     .foregroundColor(isAdded ? signedTextColor : unsignTextColor)
                     .background(isAdded ? .white : .eventTint)
@@ -81,7 +87,6 @@ struct EventRow: View {
                     )
                     .cornerRadius(buttonCornerRadius)
                 }
-                .disabled(isAdded)
               }
             }
           }
