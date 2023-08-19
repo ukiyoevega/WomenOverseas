@@ -34,7 +34,7 @@ enum UserActionAction {
   case dismissToast
 }
 
-let userActionReducer = Reducer<UserActionState, UserActionAction, TopicEnvironment> { state, action, environment in
+let userActionReducer = AnyReducer<UserActionState, UserActionAction, TopicEnvironment> { state, action, environment in
   switch action {
   case .loadUserAction(let onStart):
     if onStart {

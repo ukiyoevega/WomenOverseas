@@ -45,7 +45,7 @@ struct TopicEnvironment {
   let mainQueue: AnySchedulerOf<DispatchQueue> = .main
 }
 
-let topicReducer = Reducer<TopicState, TopicAction, TopicEnvironment> { state, action, environment in
+let topicReducer = AnyReducer<TopicState, TopicAction, TopicEnvironment> { state, action, environment in
   switch action {
   case .toggleSortSheet:
     state.showSortSheet = !state.showSortSheet

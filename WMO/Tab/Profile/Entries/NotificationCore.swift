@@ -21,7 +21,7 @@ enum NotificationAction {
   
 }
 
-let notificationReducer = Reducer<NotificationState, NotificationAction, ProfileEnvironment> { state, action, environment in
+let notificationReducer = AnyReducer<NotificationState, NotificationAction, ProfileEnvironment> { state, action, environment in
   switch action {
   case .dismissToast:
     state.toastMessage = nil

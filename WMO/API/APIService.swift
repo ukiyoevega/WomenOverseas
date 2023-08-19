@@ -82,7 +82,7 @@ struct APIService {
     }
   }
 
-  static func generateDataTaskPublisher<ResponseType: Decodable>(endpoint: RESTful) -> Effect<ResponseType, Failure> {
+  static func generateDataTaskPublisher<ResponseType: Decodable>(endpoint: RESTful) -> EffectPublisher<ResponseType, Failure> {
     return URLSession.shared.dataTaskPublisher(for: generateRequest(endpoint: endpoint))
       .map { data, _ in data }
       .decode(type: ResponseType.self, decoder: JSONDecoder())
@@ -93,39 +93,39 @@ struct APIService {
       .eraseToEffect()
   }
   
-  lazy var getUserActions: (EndPoint.Topics) -> Effect<UserActionResponse, Failure> = {
+  lazy var getUserActions: (EndPoint.Topics) -> EffectPublisher<UserActionResponse, Failure> = {
     return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
   }()
   
-  lazy var bookmark: (EndPoint.Bookmarks) -> Effect<BookmarkResponse, Failure> = {
+  lazy var bookmark: (EndPoint.Bookmarks) -> EffectPublisher<BookmarkResponse, Failure> = {
     return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
   }()
   
-  lazy var updateUser: (EndPoint.User) -> Effect<UserResponse, Failure> = {
+  lazy var updateUser: (EndPoint.User) -> EffectPublisher<UserResponse, Failure> = {
     return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
   }()
   
-  lazy var getUser: (EndPoint.User) -> Effect<UserResponse, Failure> = {
+  lazy var getUser: (EndPoint.User) -> EffectPublisher<UserResponse, Failure> = {
     return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
   }()
   
-  lazy var getUserSummary: (EndPoint.User) -> Effect<UserSummaryResponse, Failure> = {
+  lazy var getUserSummary: (EndPoint.User) -> EffectPublisher<UserSummaryResponse, Failure> = {
     return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
   }()
   
-  lazy var getTopics: (EndPoint.Topics) -> Effect<TopicListResponse, Failure> = {
+  lazy var getTopics: (EndPoint.Topics) -> EffectPublisher<TopicListResponse, Failure> = {
     return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
   }()
   
-  lazy var getTags: (EndPoint.Tag) -> Effect<TagsResponse, Failure> = {
+  lazy var getTags: (EndPoint.Tag) -> EffectPublisher<TagsResponse, Failure> = {
     return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
   }()
   
-  lazy var getNotifications: (EndPoint.Noti) -> Effect<NotificationResponse, Failure> = {
+  lazy var getNotifications: (EndPoint.Noti) -> EffectPublisher<NotificationResponse, Failure> = {
     return { endpoint in APIService.generateDataTaskPublisher(endpoint: endpoint) }
   }()
   
-  lazy var getCategories: (EndPoint.Category) -> Effect<[CategoryList.Category], Failure> = {
+  lazy var getCategories: (EndPoint.Category) -> EffectPublisher<[CategoryList.Category], Failure> = {
     return { endpoint in
       return URLSession.shared.dataTaskPublisher(for: APIService.generateRequest(endpoint: endpoint))
         .map { data, _ in data }

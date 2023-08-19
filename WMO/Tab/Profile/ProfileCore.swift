@@ -31,7 +31,7 @@ enum ProfileHeaderAction {
   case updateResponse(Result<UserResponse, Failure>)
 }
 
-let profileHeaderReducer = Reducer<ProfileHeaderState, ProfileHeaderAction, ProfileEnvironment> { state, action, environment in
+let profileHeaderReducer = AnyReducer<ProfileHeaderState, ProfileHeaderAction, ProfileEnvironment> { state, action, environment in
   let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username")?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
   switch action {
   case .togglshowInfo:
@@ -80,7 +80,7 @@ enum ProfileSummaryAction {
   case userResponse(Result<UserSummaryResponse, Failure>)
 }
 
-let profileSummaryReducer = Reducer<ProfileSummaryState, ProfileSummaryAction, ProfileEnvironment> { state, action, environment in
+let profileSummaryReducer = AnyReducer<ProfileSummaryState, ProfileSummaryAction, ProfileEnvironment> { state, action, environment in
   switch action {
   case .refresh:
     let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username")?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -117,7 +117,7 @@ enum ProfileAction {
 }
 
 // TODO: reducer should not be global instance
-let profileReducer = Reducer<ProfileState, ProfileAction, Void>.combine(
+let profileReducer = AnyReducer<ProfileState, ProfileAction, Void>.combine(
   profileSummaryReducer.pullback(
     state: \ProfileState.profileSummaryState,
     action: /ProfileAction.summary,
@@ -133,7 +133,7 @@ let profileReducer = Reducer<ProfileState, ProfileAction, Void>.combine(
     action: /ProfileAction.notification,
     environment: { ProfileEnvironment() }
   ),
-  Reducer { state, action, _ in
+  AnyReducer { state, action, _ in
     switch action {
     case .summary, .header, .notification:
       break

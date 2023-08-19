@@ -29,7 +29,7 @@ enum TagAction {
   case toggleSortSheet
 }
 
-let tagReducer = Reducer<TagState, TagAction, TopicEnvironment> { state, action, environment in
+let tagReducer = AnyReducer<TagState, TagAction, TopicEnvironment> { state, action, environment in
   switch action {
   case .toggleSortSheet:
     state.showSortSheet = !state.showSortSheet

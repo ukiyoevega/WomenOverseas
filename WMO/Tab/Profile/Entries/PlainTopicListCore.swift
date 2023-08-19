@@ -33,7 +33,7 @@ enum PlainTopicListAction {
   case dismissToast
 }
 
-let historyReducer = Reducer<PlainTopicListState, PlainTopicListAction, TopicEnvironment> { state, action, environment in
+let historyReducer = AnyReducer<PlainTopicListState, PlainTopicListAction, TopicEnvironment> { state, action, environment in
   switch action {
   case .loadTopics(let onStart):
     if onStart {

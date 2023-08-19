@@ -47,12 +47,12 @@ enum BookmarkAction {
   case categoriesResponse(Result<[CategoryList.Category], Failure>)
 }
 
-let bookmarkReducer = Reducer<BookmarkState, BookmarkAction, ProfileEnvironment> { state, action, environment in
+let bookmarkReducer = AnyReducer<BookmarkState, BookmarkAction, ProfileEnvironment> { state, action, environment in
   let username = UserDefaults.standard.string(forKey: "com.womenoverseas.username")?.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
   
   switch action {
   case .remove(let id):
-    let effect: Effect<RemoveBookmarkResponse, Failure> = APIService.generateDataTaskPublisher(endpoint: EndPoint.Bookmarks.delete(id: id))
+    let effect: EffectPublisher<RemoveBookmarkResponse, Failure> = APIService.generateDataTaskPublisher(endpoint: EndPoint.Bookmarks.delete(id: id))
     return effect
       .receive(on: environment.mainQueue)
       .map({ response in
@@ -63,7 +63,7 @@ let bookmarkReducer = Reducer<BookmarkState, BookmarkAction, ProfileEnvironment>
       .catchToEffect(BookmarkAction.removeRresponse)
     
   case .togglePin(let id):
-    let effect: Effect<[String: String], Failure> = APIService.generateDataTaskPublisher(endpoint: EndPoint.Bookmarks.togglePin(id: id))
+    let effect: EffectPublisher<[String: String], Failure> = APIService.generateDataTaskPublisher(endpoint: EndPoint.Bookmarks.togglePin(id: id))
     return effect
       .receive(on: environment.mainQueue)
       .map({ response in
