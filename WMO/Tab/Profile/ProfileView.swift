@@ -124,6 +124,7 @@ struct ProfileView: View {
   func entryRow(_ entry: SettingEntry, toggle: Binding<Bool>? = nil) -> some View {
     NavigationLink(destination: entryView(entry)) {
       entryRowView(entry)
+        .contentShape(Rectangle())
     }
     .navigationBarTitle("") // remove back button title
   }
